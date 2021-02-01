@@ -1,0 +1,19 @@
+{
+  "name": "korrekthor",
+  "version": "1.0.0",
+  "description": "Robotic project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasVandermeersch/KorreKthor.git"
+  },
+  "author": "Guillaume C. Guillaume B. Landry T. Martin S. Thomas V.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThomasVandermeersch/KorreKthor/issues"
+  },
+  "homepage": "https://github.com/ThomasVandermeersch/KorreKthor#readme"
+}
