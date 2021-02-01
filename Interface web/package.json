@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ThomasVandermeersch/KorreKthor/issues"
   },
-  "homepage": "https://github.com/ThomasVandermeersch/KorreKthor#readme"
+  "homepage": "https://github.com/ThomasVandermeersch/KorreKthor#readme",
+  "dependencies": {
+    "exceljs": "^4.2.0"
+  }
 }
