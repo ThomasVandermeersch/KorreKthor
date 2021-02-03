@@ -4,7 +4,8 @@
   "description": "Robotic project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,12 @@
   },
   "homepage": "https://github.com/ThomasVandermeersch/KorreKthor#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "csv": "^5.3.2",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "path": "^0.12.7",
+    "pug": "^3.0.0",
     "exceljs": "^4.2.0"
   }
 }

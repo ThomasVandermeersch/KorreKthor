@@ -1,0 +1,33 @@
+h1 Création du QCM
+
+p Liste des questions
+
+table(id="table")
+    each val in [1,2,3,4,5]
+        tr
+            td
+                p= "Question " + val
+            
+            each response in [1,2,3]
+                td
+                    input(
+                        class="checkboxClass"
+                        type="checkbox" 
+                        id="question"
+                        name= val 
+                        value="yes"
+                        )
+
+            td
+                button(
+                    class= "addChoice"
+                    type="button"
+                ) +
+
+button(id="addQuestion" type="button") Add Question
+button(id="removeLast" type="button") Remove last
+br
+button(id="send" type="button") Send
+
+
+script(src='/javascript/creationQCM.js')
