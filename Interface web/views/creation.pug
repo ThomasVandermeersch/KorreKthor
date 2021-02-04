@@ -1,5 +1,16 @@
 h1 Création du QCM
 
+p Importer les eleves
+
+form(action="/" method="POST" enctype="multipart/form-data")
+    input(id="fileForm" type="file" name="studentList")
+    br
+    input(type="submit", value="Submit file")
+
+p= "Fichier en ligne : "
+    div(id="filename")
+        =uploadedFilename
+
 p Liste des questions
 
 table(id="table")
