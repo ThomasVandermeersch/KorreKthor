@@ -13,8 +13,8 @@ var download = function(doc, uri, filename, index, last,sources,  callback){
       
       var answer = request(uri);
       
-      answer.pipe(fs.createWriteStream(filename).on('finish', async() => {
-        doc.image(filename, 50, 115);
+      answer.pipe(fs.createWriteStream("pre_pdf/QRCODE"+index+".PNG").on('finish', async() => {
+        doc.image("pre_pdf/QRCODE"+index+".PNG", 50, 115);
         doc.end();
         doc.pipe(fs.createWriteStream("pre_pdf/" + index.toString() + ".pdf"));
         console.log("Coucou");
@@ -34,6 +34,7 @@ var download = function(doc, uri, filename, index, last,sources,  callback){
             }else{
               for (file=0; file < sources.length; file++){
                   fs.unlinkSync("pre_pdf/" +file.toString()+ ".pdf");
+                  fs.unlinkSync("pre_pdf/QRCODE" +file.toString()+ ".PNG");
               }
               console.log('Successfully merged!');
             }
@@ -181,7 +182,8 @@ async function generateStudentInformation(doc, name, matricule, cours, index, la
 
 
     doc.text(`Date: ${date.getDay()}/${date.getMonth()+1}/${date.getFullYear()}`, 140, 150);
-    doc.text(`Cours: ${cours}`, 140, 165);   
+    doc.text(`Cours: ${cours}`, 140, 165); 
+    doc.text(`Version: ${version}`, 140, 180);   
 
   }
 
