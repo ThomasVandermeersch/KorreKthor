@@ -4,7 +4,7 @@ p Liste des questions
 
 div(id="questions")
     each questID in versions
-        div(id="question" + questID)
+        div(id=questID)
             h2= "Questionnaire " + questID
             table(id="table" class="tableClass")
                 each val in [1,2,3,4,5]
