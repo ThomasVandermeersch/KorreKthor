@@ -4,6 +4,7 @@ const request = require('request');
 const merge = require('easy-pdf-merge');
 const { versions } = require("process");
 const { version } = require("os");
+const { create } = require("domain");
 
 var download = function(doc, uri, filename, index, last,sources,  callback){
     request.head(uri, async function(err, res, body){
@@ -48,9 +49,6 @@ var download = function(doc, uri, filename, index, last,sources,  callback){
 
     return filename
   };
-
-
-
 
 async function createInvoice(students, cours, answers){
 
@@ -99,7 +97,7 @@ function generateTable(doc, answers) {
   for (question = 0; question < answers.length; question ++){
     doc.text("Question" + (question + 1).toString(),  125, 222 + (question*55));
     for (answer = 0; answer < answers[question].length; answer++){
-        doc.image("test/vide.PNG", 250 + (answer*55), 200 + (question*55) ); 
+        doc.image("result_pdf/vide.PNG", 250 + (answer*55), 200 + (question*55) ); 
     }
   }
 
@@ -127,12 +125,12 @@ function generateCorection(answers){
         // doc.text("ok", 250 + (answer*45), 300 + (question*30) );
           console.log("hauteur ***", answers[letter].indexOf(questions) );
           console.log("largeur ***", questions.indexOf(answer));
-          correction.image("test/rempli.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+          correction.image("result_pdf/rempli.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
           // correction.text("ok",  250 + (Aindex*55), 200 + (Qindex*55) );
         }else{
           console.log("Reponse ***", answer );
         // doc.text("", 250 + (answer*45), 300 + (question*30) );
-          correction.image("test/vide.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+          correction.image("result_pdf/vide.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
       }
       Aindex++;
       });
@@ -168,8 +166,6 @@ function generateCorection(answers){
   // correction.pipe(fs.createWriteStream("pre_pdf/correction" + version + ".pdf"));
 }
 
-
-
 async function generateStudentInformation(doc, name, matricule, cours, index, last, sources, version) {
 
     await download(doc, 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=Nom : ' + name + "\nMatricule : " + matricule + "\nCours : " + cours + "\nVersion : " + version, 'result_pdf/QRCode.PNG', index, last, sources, function(){
@@ -197,8 +193,9 @@ const answers = JSON.parse('{"A": [[true, false, false], [false, false, true, fa
 
 console.log(answers)
 console.log(students);
-createInvoice(students, 'Math', answers);
+//createInvoice(students, 'Math', answers);
 
+exports.createInvoice = createInvoice
 
 
 

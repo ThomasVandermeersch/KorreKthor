@@ -75,10 +75,9 @@ function sayHello(){ //test
 }
 
 
-exports.importStudents = sayHello
+exports.importStudents = importStudents
 exports.getVersions = getVersions
 exports.sayHello = sayHello
-
 
 //table = importStudents("./exemple_liste.xlsx").then(table => { console.log(table)})
 //versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})

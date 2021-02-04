@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const url = require('url')
 
 const functions = require("./functions")
+const QCM_automatisation = require("./QCM_automatisation")
 var multer  = require('multer') // Specific import for files 
 var storage = multer.diskStorage(
     {
@@ -35,10 +36,14 @@ app.get("/create/Step2", async function(req, res){
 })
 
 // Route to send answers
-app.post("/quest", upload.single("studentList"), (req, res, next)=>{
+app.post("/quest", upload.single("studentList"), async (req, res,next)=>{
     console.log(req.body)
     console.log(JSON.parse(req.body.liste))
     res.end("<h1> Hello World </h1>")
+    const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
+    const answers = JSON.parse(req.body.liste)
+    QCM_automatisation.createInvoice(students, 'Math', answers);
+
 })
 
 // Route to upload files
