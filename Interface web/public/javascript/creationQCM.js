@@ -38,7 +38,7 @@ document.querySelectorAll(".addChoice").forEach(item=>{
 
 
 //Add a question
-addQuestionButton.addEventListener("click", function(){
+addQuestionButton.addEventListener("click", function(event){
     nbquestion +=1  
     var row = table.insertRow(nbquestion-1)
     row.insertCell(0).innerHTML = "Question " + nbquestion
@@ -83,6 +83,8 @@ document.getElementById("send").addEventListener("click", function(){
 
 //Remove last column
 document.getElementById("removeLast").addEventListener("click",function(){
-    table.deleteRow(table.rows.length -1);
-    nbquestion = nbquestion -1
+    if (nbquestion > 1){
+        table.deleteRow(table.rows.length -1);
+        nbquestion = nbquestion -1
+    }
 })
