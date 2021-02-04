@@ -13,30 +13,37 @@ p= "Fichier en ligne : "
 
 p Liste des questions
 
-table(id="table")
-    each val in [1,2,3,4,5]
-        tr
-            td
-                p= "Question " + val
-            
-            each response in [1,2,3]
-                td
-                    input(
-                        class="checkboxClass"
-                        type="checkbox" 
-                        id="question"
-                        name= val 
-                        value="yes"
-                        )
+div(id="questions")
+    each questID in ["A","B","C","D"]
+        div(id="question" + questID)
+            h2= "Questionnaire " + questID
+            table(id="table" class="tableClass")
+                each val in [1,2,3,4,5]
+                    tr
+                        td
+                            p= "Question " + val
+                        
+                        each response in [1,2,3]
+                            td
+                                input(
+                                    class="checkboxClass"
+                                    type="checkbox" 
+                                    id="question"
+                                    name= val 
+                                    value="yes"
+                                    )
 
-            td
-                button(
-                    class= "addChoice"
-                    type="button"
-                ) +
+                        td
+                            button(
+                                class= "addChoice"
+                                type="button"
+                            ) +
 
-button(id="addQuestion" type="button") Add Question
-button(id="removeLast" type="button") Remove last
+            button(id="addQuestion" + questID type="button" class="addQuestion") Add Question
+            button(id="removeLast" +questID type="button" class="removeQuestion") Remove last
+
+br
+br
 br
 button(id="send" type="button") Send
 
