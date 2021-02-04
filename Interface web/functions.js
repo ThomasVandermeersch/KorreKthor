@@ -68,8 +68,17 @@ async function getVersions(path){
     });
 
     return versions
-
 }
 
-table = importStudents("./exemple_liste.xlsx").then(table => { console.log(table)})
-versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})
+function sayHello(){ //test
+  console.log("Hello World")
+}
+
+
+exports.importStudents = sayHello
+exports.getVersions = getVersions
+exports.sayHello = sayHello
+
+
+//table = importStudents("./exemple_liste.xlsx").then(table => { console.log(table)})
+//versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})
