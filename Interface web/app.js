@@ -25,21 +25,36 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // Main route
+app.get("/",function(req,res){
+    res.redirect("/create/Step1")
+})
+
+app.get("/create/downloads", (req, res) => {
+  res.download(
+    path.join('downloads', "ResultatFinal.pdf" ),
+    (err) => {
+      if (err) res.status(404).send("<h1>File Not found: 404</h1>");
+    }
+  );
+});
 app.get("/create/Step1",function(req,res){
     res.render('creation2',{title:"QCM CREATOR"})
 })
 
 app.get("/create/Step2", async function(req, res){
     var versions = await functions.getVersions("./uploads/"+req.query.filename)
-    console.log(req.query)
     res.render('creation',{title:"QCM CREATOR", "uploadedFilename": "None",versions:versions})
+})
+
+app.get("/create/Step3",function(req,res){
+    res.render('creation3')
 })
 
 // Route to send answers
 app.post("/quest", upload.single("studentList"), async (req, res,next)=>{
     console.log(req.body)
     console.log(JSON.parse(req.body.liste))
-    res.end("<h1> Hello World </h1>")
+    res.redirect("./create/Step3")
     const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
     const answers = JSON.parse(req.body.liste)
     QCM_automatisation.createInvoice(students, 'Math', answers);

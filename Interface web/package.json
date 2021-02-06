@@ -18,13 +18,22 @@
   },
   "homepage": "https://github.com/ThomasVandermeersch/KorreKthor#readme",
   "dependencies": {
+    "async": "^3.2.0",
     "body-parser": "^1.19.0",
     "csv": "^5.3.2",
+    "delay": "^5.0.0",
+    "easy-pdf-merge": "^0.2.6",
     "exceljs": "^4.2.0",
     "express": "^4.17.1",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.5.0",
     "multer": "^1.4.2",
     "nodemon": "^2.0.7",
     "path": "^0.12.7",
-    "pug": "^3.0.0"
+    "pdf-merge": "^1.2.0",
+    "pdf-merger-js": "^3.0.5",
+    "pdfmerge": "^1.0.2",
+    "pug": "^3.0.0",
+    "qrcode": "^1.4.4"
   }
 }

@@ -9,7 +9,7 @@ async function importStudents(path){
     await workbook.xlsx.readFile(path);
     const worksheet = workbook.worksheets[0];
     
-    var table = {}
+    var table = []
     var target = 1000
     var matricule = 0
     var student = 0
@@ -25,15 +25,17 @@ async function importStudents(path){
         matricule = indexMatr
         student = indexEtu
         version = indexVersion
-        console.log("Target:", target)
-        console.log(version)
+        // console.log("Target:", target)
+        // console.log(version)
       }
 
       if (target < rowNumber){
         studentDict = {}
         studentDict["name"] = row.values[student]
         studentDict["version"] = row.values[version]
-        table[`${row.values[matricule]}`] = studentDict
+        studentDict["matricule"] = row.values[matricule]
+        table.push(studentDict)
+        //table[`${row.values[matricule]}`] = studentDict
       }
     });
 
@@ -77,7 +79,7 @@ function sayHello(){ //test
 
 exports.importStudents = importStudents
 exports.getVersions = getVersions
-exports.sayHello = sayHello
+// exports.sayHello = sayHello
 
-//table = importStudents("./exemple_liste.xlsx").then(table => { console.log(table)})
+//table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
 //versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})
