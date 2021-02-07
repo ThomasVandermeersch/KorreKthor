@@ -27,11 +27,11 @@ async function mergeOnePDF(sources){
 }
 
 
-async function createInvoice(students, cours, answers){
+async function createInvoice(students, cours, answers,res){
   generateCorection(answers);
   var sources = [];
   var max = students.length
-  let done =false
+  let nbDone = 0
   Async.forEach(students, async (student)=>{
     let doc = new PDFDocument();
     let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
@@ -50,9 +50,10 @@ async function createInvoice(students, cours, answers){
     
     console.log("hehe")
     writeStream.on('finish',async function(){
-      if(sources.length == max && done==false){
-        done= true
-        await delay(1000);
+      nbDone++;
+      if(nbDone == max){
+        console.log(sources.length)
+        //await delay(8*sources.length);
         m = new PDFMerger()
        var version = Object.keys(answers);
        
@@ -65,8 +66,10 @@ async function createInvoice(students, cours, answers){
         })
         await m.save('./downloads/ResultatFinal.pdf'); //save under given name
         //var zippath = ["pre_pdf/QuestinnaireEtudiant.pdf"]
+        console.log("doneee")
+        res.redirect("./create/Step3")
         var zip = new JSZip();
-
+        
         // var version = Object.keys(answers);
         // zip.file("pre_pdf/QuestinnaireEtudiant.pdf")
         // version.forEach(letter=>{
@@ -84,21 +87,16 @@ async function createInvoice(students, cours, answers){
 
     }})
 
-
     QRCode.toFile('pre_pdf/fff'+student.matricule + ".png",
       'Nom : ' + student.name + "\nMatricule : " + student.matricule + "\nCours : " + cours + "\nVersion : " + student.version,
       function (err) {
         console.log('done')
         doc.image('pre_pdf/fff'+student.matricule + ".png", 50, 115,{scale:0.45});
         doc.pipe(writeStream);
-        doc.end();
-        
-    console.log("Finished finished")
-      
+        doc.end();      
     })
   })  
-  }
-
+}
 
 
 function generateHeader(doc) {
@@ -120,55 +118,50 @@ for (question = 0; question < answers.length; question ++){
 }
 
 function generateCorection(answers){
-var version = Object.keys(answers);
+  var version = Object.keys(answers);
+  version.forEach((letter) => {
+    //console.log(letter);
+    let correction = new PDFDocument();
 
-version.forEach((letter) => {
-  //console.log(letter);
-  let correction = new PDFDocument();
-
-  correction.fontSize(20);
-  correction.text("Correctif version : " + letter, 110, 57, { align: "center" });
-  Qindex = 0;
-  answers[letter].forEach((questions) => {
-    Aindex = 0;
-    correction.text("Question " + (answers[letter].indexOf(questions)+1).toString(),  125, 222 + Qindex*55);
-    questions.forEach((answer) => {
-      //console.log("---->", answer);
-      if (answer==true){
-      // doc.text("ok", 250 + (answer*45), 300 + (question*30) );
-        //console.log("hauteur ***", answers[letter].indexOf(questions) );
-        //console.log("largeur ***", questions.indexOf(answer));
-        correction.image("result_pdf/rempli.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
-        // correction.text("ok",  250 + (Aindex*55), 200 + (Qindex*55) );
-      }else{
-        //console.log("Reponse ***", answer );
-      // doc.text("", 250 + (answer*45), 300 + (question*30) );
-        correction.image("result_pdf/vide.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
-    }
-    Aindex++;
+    correction.fontSize(20);
+    correction.text("Correctif version : " + letter, 110, 57, { align: "center" });
+    Qindex = 0;
+    answers[letter].forEach((questions) => {
+      Aindex = 0;
+      correction.text("Question " + (answers[letter].indexOf(questions)+1).toString(),  125, 222 + Qindex*55);
+      questions.forEach((answer) => {
+        //console.log("---->", answer);
+        if (answer==true){
+        // doc.text("ok", 250 + (answer*45), 300 + (question*30) );
+          //console.log("hauteur ***", answers[letter].indexOf(questions) );
+          //console.log("largeur ***", questions.indexOf(answer));
+          correction.image("result_pdf/rempli.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+          // correction.text("ok",  250 + (Aindex*55), 200 + (Qindex*55) );
+        }else{
+          //console.log("Reponse ***", answer );
+        // doc.text("", 250 + (answer*45), 300 + (question*30) );
+          correction.image("result_pdf/vide.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+      }
+      Aindex++;
+      });
+      Qindex++;
     });
-    Qindex++;
+    correction.end();
+    correction.pipe(fs.createWriteStream("pre_pdf/correction" + letter + ".pdf"));
   });
-  correction.end();
-  correction.pipe(fs.createWriteStream("pre_pdf/correction" + letter + ".pdf"));
-});
 }
 
-
-const path = "result_pdf"
-// const students = {17036:{name: "CAESTECKER Guillaume", version : "A", matricule: "17036"}, 
-//                   17076: {name:"BOUILLON Guillaume",  version :"B", matricule: "17076"}};
-const answers = JSON.parse('{"A": [[true, false, false], [false, false, true, false], [false, false, true, true]], "B": [[true, false,true, false], [false, true, false], [false, false, true]]}');
-
 async function call(){
+  // const path = "result_pdf"
+  // const students = {17036:{name: "CAESTECKER Guillaume", version : "A", matricule: "17036"}, 
+  //                   17076: {name:"BOUILLON Guillaume",  version :"B", matricule: "17076"}};
+  const answers = JSON.parse('{"A": [[true, false, false], [false, false, true, false], [false, false, true, true]], "B": [[true, false,true, false], [false, true, false], [false, false, true]]}');
 
+  const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
+  // console.log(answers)
+  // console.log(students);
 
-const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
-// console.log(answers)
-// console.log(students);
-
-createInvoice(students, 'Math', answers);
-
+  createInvoice(students, 'Math', answers);
 }
 
 //call()

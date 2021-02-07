@@ -54,10 +54,12 @@ app.get("/create/Step3",function(req,res){
 app.post("/quest", upload.single("studentList"), async (req, res,next)=>{
     console.log(req.body)
     console.log(JSON.parse(req.body.liste))
-    res.redirect("./create/Step3")
+    
+    //res.redirect("./create/Step3") //res.redirect est appelé lorsque la fonction de création a terminé
+    
     const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
     const answers = JSON.parse(req.body.liste)
-    QCM_automatisation.createInvoice(students, 'Math', answers);
+    QCM_automatisation.createInvoice(students, 'Math', answers,res);
 
 })
 
