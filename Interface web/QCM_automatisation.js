@@ -1,9 +1,6 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const request = require('request');
 const merge = require('easy-pdf-merge');
-const { versions } = require("process");
-const { version } = require("os");
 const { create } = require("domain");
 const PDFMerger = require('pdf-merger-js');
 const Async = require('async')
@@ -28,13 +25,19 @@ async function mergeOnePDF(sources){
 
 
 async function createInvoice(students, cours, answers,res){
+
+  var pre_pdf = "pre_pdf/"
+  if (!fs.existsSync(pre_pdf)){
+    fs.mkdirSync(pre_pdf)
+  }
+
   generateCorection(answers);
   var sources = [];
   var max = students.length
   let nbDone = 0
   Async.forEach(students, async (student)=>{
     let doc = new PDFDocument();
-    let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
+    let writeStream = fs.createWriteStream(pre_pdf + (student.matricule).toString() + ".pdf")
 
     generateHeader(doc); //Mise des carés et d'un titre
     generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
