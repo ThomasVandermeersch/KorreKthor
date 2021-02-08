@@ -1,0 +1,17 @@
+h1 Création du QCM
+
+h2 Etape 2 : Importer les versions des questionnaires
+
+p Liste des etudiants : 
+div(id="filename")
+    p= uploadedFilename
+
+form(action="/sendQuestions" method="POST" enctype="multipart/form-data")
+    each questID in versions 
+        div(id="question" + questID)
+            p= "Questionnaire " + questID 
+            input(id="fileForm"+questID type="file" name="question")
+
+    input(id="versions" type="hidden" name="versions", value=versions)
+    input(id="listeEtu" type="hidden" name="listeEtu", value=uploadedFilename)
+    input(type="submit", value="Submit all files")

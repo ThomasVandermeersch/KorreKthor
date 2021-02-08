@@ -1,7 +1,9 @@
-
 function post(path, params, method='post') {
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
+    /**
+     * "handmade" javascript POST function
+     * This function make a posts request to path with params as args
+     */
+
     const form = document.createElement('form');
     form.method = method;
     form.action = path;
@@ -16,6 +18,7 @@ function post(path, params, method='post') {
         form.appendChild(hiddenField);
       }
     }
+
     document.body.appendChild(form);
     form.submit();
   }
@@ -29,6 +32,7 @@ document.querySelectorAll(".addChoice").forEach(item=>{
     })
 })
 
+// Add a question to a version
 document.querySelectorAll(".addQuestion").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.childNodes[1]
@@ -52,9 +56,7 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
     })
 })
 
-
-//Remove last column
-
+//Remove last line in a version
 document.querySelectorAll(".removeQuestion").forEach(item=>{
     item.addEventListener('click',function(){
         var table =  item.parentNode.childNodes[1]
@@ -65,26 +67,25 @@ document.querySelectorAll(".removeQuestion").forEach(item=>{
     })
 })
 
-
-
 //Send question to the server
 document.getElementById("send").addEventListener("click", function(){
     var responseObject = {}
     document.getElementById("questions").childNodes.forEach(childNode=>{
         //Prepare the response object
         responseObject[childNode.id] = [[]] //add the first div
-        var table = childNode.childNodes[1]//get table of first div
+        var table = childNode.childNodes[1] //get table of first div
         for(let i=0; i<table.rows.length -1; i++){
             responseObject[childNode.id].push([])
         }
     })
-        //Fill in the responseObject
-        document.querySelectorAll(".checkboxClass").forEach(item=>{
-            //associate the item to a table.
-            var id = item.parentNode.parentNode.parentNode.parentNode.parentNode.id //lol
-            var row = item.parentNode.parentNode.rowIndex
-            var col = item.parentNode.cellIndex
-            responseObject[id][row][col -1] = item.checked
-        })
-        post("/quest", {"liste":JSON.stringify(responseObject)})
+    //Fill in the responseObject
+    document.querySelectorAll(".checkboxClass").forEach(item=>{
+        //associate the item to a table.
+        var id = item.parentNode.parentNode.parentNode.parentNode.parentNode.id //lol
+        var row = item.parentNode.parentNode.rowIndex
+        var col = item.parentNode.cellIndex
+        responseObject[id][row][col -1] = item.checked
+    })
+    
+    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText})
 })

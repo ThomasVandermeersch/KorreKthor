@@ -2,7 +2,8 @@ const ExcelJS = require('exceljs');
 
 async function importStudents(path){
   /**
-   * Get students infos : { $matricule : {"name": $name, "version": $version} }
+   * Function that get students infos from an formated excel 
+   * Return structure : [{"name": $name, "version": $version, "matricule" : $matricule}, ... ]
    */
 
     const workbook = new ExcelJS.Workbook();
@@ -25,8 +26,6 @@ async function importStudents(path){
         matricule = indexMatr
         student = indexEtu
         version = indexVersion
-        // console.log("Target:", target)
-        // console.log(version)
       }
 
       if (target < rowNumber){
@@ -35,7 +34,6 @@ async function importStudents(path){
         studentDict["version"] = row.values[version]
         studentDict["matricule"] = row.values[matricule]
         table.push(studentDict)
-        //table[`${row.values[matricule]}`] = studentDict
       }
     });
 
@@ -45,6 +43,7 @@ async function importStudents(path){
 async function getVersions(path){
   /**
    * Function that returns the number of version in a list
+   * Return structure : ["A", "B", ... ]
    */
 
     const workbook = new ExcelJS.Workbook();
@@ -72,14 +71,8 @@ async function getVersions(path){
     return versions
 }
 
-function sayHello(){ //test
-  console.log("Hello World")
-}
-
-
 exports.importStudents = importStudents
 exports.getVersions = getVersions
-// exports.sayHello = sayHello
 
 //table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
 //versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})

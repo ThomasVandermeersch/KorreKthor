@@ -3,20 +3,21 @@ const path = require("path")
 const bodyParser = require('body-parser');
 const url = require('url')
 
-const functions = require("./functions")
-const QCM_automatisation = require("./QCM_automatisation")
+const functions = require("./node_scripts/functions")
+const QCM_automatisation = require("./node_scripts/QCM_automatisation")
 var multer  = require('multer') // Specific import for files 
 var storage = multer.diskStorage(
     {
         destination: './uploads/',
         filename: function(req, file, cb){
-            console.log(cb(null, file.originalname))
+            cb(null, file.originalname)
         }
     }
 )
 var upload = multer({ storage: storage})
 
 
+// Initializing the app
 app = express()
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -29,6 +30,7 @@ app.get("/",function(req,res){
     res.redirect("/create/Step1")
 })
 
+// Download final pdf route 
 app.get("/create/downloads", (req, res) => {
   res.download(
     path.join('downloads', "ResultatFinal.pdf" ),
@@ -37,40 +39,63 @@ app.get("/create/downloads", (req, res) => {
     }
   );
 });
+
+// Route to upload file
 app.get("/create/Step1",function(req,res){
-    res.render('creation2',{title:"QCM CREATOR"})
+    res.render('uploadFile', {title:"QCM CREATOR"})
 })
 
-app.get("/create/Step2", async function(req, res){
-    var versions = await functions.getVersions("./uploads/"+req.query.filename)
-    res.render('creation',{title:"QCM CREATOR", "uploadedFilename": "None",versions:versions})
+// Route to upload questions
+app.get("/create/Step2",function(req,res){
+    var versions = JSON.parse(req.query.versions)
+    res.render('loadQuestions', {title:"QCM CREATOR", "uploadedFilename":req.query.filename, "versions":versions})
 })
 
-app.get("/create/Step3",function(req,res){
-    res.render('creation3')
+// Route to load the answers
+app.get("/create/Step3", function(req, res){
+    res.render('loadAnswers', {title:"QCM CREATOR", "uploadedFilename": req.query.filename, "versions":JSON.parse(req.query.versions), "files":JSON.parse(req.query.files)})
+})
+
+// Route to the download page
+app.get("/create/Step4",function(req,res){
+    res.render('downloadPDF')
 })
 
 // Route to send answers
-app.post("/quest", upload.single("studentList"), async (req, res,next)=>{
-    console.log(req.body)
-    console.log(JSON.parse(req.body.liste))
+app.post("/quest", upload.single("studentList"), async (req, res, next)=>{
+    filename = req.body.filename
     
-    //res.redirect("./create/Step3") //res.redirect est appelé lorsque la fonction de création a terminé
-    
-    const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
+    const students = await functions.importStudents("./uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
-    QCM_automatisation.createInvoice(students, 'Math', answers,res);
-
+    QCM_automatisation.createInvoice(students, 'Math', answers).then(res.redirect("./create/Step4"));
 })
 
-// Route to upload files
-app.post("/sendList", upload.single("studentList"), function(req, res, next) {
+// Route to upload the student list file
+app.post("/sendList", upload.single("studentList"), async function(req, res, next) {
+    var versions = await functions.getVersions("./uploads/"+req.file.originalname)
+
     res.redirect(url.format({
         pathname:"/create/Step2",
-        query: { filename: req.file.originalname}
-    }))
-          
-    //res.render('creation',{title:"QCM CREATOR", "uploadedFilename": req.file.originalname,versions : functions.getVersions('./uploads()')})
+        query: { filename: req.file.originalname, versions:JSON.stringify(versions)}
+    }))     
 })
 
+// Route to upload the question files
+app.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>{
+    var files = {}
+    var liste = JSON.parse(req.body.versions)
+
+    var i;
+    for (i = 0; i < liste.length; i++) {
+        files[liste[i]] = req.files[i].filename
+    }
+
+    res.redirect(url.format({
+        pathname:"/create/Step3",
+        query: { filename: req.body.listeEtu, versions:req.body.versions, files:JSON.stringify(files)}
+    }))
+
+})
+
+// Application port 8000
 app.listen(8000)

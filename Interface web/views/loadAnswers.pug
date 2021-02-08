@@ -1,6 +1,15 @@
 h1 Création du QCM
 
-p Liste des questions
+h2 Etape 3 : Remplissez les versions des questionnaires
+
+p Liste des questions pour : 
+div(id="filename")
+    p= uploadedFilename
+
+p Liste des fichiers :
+div(id="files")
+    each elem, i in files
+        li !{i} : !{elem}
 
 div(id="questions")
     each questID in versions
@@ -31,10 +40,6 @@ div(id="questions")
             button(id="addQuestion" + questID type="button" class="addQuestion") Add Question
             button(id="removeLast" +questID type="button" class="removeQuestion") Remove last
 
-br
-br
-br
 button(id="send" type="button") Send
 
-
-script(src='/javascript/creationQCM.js')
+script(src='/javascript/loadAnswers.js')
