@@ -1,15 +1,18 @@
 # KorreKthor <!-- omit in TOC -->
 
-- [Install dependencies](#install-dependencies)
-- [Run Project](#run-project)
-- [How to use](#how-to-use)
-- [Student list format](#student-list-format)
+- [Web interface](#web-interface)
+  - [Install dependencies](#install-dependencies)
+  - [Run Project](#run-project)
+  - [How to use](#how-to-use)
+  - [Student list format](#student-list-format)
+- [Code structure](#code-structure)
 
-## Install dependencies
+## Web interface
+### Install dependencies
 ````
 npm install
 ````
-## Run Project
+### Run Project
 Run :
 ````cmd
 node app.js
@@ -19,7 +22,7 @@ or, if you want to automaticly reload the server when changes :
 npm run start
 ````
 
-## How to use
+### How to use
 First, open your favorit browser and enter this url : http://localhost:8000/.
 
 Then, upload you student list and click **Submit file**.
@@ -34,7 +37,7 @@ For each version, select the correct answer(s) and click **Send**
 
 Wait a few seconds and your file is ready! Just click **Download**
 
-## Student list format
+### Student list format
 The student list must contain at least 3 columns :
 - *matricule* 
 - *etudiant*
@@ -44,3 +47,12 @@ The student list must contain at least 3 columns :
 Here is an example of stuent list :
 
 ![Student list exemple](Images/StudentList.png)
+
+## Code structure
+The main file to run is in "Interface Web"/
+
+The embedded javascript files are in "Interface web"/public/javascript/
+
+The backend files are located in "Interface web"/node_scripts/
+
+The .pug view files are in  "Interface web"/views/
