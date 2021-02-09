@@ -99,5 +99,9 @@ app.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>
 
 })
 
+app.get("/debug", function(req, res){
+    res.render("header")
+})
+
 // Application port 8000
 app.listen(8000)

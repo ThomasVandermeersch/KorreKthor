@@ -1,8 +1,19 @@
-h1 Création du QCM
+include header.pug
 
-h2 Etape 1 : Importer les eleves
-p Veuillez entrer le fichier Excel avec la liste d'élèves.
+div(class="container w-50")
+    div(class="progress mt-3 mb-2")
+        <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+    
+    h2 Etape 1 : Importer les eleves
 
-form(action="/sendList" method="POST" enctype="multipart/form-data")
-    input(id="fileForm" type="file" name="studentList")
-    input(type="submit", value="Submit file")
+    form(action="/sendList" method="POST" enctype="multipart/form-data")
+        div(class="row mt-3")
+            div(class="col-md-12")
+                label(for="fileForm" class="form-label") Veuillez entrer le fichier Excel avec la liste d'élèves.
+            div(class="col-md-10")
+                input(class="form-control" id="fileForm" type="file" name="studentList")
+            div(class="col-md-2")
+                input(class="btn btn-warning" type="submit", value="Submit file")
+
+
+include footer.pug
