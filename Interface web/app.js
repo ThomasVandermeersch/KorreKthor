@@ -64,10 +64,12 @@ app.get("/create/Step4",function(req,res){
 // Route to send answers
 app.post("/quest", upload.single("studentList"), async (req, res, next)=>{
     filename = req.body.filename
+
     
     const students = await functions.importStudents("./uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
-    QCM_automatisation.createInvoice(students, 'Math', answers).then(res.redirect("./create/Step4"));
+    const files = JSON.parse(req.body.files)
+    QCM_automatisation.createInvoice(students, 'Math', answers, files).then(res.redirect("./create/Step4"));
 })
 
 // Route to upload the student list file

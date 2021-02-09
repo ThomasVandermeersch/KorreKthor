@@ -86,6 +86,8 @@ document.getElementById("send").addEventListener("click", function(){
         var col = item.parentNode.cellIndex
         responseObject[id][row][col -1] = item.checked
     })
+
+    var files = document.getElementById("filesList")
     
-    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText})
+    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.parse(files.value)})
 })

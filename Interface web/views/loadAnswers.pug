@@ -10,7 +10,7 @@ p Liste des fichiers :
 div(id="files")
     each elem, i in files
         li !{i} : !{elem}
-
+    input(id="filesList" type="hidden" name="files" value=files)
 div(id="questions")
     each questID in versions
         div(id=questID)

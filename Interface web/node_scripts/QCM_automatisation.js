@@ -5,10 +5,10 @@ const Async = require('async')
 var QRCode = require('qrcode')
 
 
-async function createInvoice(students, cours, answers){
+async function createInvoice(students, cours, answers, fileVersions){
   /**
    * Function that create a printable pdf for teachers
-   * This function needs a student list, the course name, the answers array
+   * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
    * The output file is located in ./downloads 
    * Temps files are located in ./pre_pdf, ./result_pdf
    */
@@ -84,7 +84,7 @@ function generateHeader(doc) {
 
 function generateTable(doc, answers) {
   /**
-   * Function that generate 
+   * Function that generate table for the answers 
    */
 
   for (question = 0; question < answers.length; question ++){
