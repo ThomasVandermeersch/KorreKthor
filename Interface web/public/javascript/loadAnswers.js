@@ -89,5 +89,5 @@ document.getElementById("send").addEventListener("click", function(){
 
     var files = document.getElementById("filesList")
     
-    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.parse(files.value)})
+    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.stringify(files.value)})
 })
