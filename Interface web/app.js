@@ -63,12 +63,11 @@ app.get("/create/Step4",function(req,res){
 
 // Route to send answers
 app.post("/quest", upload.single("studentList"), async (req, res, next)=>{
-    filename = req.body.filename
-
-    
+    const filename = req.body.filename
     const students = await functions.importStudents("./uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
     const files = JSON.parse(req.body.files)
+
     QCM_automatisation.createInvoice(students, 'Math', answers, files).then(res.redirect("./create/Step4"));
 })
 
@@ -97,10 +96,6 @@ app.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>
         query: { filename: req.body.listeEtu, versions:req.body.versions, files:JSON.stringify(files)}
     }))
 
-})
-
-app.get("/debug", function(req, res){
-    res.render("loadQuestions")
 })
 
 // Application port 8000

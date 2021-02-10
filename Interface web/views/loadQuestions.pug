@@ -6,11 +6,12 @@ div(class="container w-50")
 
     h2 Etape 2 : Importer les versions des questionnaires
 
-    div(class="row row-cols-auto mt-3") 
-        div(class="col") Liste des etudiants : 
+    div(class="container border border-1 rounded mt-3")
+        div(class="row row-cols-auto my-2") 
+            div(class="col") Liste des etudiants : 
 
-        div(class="col p-0" id="filename")
-            b= uploadedFilename
+            div(class="col p-0" id="filename")
+                b= uploadedFilename
 
     form(action="/sendQuestions" method="POST" enctype="multipart/form-data")
         each questID in versions 

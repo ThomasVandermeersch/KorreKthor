@@ -28,30 +28,33 @@ document.querySelectorAll(".addChoice").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.parentNode.parentNode
         var row = table.rows[item.parentNode.parentNode.rowIndex]
-        row.insertCell(4).innerHTML +=  "<input type='checkbox' class='checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
+        row.insertCell(4).innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
     })
 })
 
 // Add a question to a version
 document.querySelectorAll(".addQuestion").forEach(item=>{
-    item.addEventListener("click",function(){
-        var table = item.parentNode.childNodes[1]
+    item.addEventListener("click", function(){
+        var table = item.parentNode.parentNode.childNodes[1]
         var nbRows = table.rows.length
         var row = table.insertRow()
         row.insertCell(0).innerHTML = "Question " + (nbRows + 1)
+
         for(let i=1; i < 4; i++ ){
-            row.insertCell(i).innerHTML = "<input type='checkbox' class='checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
+            row.insertCell(i).innerHTML = "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
         }
 
         var button = document.createElement("button")
-        button.type = "button"
+        button.classList.add("btn", "btn-secondary", "btn-sm", "addChoice-0")
         button.innerHTML = "+"
+
         row.insertCell(4).appendChild(button)
+        button.parentNode.classList.add("px-0", "mx-0")
 
         button.addEventListener("click",function(){
             var row2 = table.rows[button.parentNode.parentNode.rowIndex]
             var cell2 = row2.insertCell(4)
-            cell2.innerHTML +=  "<input type='checkbox' class='checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>" 
+            cell2.innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>" 
         })
     })
 })
@@ -59,7 +62,7 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
 //Remove last line in a version
 document.querySelectorAll(".removeQuestion").forEach(item=>{
     item.addEventListener('click',function(){
-        var table =  item.parentNode.childNodes[1]
+        var table =  item.parentNode.parentNode.childNodes[1]
         var lastRowIndex = table.rows.length  - 1
         if ( lastRowIndex > 0){
             table.deleteRow(lastRowIndex);
@@ -70,14 +73,14 @@ document.querySelectorAll(".removeQuestion").forEach(item=>{
 //Send question to the server
 document.getElementById("send").addEventListener("click", function(){
     var responseObject = {}
-    document.getElementById("questions").childNodes.forEach(childNode=>{
-        //Prepare the response object
-        responseObject[childNode.id] = [[]] //add the first div
-        var table = childNode.childNodes[1] //get table of first div
+    document.querySelectorAll(".tableClass").forEach(table =>{
+        responseObject[table.id] = [[]]
+
         for(let i=0; i<table.rows.length -1; i++){
-            responseObject[childNode.id].push([])
+            responseObject[table.id].push([])
         }
     })
+
     //Fill in the responseObject
     document.querySelectorAll(".checkboxClass").forEach(item=>{
         //associate the item to a table.
@@ -88,6 +91,6 @@ document.getElementById("send").addEventListener("click", function(){
     })
 
     var files = document.getElementById("filesList")
-    
+
     post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.stringify(files.value)})
 })
