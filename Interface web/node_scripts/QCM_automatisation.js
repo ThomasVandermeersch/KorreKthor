@@ -37,6 +37,7 @@ async function createInvoice(students, cours, answers, fileVersions){
     doc.text(`Version: ${student.version}`, 140, 180);
     
     sources.push("pre_pdf/" + (student.matricule).toString() + ".pdf")
+    const files = JSON.parse(fileVersions)
     
     writeStream.on('finish',async function(){
       nbDone++;
@@ -48,7 +49,11 @@ async function createInvoice(students, cours, answers, fileVersions){
           m.add("pre_pdf/correction" + letter + ".pdf")
         })
 
+
         sources.forEach(path=>{
+
+          index = sources.indexOf(path)
+          m.add("uploads/" + files[students[index].version])
           m.add(path)
         })
 
