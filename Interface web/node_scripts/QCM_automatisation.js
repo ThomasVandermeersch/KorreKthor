@@ -43,11 +43,14 @@ async function createInvoice(students, cours, answers, fileVersions){
       nbDone++;
       if(nbDone == max){
         m = new PDFMerger()
+        c = new PDFMerger()
         var version = Object.keys(answers);
        
         version.forEach(letter=>{
-          m.add("pre_pdf/correction" + letter + ".pdf")
+          c.add("pre_pdf/correction" + letter + ".pdf")
         })
+
+        await c.save('./downloads/Correction.pdf');
 
 
         sources.forEach(path=>{
