@@ -54,12 +54,16 @@ async function createInvoice(students, cours, answers, fileVersions){
 
 
         sources.forEach(path=>{
-
           index = sources.indexOf(path)
+          console.log(files[students[index].version])
+
+          
           m.add("uploads/" + files[students[index].version])
+          console.log("kikou")
           m.add(path)
         })
 
+        console.log("eheeh")
         await m.save('./downloads/ResultatFinal.pdf'); //save under given name
         console.log("Generation completed !")
 
@@ -96,9 +100,10 @@ function generateTable(doc, answers) {
    */
 
   for (question = 0; question < answers.length; question ++){
-    doc.text("Question" + (question + 1).toString(),  125, 222 + (question*55));
+    doc.fontSize(14);
+    doc.text("Question :" + (question + 1).toString(),  125, 252 + (question*25));
     for (answer = 0; answer < answers[question].length; answer++){
-        doc.image("result_pdf/vide.PNG", 250 + (answer*55), 200 + (question*55) );
+        doc.image("result_pdf/vide.PNG", 250 + (answer*35), 245 + (question*25) );
     }
   }
 }
@@ -112,18 +117,18 @@ function generateCorection(answers){
   version.forEach((letter) => {
     let correction = new PDFDocument();
 
-    correction.fontSize(20);
+    correction.fontSize(14);
     correction.text("Correctif version : " + letter, 110, 57, { align: "center" });
     Qindex = 0;
     answers[letter].forEach((questions) => {
       Aindex = 0;
-      correction.text("Question " + (answers[letter].indexOf(questions)+1).toString(),  125, 222 + Qindex*55);
+      correction.text("Question " + (answers[letter].indexOf(questions)+1).toString(),  125, 252 + Qindex*25);
       questions.forEach((answer) => {
         if (answer==true){
-          correction.image("result_pdf/rempli.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+          correction.image("result_pdf/rempli.PNG", 250 + (Aindex*35), 245 + (Qindex*25) )
         }
         else{
-          correction.image("result_pdf/vide.PNG", 250 + (Aindex*55), 200 + (Qindex*55) )
+          correction.image("result_pdf/vide.PNG", 250 + (Aindex*35), 245 + (Qindex*25) )
         }
         Aindex++;
       });
