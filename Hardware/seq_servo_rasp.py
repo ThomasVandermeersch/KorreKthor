@@ -50,21 +50,37 @@ right = 3
 ############# Movement #############
 ####################################
 def bLeft():
-    base.ChangeDutyCycle(left)
+    i = center
+    while i < left:
+        base.ChangeDutyCycle(i)
+        print(i)
+        time.sleep(.1)
+        i += 0.1
     time.sleep(2)   
 def bCenter():
     base.ChangeDutyCycle(center)
     time.sleep(2)
 def bRight():
-    base.ChangeDutyCycle(right)
+    i = center
+    while i > right:
+        base.ChangeDutyCycle(i)
+        print(i)
+        time.sleep(.1)
+        i -= 0.1
     time.sleep(2)
 
 def aDown():
     arm.ChangeDutyCycle(down)
     time.sleep(4)
 def aUp():
-    arm.ChangeDutyCycle(up)
+    i = down
+    while i > up:
+        arm.ChangeDutyCycle(i)
+        print(i)
+        time.sleep(.1)
+        i -= 0.1
     time.sleep(2)
+
 
 def valveON():
     GPIO.output(valvePIN, 1)
@@ -73,6 +89,8 @@ def valveON():
 def valveOFF():
     GPIO.output(valvePIN, 0)
     time.sleep(3)
+
+
 
 ####################################
 ############# Sequence #############
