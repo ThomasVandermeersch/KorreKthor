@@ -31,7 +31,7 @@ app.get("/",function(req,res){
 })
 
 // Download final pdf route 
-app.get("/create/downloads", (req, res) => {
+app.get("/create/downloadresult", (req, res) => {
   res.download(
     path.join('downloads', "ResultatFinal.pdf" ),
     (err) => {
@@ -39,6 +39,15 @@ app.get("/create/downloads", (req, res) => {
     }
   );
 });
+
+app.get("/create/downloadcorrection", (req, res) => {
+    res.download(
+        path.join('downloads', "Correction.pdf" ),
+        (err) => {
+            if (err) res.status(404).send("<h1>File Not found: 404</h1>");
+        }
+    );
+})
 
 // Route to upload file
 app.get("/create/Step1",function(req,res){
