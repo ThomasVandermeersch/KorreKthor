@@ -101,7 +101,7 @@ function generateTable(doc, answers) {
 
   for (question = 0; question < answers.length; question ++){
     doc.fontSize(14);
-    doc.text("Question :" + (question + 1).toString(),  125, 252 + (question*25));
+    doc.text("Question " + (question + 1).toString() + " :",  125, 252 + (question*25));
     for (answer = 0; answer < answers[question].length; answer++){
         doc.image("result_pdf/vide.PNG", 250 + (answer*35), 245 + (question*25) );
     }
