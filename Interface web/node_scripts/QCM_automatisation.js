@@ -59,26 +59,38 @@ async function createInvoice(students, cours, answers, fileVersions){
 
           
           m.add("uploads/" + files[students[index].version])
-          console.log("kikou")
           m.add(path)
+
         })
 
-        console.log("eheeh")
         await m.save('./downloads/ResultatFinal.pdf'); //save under given name
+
+        removeUnnecessary()
         console.log("Generation completed !")
 
     }})
 
     // QRCode generator
-    QRCode.toFile('pre_pdf/fff'+student.matricule + ".png",
+    QRCode.toFile('pre_pdf/'+student.matricule + ".png",
       'Nom : ' + student.name + "\nMatricule : " + student.matricule + "\nCours : " + 
                  cours + "\nVersion : " + student.version, function (err) {
 
-        doc.image('pre_pdf/fff'+student.matricule + ".png", 50, 115, {scale:0.45});
+        doc.image('pre_pdf/'+student.matricule + ".png", 50, 115, {scale:0.45});
         doc.pipe(writeStream);
-        doc.end();      
+        doc.end();
+
     })
   })  
+}
+
+function removeUnnecessary(){
+  fs.rmdir("pre_pdf/", { recursive: true }, (err) => {
+    if (err) {
+        throw err;
+    }
+
+    console.log('pre_pdf/ is deleted');
+});
 }
 
 function generateHeader(doc) {
