@@ -65,10 +65,17 @@ app.get("/create/Step3", function(req, res){
     res.render('loadAnswers', {title:"QCM CREATOR", "uploadedFilename": req.query.filename, "versions":JSON.parse(req.query.versions), "files":JSON.parse(req.query.files)})
 })
 
-// Route to the download page
+
+//Route de cotation
 app.get("/create/Step4",function(req,res){
+    res.render('cotation.pug')
+})
+
+// Route to the download page
+app.get("/create/Step5",function(req,res){
     res.render('downloadPDF')
 })
+
 
 // Route to send answers
 app.post("/quest", upload.single("studentList"), async (req, res, next)=>{
@@ -105,6 +112,17 @@ app.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>
         query: { filename: req.body.listeEtu, versions:req.body.versions, files:JSON.stringify(files)}
     }))
 
+})
+
+
+app.post("/sendNormalCotationCriteria", (req,res)=>{
+    console.log(req.body)
+    res.redirect('/create/Step5')
+})
+
+app.post("/sendAdvancedCotationCriteria",(req,res)=>{
+    console.log(req.body)
+    res.redirect('/create/Step5')
 })
 
 // Application port 8000
