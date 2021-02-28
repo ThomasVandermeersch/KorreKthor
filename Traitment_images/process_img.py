@@ -2,8 +2,6 @@ import numpy as np
 import cv2
 import glob
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import process_pdf
 import math
 from pyzbar.pyzbar import decode
 import json
