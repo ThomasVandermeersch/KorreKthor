@@ -4,3 +4,4 @@ fpdf
 Pillow
 PyMuPDF
 PyPDF2
+pyzbar

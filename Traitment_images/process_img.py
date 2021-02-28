@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import process_pdf
 import math
+from pyzbar.pyzbar import decode
+import json
 
 
 def process(imgPath):
@@ -14,6 +16,12 @@ def process(imgPath):
     """
     img_rgb = cv2.imread(imgPath)
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+    # img = cv2.resize(img, (710, 1024), interpolation=cv2.INTER_LINEAR)
+
+    # img[img>190] = 255
+    # cv2.imshow("img", img)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
 
     goodPage = isGoodPage(img)
 
@@ -29,7 +37,7 @@ def process(imgPath):
         return None
 
 
-def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.9):
+def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8):
     """
     This function checks is the povided image can be analysed (this means it has 3 templates: TL, TR, BL). 
     If yes returns the squares points list else None. 
@@ -38,7 +46,11 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.9)
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    template = cv2.resize(template, (210,210), interpolation=cv2.INTER_LINEAR)
+    template = cv2.resize(template, (150, 150), interpolation=cv2.INTER_LINEAR)
+
+    # cv2.imshow("img", template)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
 
     res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
     loc = np.where(res >= threshold)
@@ -85,12 +97,19 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     - The emptyTemplatePath param is the empty template source path
     - The emptyThreshold param is the resemblance ratio between the empty template and a block in the image
     """
-    
     emptyTemplate = cv2.imread(emptyTemplatePath, 0)
     emptyTemplate = cv2.resize(emptyTemplate, (100,100), interpolation=cv2.INTER_LINEAR)
 
+    # cv2.imshow("img", emptyTemplate)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
+
     fullTemplate = cv2.imread(fullTemplatePath, 0)
     fullTemplate = cv2.resize(fullTemplate, (150,150), interpolation=cv2.INTER_LINEAR)
+
+    # cv2.imshow("img", fullTemplate)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
 
     emptyListe = getPatternList(img, emptyTemplate, emptyThreshold, 50)
     fullListe = getPatternList(img, fullTemplate, fullThreshold, 70)
@@ -189,5 +208,8 @@ def getBoolArray(emptyListe, fullListe, minDistance):
             
     return boolArray
     
+def decodeQRCode(imagePath):
+    qrcode = json.loads(decode(cv2.imread(imagePath))[0].data)
 
-    
+    return qrcode
+
