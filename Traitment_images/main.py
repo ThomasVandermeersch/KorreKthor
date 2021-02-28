@@ -1,9 +1,7 @@
 import process_pdf
 import make_pdf
 import process_img
-
 import glob
-
 
 make_pdf.makePdf('result', 'scan')
 process_pdf.ExtractTextAndImg("scan_result.pdf")
@@ -11,6 +9,10 @@ process_pdf.ExtractTextAndImg("scan_result.pdf")
 listPages = glob.glob('From_PDF/*.png')
 
 for img in listPages :
+    print("\n")
+    print("--", img, "--")
     value = process_img.process(img)
-    print(value)
+    print("Result ->", value)
+
+print("\nTranslation done!\n")
 
