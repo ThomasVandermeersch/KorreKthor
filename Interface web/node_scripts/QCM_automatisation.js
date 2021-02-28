@@ -69,12 +69,11 @@ async function createInvoice(students, cours, answers, fileVersions){
         console.log("Generation completed !")
 
     }})
+    
 
     // QRCode generator
-    QRCode.toFile('pre_pdf/'+student.matricule + ".png",
-      'Nom : ' + student.name + "\nMatricule : " + student.matricule + "\nCours : " + 
-                 cours + "\nVersion : " + student.version, function (err) {
-
+    studentJson = {"name": student.name, "matricule": student.matricule, "lesson": cours, "version":student.version}
+    QRCode.toFile('pre_pdf/'+student.matricule + ".png", JSON.stringify(studentJson), function (err) {
         doc.image('pre_pdf/'+student.matricule + ".png", 50, 115, {scale:0.45});
         doc.pipe(writeStream);
         doc.end();
