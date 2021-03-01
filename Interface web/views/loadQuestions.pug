@@ -13,7 +13,7 @@ div(class="container w-50 page")
             div(class="col p-0" id="filename")
                 b= uploadedFilename
 
-    form(action="/sendQuestions" method="POST" enctype="multipart/form-data")
+    form(action="/create/sendQuestions" method="POST" enctype="multipart/form-data")
         each questID in versions 
             div(class="row mt-3" id="question" + questID)
                 div

@@ -30,6 +30,7 @@
     "easy-pdf-merge": "^0.2.6",
     "exceljs": "^4.2.0",
     "express": "^4.17.1",
+    "express-promise-router": "^4.0.1",
     "express-session": "^1.17.1",
     "file-saver": "^2.0.5",
     "http-errors": "^1.8.0",

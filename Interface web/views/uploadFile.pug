@@ -4,9 +4,9 @@ div(class="container w-50 page")
     div(class="progress mt-3 mb-2")
         <div class="progress-bar" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
     
-    h2 Etape 1 : Importer les eleves
+    h2 Etape 1 : Importer les élèves
 
-    form(action="/sendList" method="POST" enctype="multipart/form-data")
+    form(action="/create/sendList" method="POST" enctype="multipart/form-data")
         div(class="row mt-3")
             div(class="col-md-12")
                 label(for="fileForm" class="form-label") Veuillez entrer le fichier Excel avec la liste d'élèves.

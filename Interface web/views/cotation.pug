@@ -16,7 +16,7 @@ div(class="container w-50 page")
 
         div(id='normal')
             br
-            form(action="/sendNormalCotationCriteria", method="POST" , class="form-inline")
+            form(action="/create/sendNormalCotationCriteria", method="POST" , class="form-inline")
                 div(class="form-group row")
                     div(class="form-group col-md-6")
                         label(for="inputEmail4") Une bonne réponse rapporte (pts)
@@ -39,7 +39,7 @@ div(class="container w-50 page")
             br
             p Ce type de QCM s'utilise lorsqu'il y a plusieurs choix possibles. Entrez le nombre de points que rapportent/perdent la proposition.
             
-            form(action="/sendAdvancedCotationCriteria", method="POST" , class="form-inline")
+            form(action="/create/sendAdvancedCotationCriteria", method="POST" , class="form-inline")
                 div(class="form-group row")
                     div(class="form-group col-md-6")
                         label() Toutes les réponses sont correctes (pts)
