@@ -41,7 +41,7 @@ const msalConfig = {
   // NOTE: Uses default in-memory session store, which is not
   // suitable for production
   app.use(session({
-    secret: 'fjoirznthoirucnhçep@@@298Y7974869nthoirucnhçep@@@298Y79748693838Y398ronthoirucnhçep@@@298Y797486938intchgorungehg',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     unset: 'destroy'
