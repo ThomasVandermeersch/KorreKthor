@@ -31,7 +31,6 @@ def process(imgPath):
         return getImageResponses(img)
 
     else: 
-        print("Not a QCM file")
         return None
 
 
@@ -70,7 +69,7 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     if(len(points) > 0 ) :
         return points
 
-    return None
+    return False
 
 def getGoodOrientation(img, squaresLocations, margin=0.8):
     """
@@ -209,5 +208,9 @@ def getBoolArray(emptyListe, fullListe, minDistance):
 def decodeQRCode(imagePath):
     qrcode = json.loads(decode(cv2.imread(imagePath))[0].data)
 
-    return qrcode
+    if qrcode :
+        return qrcode
+    else :
+        return None
+
 
