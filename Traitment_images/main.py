@@ -19,7 +19,6 @@ else :
     else :
         print("\nGetting answers...")
         listPages = glob.glob('From_PDF/*.png')
-        print(listPages)
 
         if len(listPages) == 0 :
             jsonToSend.append({"error" : "No exported image from PDF"})
@@ -29,19 +28,16 @@ else :
                 answers = process_img.process(img)
 
                 if answers == None:
-                    print("Not a QCM file")
-                    jsonToSend.append({"error" : "Not a QCM file"})
+                    jsonToSend.append({"error" : f"{img}is not a QCM file"})
                 elif answers == False :
-                    jsonToSend.append({"error" : "No answers scanned"})
+                    jsonToSend.append({"error" : f"{img}, no answers scanned"})
                 else :
                     qrcode = process_img.decodeQRCode(img)
 
                     if qrcode == None:
-                        print("No enable QR Code")
-                        jsonToSend.append({"error" : "No Enable QR Code"})
-                        jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
-
-                
+                        jsonToSend.append({"error" : f"{img} has no Enable QR Code"})
+                    
+                    jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
 
 
 print(json.dumps(jsonToSend))
