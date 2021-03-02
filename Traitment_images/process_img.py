@@ -31,6 +31,7 @@ def process(imgPath):
         return getImageResponses(img)
 
     else: 
+        print("wrong page")
         return None
 
 
@@ -66,7 +67,7 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
 
         prev = pt
     
-    if(len(points) > 0 ) :
+    if(len(points) >= 3 ) :
         return points
 
     return False
@@ -206,7 +207,15 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     return boolArray
     
 def decodeQRCode(imagePath):
-    qrcode = json.loads(decode(cv2.imread(imagePath))[0].data)
+    preQRCode = decode(cv2.imread(imagePath))
+
+    if len(preQRCode) == 0:
+        return None
+    
+    try:
+        qrcode = json.loads(preQRCode[0].data)
+    except:
+        return None
 
     if qrcode :
         return qrcode

@@ -11,8 +11,6 @@ def makePdf(pdfFileName, dir=''):
     listPages = glob.glob(dir + '/*.JPG')
 
     if len(listPages) != 0 :
-        print(listPages)
-
         cover = Image.open(str(listPages[0]))
         width, height = cover.size
 
@@ -23,6 +21,7 @@ def makePdf(pdfFileName, dir=''):
             pdf.image(page, 0, 0)
 
         pdf.output(dir + "_" + pdfFileName + ".pdf", "F")
+        return True 
     else :
         return None
 
