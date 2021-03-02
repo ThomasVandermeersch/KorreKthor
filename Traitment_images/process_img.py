@@ -31,7 +31,6 @@ def process(imgPath):
         return getImageResponses(img)
 
     else: 
-        print("wrong page")
         return None
 
 
