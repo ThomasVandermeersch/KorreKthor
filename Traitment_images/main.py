@@ -17,7 +17,7 @@ else :
     ImgDone = extractTextAndImg("scan_result.pdf")
 
     if ImgDone == None :
-        print("No existing pages in de PDF")
+        print("No existing pages in the PDF")
         jsonToSend.append({"error" : "No existing PDF"})
 
     else :
