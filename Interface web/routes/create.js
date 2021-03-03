@@ -7,7 +7,7 @@ const QCM_automatisation = require("../node_scripts/QCM_automatisation")
 var multer  = require('multer') // Specific import for files 
 var storage = multer.diskStorage(
     {
-        destination: '../uploads/',
+        destination: 'uploads/',
         filename: function(req, file, cb){
             cb(null, file.originalname)
         }
@@ -50,7 +50,8 @@ router.get("/Step1",function(req,res){
 router.get("/Step2",function(req,res){
     if (hasAcces(req.session.userId,res)){
         var versions = JSON.parse(req.query.versions)
-        res.render('loadQuestions', {title:"QCM CREATOR", "uploadedFilename":req.query.filename, "versions":versions})
+        var lesson = req.query.lesson
+        res.render('loadQuestions', {title:"QCM CREATOR", "uploadedFilename":req.query.filename, "versions":versions, "lesson":lesson})
     }
 })
 
@@ -58,7 +59,7 @@ router.get("/Step2",function(req,res){
 router.get("/Step3", function(req, res){
     if (hasAcces(req.session.userId,res)){
 
-        res.render('loadAnswers', {title:"QCM CREATOR", "uploadedFilename": req.query.filename, "versions":JSON.parse(req.query.versions), "files":JSON.parse(req.query.files)})
+        res.render('loadAnswers', {title:"QCM CREATOR", "uploadedFilename": req.query.filename, "versions":JSON.parse(req.query.versions), "lesson":req.query.lesson, "files":JSON.parse(req.query.files)})
     }
 })
 
@@ -78,22 +79,23 @@ router.get("/Step5",function(req,res){
 })
 
 // Route to send answers
-router.post("/quest", upload.single("studentList"), async (req, res, next)=>{
-    const filename = req.body.filename
-    const students = await functions.importStudents("../uploads/"+filename)
+router.post("/quest", upload.single("studentList"), async (req, res) => {
+    const filename = req.body.filename  
+    const lesson = req.body.lesson
+    const students = await functions.importStudents("uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
     const files = JSON.parse(req.body.files)
 
-    QCM_automatisation.createInvoice(students, 'Math', answers, files).then(res.redirect("/create/Step4"));
+    QCM_automatisation.createInvoice(students, lesson, answers, files).then(res.redirect("/create/Step4"));
 })
 
 // Route to upload the student list file
 router.post("/sendList", upload.single("studentList"), async function(req, res, next) {
-    var versions = await functions.getVersions("../uploads/"+req.file.originalname)
+    var [versions, lesson] = await functions.getExcelInfo("uploads/"+req.file.originalname)
 
     res.redirect(url.format({
         pathname:"/create/Step2",
-        query: { filename: req.file.originalname, versions:JSON.stringify(versions)}
+        query: { filename: req.file.originalname, versions:JSON.stringify(versions), lesson:lesson}
     }))     
 })
 
@@ -101,6 +103,7 @@ router.post("/sendList", upload.single("studentList"), async function(req, res, 
 router.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
+    var lesson = req.body.lesson
 
     var i;
     for (i = 0; i < liste.length; i++) {
@@ -109,7 +112,7 @@ router.post("/sendQuestions", upload.array("question", 4), async (req, res, next
 
     res.redirect(url.format({
         pathname:"/create/Step3",
-        query: { filename: req.body.listeEtu, versions:req.body.versions, files:JSON.stringify(files)}
+        query: { filename: req.body.listeEtu, versions:req.body.versions, lesson:lesson, files:JSON.stringify(files)}
     }))
 
 })

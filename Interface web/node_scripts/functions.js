@@ -21,7 +21,7 @@ async function importStudents(path){
       var indexEtu = row.values.indexOf("etudiant")
       var indexVersion = row.values.indexOf("version")
 
-      if (indexMatr>=0 && indexEtu >=0 && indexVersion >= 0){
+      if (indexMatr >= 0 && indexEtu >= 0 && indexVersion >= 0){
         target = rowNumber
         matricule = indexMatr
         student = indexEtu
@@ -40,7 +40,7 @@ async function importStudents(path){
     return table
 }
 
-async function getVersions(path){
+async function getExcelInfo(path){
   /**
    * Function that returns the number of version in a list
    * Return structure : ["A", "B", ... ]
@@ -67,12 +67,14 @@ async function getVersions(path){
         }
       }
     });
+    
+    lesson = worksheet.getCell("A1").value
 
-    return versions
+    return [versions, lesson]
 }
 
 exports.importStudents = importStudents
-exports.getVersions = getVersions
+exports.getExcelInfo = getExcelInfo
 
 //table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
-//versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})
+//versions = getExcelInfo("./exemple_liste.xlsx").then(versions => { console.log(versions)})
