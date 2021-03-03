@@ -1,0 +1,17 @@
+Comment,Description,Designator,Value,Footprint,Quantity
+
+"1N4004","1 Amp General Purpose Rectifier","D1, D2","","DO-41","2"
+"ON","Typical INFRARED GaAs LED","D3","","LED_3MM","1"
+"LED +","Typical INFRARED GaAs LED","D4","","LED_5mm","1"
+"status","Typical INFRARED GaAs LED","D5","","LED RGB","1"
+"Relay-SPDT","Single-Pole Dual-Throw Relay","K1, K2","","MODULE5B","2"
+"Buzzer","Magnetic Transducer Buzzer","LS1","","ABSM-1574","1"
+"Ruban LED, Servo Base, Servo Bras","Header, 3-Pin","P1, P3, P5","","HDR1X3","3"
+"Power Supply, Pompe, Valve","Header, 2-Pin","P2, P6, P8","","HDR1X2","3"
+"Rasberry Pi Connector","Header, 20-Pin, Dual row","P7","","MHDR2X20","1"
+"Interface, Shield","Header, 11-Pin","P9, P10","","HDR1X11","2"
+"2N2222","NPN Bipolar Transistor","Q1, Q2","","TO-92","2"
+"Res1","Resistor","R1, R2","3.9K","AXIAL-0.3","2"
+"Res1","Resistor","R3","1k","AXIAL-0.3","1"
+"Res1","Resistor","R4, R5, R6, R7","100","AXIAL-0.3","4"
+"Shutdown, Start/Stop, Button +, Button ++","Switch","S1, S2, S3, S4","","SPST-2","4"
