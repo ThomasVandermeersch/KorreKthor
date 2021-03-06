@@ -90,8 +90,23 @@ app.use('/auth',authRouter)
 // Application port 8000
 app.listen(8000)
 
-const { sequelize, User} = require("./node_scripts/database/models");
+const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 (async function () {
-  await User.create({"fullName":"Tom"})
+  // var user = await User.create({"fullName":"Tom"})
+  // var exam = await Exam.create({"name":"Exam 1", "numberOfVersion":4, "userId":user.id})
+  // var copyA = await Copy.create({"version":"A", "userId":user.id, "examId":exam.id})
+  // var copyB = await Copy.create({"version":"B", "userId":user.id, "examId":exam.id})
+  
+  // var examS = (await Exam.findAll())[0]
+  // console.log(await examS.getUser())
+  // console.log(await examS.getCopies())
+
+  // var userS = (await User.findAll())[0]
+  // console.log(await userS.getExams())
+  // console.log(await userS.getCopies())
+
+  // var copyS = (await Copy.findAll())[0]
+  // console.log(await copyS.getUser())
+  // console.log(await copyS.getExam())
 })()

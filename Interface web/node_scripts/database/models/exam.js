@@ -10,8 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ User, Copy }) {
       // define association here
+      this.belongsTo(User, {foreignKey:"userId", as:"user"})
+      this.hasMany(Copy, {foreignKey:"examId", as:"copies"})
     }
   };
   Exam.init({
@@ -24,8 +26,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
     },
-    // sudentList relation
-
     numberOfVersion:{
         type: DataTypes.INTEGER,
         allowNull: false
