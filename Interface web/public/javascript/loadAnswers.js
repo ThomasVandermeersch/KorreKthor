@@ -92,5 +92,5 @@ document.getElementById("send").addEventListener("click", function(){
 
     var files = document.getElementById("filesList")
 
-    post("/create/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.stringify(files.value)})
+    post("/create/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "lesson":document.getElementById("lesson").innerText, "files":JSON.stringify(files.value)})
 })

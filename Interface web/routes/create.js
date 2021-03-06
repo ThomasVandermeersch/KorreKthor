@@ -76,13 +76,14 @@ router.get("/Step5",acces.hasAcces, function(req,res){
 })
 
 // Route to send answers
-router.post("/quest", upload.single("studentList"), async (req, res, next)=>{
-    const filename = req.body.filename
-    const students = await functions.importStudents("../uploads/"+filename)
+router.post("/quest", upload.single("studentList"), async (req, res) => {
+    const filename = req.body.filename  
+    const lesson = req.body.lesson
+    const students = await functions.importStudents("uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
     const files = JSON.parse(req.body.files)
 
-    QCM_automatisation.createInvoice(students, 'Math', answers, files).then(res.redirect("/create/Step4"));
+    QCM_automatisation.createInvoice(students, lesson, answers, files).then(res.redirect("/create/Step4"));
 })
 
 // Route to upload the student list file
@@ -115,6 +116,7 @@ router.post("/sendList", acces.hasAcces, upload.single("studentList"), async fun
 router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (req, res, next)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
+    var lesson = req.body.lesson
 
     for (var i = 0; i < liste.length; i++) {
         var fileName = req.files[i].filename
