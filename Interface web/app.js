@@ -86,5 +86,21 @@ app.use('/create', createRouter);
 app.use('',indexRouter)
 app.use('/auth',authRouter)
 
+
+const acces = require('./routes/auth')
+
+//Si aucune route n'est trouvée
+app.get("*", function (req, res) {
+  if(hasAcces(req.session.userId,res)) res.render("error");   
+});
+
+function hasAcces(userID,res){
+  if(!userID){
+      res.redirect("/auth/login")
+      return false
+  }
+  return true
+}
+
 // Application port 8000
 app.listen(8000)
