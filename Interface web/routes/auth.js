@@ -5,7 +5,7 @@ const router = require('express-promise-router')();
 router.get("/login",function(req,res){
     //On est pas supposé se connecter si on l'est déjà
     if(!req.session.userId) res.render("login")
-    else res.redirect('/auth/login')
+    else res.redirect('/')
 })
 
 router.get('/signin',

@@ -68,8 +68,8 @@ app.use('/auth',authRouter)
 const acces = require('./node_scripts/hasAcces')
 
 //Si aucune route n'est trouvée
-app.get("*", function (req, res) {
-  if(acces.hasAcces(req.session.userId,res)) res.render("error");   
+app.get("*", acces.hasAcces, function (req, res) {
+  res.render("error");   
 });
 
 // Application port 8000

@@ -1,9 +1,11 @@
 const { nextTick } = require("async")
 
 function hasAcces(req,res,next){
+
     if(!req.session.userId){
-        res.redirect("/auth/login")
+        return res.redirect("/auth/login")
     }
+
     next()
 }
 

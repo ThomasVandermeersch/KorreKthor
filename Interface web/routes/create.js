@@ -38,8 +38,8 @@ router.get("/downloadcorrection", acces.hasAcces, (req, res) => {
 
 // Route to upload file
 router.get("/Step1",acces.hasAcces, function(req,res){
-        res.render('uploadFile', {title:"QCM CREATOR"})
-    
+    res.render('uploadFile', {title:"QCM CREATOR"})
+
 })
 
 // Route to upload questions
