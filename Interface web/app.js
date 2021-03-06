@@ -7,6 +7,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const msal = require('@azure/msal-node');
 require('dotenv').config();
+const Sequelize = require('sequelize');
 
 
 app = express()
@@ -88,3 +89,9 @@ app.use('/auth',authRouter)
 
 // Application port 8000
 app.listen(8000)
+
+const { sequelize, User} = require("./node_scripts/database/models");
+
+(async function () {
+  await User.create({"fullName":"Tom"})
+})()

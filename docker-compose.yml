@@ -1,4 +1,4 @@
-# Run : sudo docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
+# Run : docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
 # The restart: always will start the container from boot !
 version: '3.1'
 services:
