@@ -45,9 +45,12 @@ async function getVersions(path){
    * Function that returns the number of version in a list
    * Return structure : ["A", "B", ... ]
    */
-
-    const workbook = new ExcelJS.Workbook();
+  console.log("I'm called 1")
+  const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
+    console.log("Coucou")
+
+
     const worksheet = workbook.worksheets[0];
 
     var target = 10000
@@ -66,9 +69,14 @@ async function getVersions(path){
           versions.push(row.values[version])
         }
       }
-    });
+    })
 
-    return versions
+    if(versions){
+      return [null, null,versions]
+    }
+    return ["Il manque un champ 'version' dans le fichier Excel", "Erreur auto-générée", null]
+
+
 }
 
 exports.importStudents = importStudents

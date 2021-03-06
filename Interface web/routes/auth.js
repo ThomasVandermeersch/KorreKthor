@@ -14,7 +14,7 @@ router.get('/signin',
       scopes: process.env.OAUTH_SCOPES.split(','),
       redirectUri: process.env.OAUTH_REDIRECT_URI
     };
-    console.log(urlParameters)
+    //console.log(urlParameters)
 
     try {
       const authUrl = await req.app.locals
@@ -50,8 +50,8 @@ router.get('/callback',
       // Save the user's homeAccountId in their session
 
       req.session.userId = response.account.homeAccountId;
-      console.log(req.session.userId)
-      console.log(response)
+      //console.log(req.session.userId)
+      //console.log(response)
       //console.log(response.accessToken)
       
       
@@ -103,13 +103,5 @@ router.get('/logout',
     });
   }
 );
-
-function hasAcces(userID,res){
-    if(!userID){
-        res.redirect("auth/login")
-        return false
-    }
-    return true
-}
 
 module.exports = router

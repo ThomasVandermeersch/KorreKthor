@@ -19,8 +19,13 @@ div(class="container w-50 page")
                 div
                     label(for="fileForm" class="form-label")= "Questionnaire " + questID 
                 div
-                    input(class="form-control" id="fileForm"+questID type="file" name="question")
+                    input(class="form-control" id="fileForm"+questID type="file" name="question" required)
 
+        if messages.errormsg
+            div(class="alert alert-danger" role="alert")
+                p= messages.errormsg
+        
+        
         input(id="versions" type="hidden" name="versions", value=versions)
         input(id="listeEtu" type="hidden" name="listeEtu", value=uploadedFilename)
 
