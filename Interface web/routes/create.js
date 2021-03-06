@@ -47,8 +47,9 @@ router.get("/Step2", acces.hasAcces, function(req,res){
     res.render('loadQuestions', 
             {title:"QCM CREATOR", 
                 uploadedFilename :req.session.excelfilename, 
-                versions: JSON.parse(req.session.excelversions)})
-    
+                versions: JSON.parse(req.session.excelversions),
+                lesson : req.session.excellesson
+            })
 })
 
 // Route to load the answers
@@ -58,7 +59,8 @@ router.get("/Step3",acces.hasAcces, function(req, res){
                     {title:"QCM CREATOR", 
                     uploadedFilename: req.session.excelfilename,
                     versions :JSON.parse(req.session.excelversions), 
-                    files :JSON.parse(req.session.pdffiles)
+                    files :JSON.parse(req.session.pdffiles),
+                    lesson : req.session.excellesson 
     })
     
 })
@@ -78,7 +80,7 @@ router.get("/Step5",acces.hasAcces, function(req,res){
 // Route to send answers
 router.post("/quest", upload.single("studentList"), async (req, res) => {
     const filename = req.body.filename  
-    const lesson = req.body.lesson
+    const lesson = req.session.excellesson
     const students = await functions.importStudents("uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
     const files = JSON.parse(req.body.files)
@@ -87,13 +89,13 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
 })
 
 // Route to upload the student list file
-router.post("/sendList", acces.hasAcces, upload.single("studentList"), async function(req, res, next) {
-        const pathTofile = "../uploads/"+req.file.originalname
+router.post("/sendList",acces.hasAcces, upload.single("studentList"), async function(req, res, next) {
+        const pathTofile = "uploads/"+req.file.originalname
         console.log(pathTofile)
         var ext = path.extname(pathTofile);
         console.log(ext);
         if(ext ==".xlsx"){
-            var versions = await functions.getVersions(pathTofile)
+            var versions = await functions.getExcelInfo(pathTofile)
             if(versions[0]){
                 req.flash('errormsg',versions[0]);
                 console.log(versions[1] ) //log de l'erreur détaillée
@@ -102,6 +104,8 @@ router.post("/sendList", acces.hasAcces, upload.single("studentList"), async fun
             else{ 
                 req.session["excelfilename"] = req.file.originalname  
                 req.session["excelversions"] = JSON.stringify(versions[2])
+                req.session["excellesson"] = JSON.stringify(versions[3])
+
                 res.redirect("/create/Step2")
             }
         }
@@ -116,7 +120,7 @@ router.post("/sendList", acces.hasAcces, upload.single("studentList"), async fun
 router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (req, res, next)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
-    var lesson = req.body.lesson
+    req.session["excellesson"] = req.body.lesson
 
     for (var i = 0; i < liste.length; i++) {
         var fileName = req.files[i].filename

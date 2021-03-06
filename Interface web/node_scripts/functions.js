@@ -47,7 +47,8 @@ async function getExcelInfo(path){
    */
   console.log("I'm called 1")
   const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(path);
+  console.log(path)
+  await workbook.xlsx.readFile(path);
     console.log("Coucou")
 
 
