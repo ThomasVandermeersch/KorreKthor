@@ -5,42 +5,45 @@ from process_pdf import extractTextAndImg
 import make_pdf
 import process_img
 
-pdf = make_pdf.makePdf('result', 'scan')
+# pdf = make_pdf.makePdf('result', 'scan')
 
-jsonToSend = []
-if pdf == None :
-    jsonToSend.append({"error" : "No scanned QCM"})
-else :
-    ImgDone = extractTextAndImg("scan_result.pdf")
+def compute(pdf):
+    jsonToSend = []
 
-    if ImgDone == None :
-        jsonToSend.append({"error" : "No existing PDF"})
-
+    if pdf == None :
+        jsonToSend.append({"error" : "No scanned QCM"})
     else :
-        print("\nGetting answers...")
-        listPages = glob.glob('From_PDF/*.png')
+        ImgDone = extractTextAndImg(pdf)
 
-        if len(listPages) == 0 :
-            jsonToSend.append({"error" : "No exported image from PDF"})
+        if ImgDone == None :
+            jsonToSend.append({"error" : "No existing PDF"})
+
         else :
-            for img in listPages :
+            print("\nGetting answers...")
+            listPages = glob.glob('From_PDF/*.png')
 
-                answers = process_img.process(img)
+            if len(listPages) == 0 :
+                jsonToSend.append({"error" : "No exported image from PDF"})
+            else :
+                for img in listPages :
 
-                if answers == None:
-                    jsonToSend.append({"error" : f"{img}is not a QCM file"})
-                elif answers == False :
-                    jsonToSend.append({"error" : f"{img}, no answers scanned"})
-                else :
-                    qrcode = process_img.decodeQRCode(img)
+                    answers = process_img.process(img)
 
-                    if qrcode == None:
-                        jsonToSend.append({"error" : f"{img} has no Enable QR Code"})
-                    
-                    jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
+                    if answers == None:
+                        jsonToSend.append({"error" : f"{img}is not a QCM file"})
+                    elif answers == False :
+                        jsonToSend.append({"error" : f"{img}, no answers scanned"})
+                    else :
+                        qrcode = process_img.decodeQRCode(img)
+
+                        if qrcode == None:
+                            jsonToSend.append({"error" : f"{img} has no Enable QR Code"})
+                        
+                        jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
 
 
-print(json.dumps(jsonToSend))
-print("\nTranslation done!\n")
+    print(json.dumps(jsonToSend))
+    print("\nTranslation done!\n")
+    return json.dumps(jsonToSend)
 
 
