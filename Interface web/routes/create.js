@@ -3,6 +3,10 @@ const path = require("path")
 const functions = require("../node_scripts/functions")
 const QCM_automatisation = require("../node_scripts/QCM_automatisation")
 const acces = require('../node_scripts/hasAcces')
+const request = require('request');
+const FormData = require('form-data');
+const fs = require("fs");
+
 var multer  = require('multer') // Specific import for files 
 var storage = multer.diskStorage(
     {
@@ -146,6 +150,18 @@ router.post("/sendNormalCotationCriteria", acces.hasAcces, (req,res)=>{
 router.post("/sendAdvancedCotationCriteria", acces.hasAcces,(req,res)=>{
     console.log(req.body)
     res.redirect('/create/Step5')
+})
+
+router.post("/blabla", upload.single("file"), async (req, res) => {
+	const formData = {
+		my_field: "file",
+		my_file: fs.createReadStream('uploads/Math.pdf'),
+	}
+	request.post({url:'http://localhost:8080/run', formData:formData})
+	//fs.createReadStream(`uploads/Math.pdf`).pipe(request.post('http://localhost:8080/run'))
+	
+	
+	res.send("coucou")
 })
 
 module.exports = router;
