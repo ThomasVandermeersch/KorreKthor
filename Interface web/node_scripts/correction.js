@@ -132,7 +132,9 @@ const response3 = [
     [false,false,false] //0.75
 ] // normalment ==> 2.5
 
+exports.correctionNormal = correctionNormal
+
 //correctionNormal(correction1,response1,1,1,0,false)
-correctionAdvanced(correction1,response1,1,0.75,0.5,0.25,0,true,1,0) //should return 1
-correctionAdvanced(correction2,response2,1,0.75,0.5,0.25,0,true,1,0) //should return 2.5
-correctionAdvanced(correction3,response3,1,0.75,0.5,0.25,0,false,1,0) //should return 2.5
+//correctionAdvanced(correction1,response1,1,0.75,0.5,0.25,0,true,1,0) //should return 1
+//correctionAdvanced(correction2,response2,1,0.75,0.5,0.25,0,true,1,0) //should return 2.5
+//correctionAdvanced(correction3,response3,1,0.75,0.5,0.25,0,false,1,0) //should return 2.5

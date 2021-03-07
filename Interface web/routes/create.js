@@ -6,6 +6,7 @@ const acces = require('../node_scripts/hasAcces')
 const request = require('request');
 const FormData = require('form-data');
 const fs = require("fs");
+const correction = require("../node_scripts/correction")
 
 var multer  = require('multer') // Specific import for files 
 var storage = multer.diskStorage(
@@ -157,11 +158,18 @@ router.post("/blabla", upload.single("file"), async (req, res) => {
 		my_field: "file",
 		my_file: fs.createReadStream('uploads/Math.pdf'),
 	}
-	request.post({url:'http://localhost:8080/run', formData:formData})
-	//fs.createReadStream(`uploads/Math.pdf`).pipe(request.post('http://localhost:8080/run'))
-	
-	
-	res.send("coucou")
+	request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
+		console.log(typeof body)
+		JSON.parse(body).forEach(copy => {
+			console.log(copy.student.name)
+			if (copy.error === "None"){
+				resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
+				console.log(correction.correctionNormal(copy.answers, resp, 1, 0, 0))
+			}
+		})
+
+	res.send({"message":"done"})
+	})
 })
 
 module.exports = router;
