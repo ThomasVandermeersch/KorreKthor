@@ -30,7 +30,7 @@ def compute(pdf):
                     answers = process_img.process(img)
 
                     if answers == None:
-                        jsonToSend.append({"error" : f"{img}is not a QCM file"})
+                        jsonToSend.append({"error" : f"{img} is not a QCM file"})
                     elif answers == False :
                         jsonToSend.append({"error" : f"{img}, no answers scanned"})
                     else :
@@ -47,3 +47,4 @@ def compute(pdf):
     return json.dumps(jsonToSend)
 
 
+compute("SAVE.pdf")
