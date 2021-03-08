@@ -1,0 +1,32 @@
+include header.pug
+
+h1 Votre profil
+
+table(id=questID class="table tableClass mt-0 p-0")
+    tr
+        td Nom
+        td= session.userObject.fullName 
+
+    tr
+        td Matricule 
+        td= session.userObject.matricule 
+    
+    tr
+        td Email 
+        td= session.userObject.email 
+    tr
+        td Rôle 
+        if session.userObject.role == 0
+            td Etudiant
+        else 
+            td Professeur
+
+    tr
+        td Privilège 
+        if session.userObject.role == 1
+            td Aucuns
+        else 
+            td Admin
+
+                                
+include footer.pug

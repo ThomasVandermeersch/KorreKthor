@@ -64,6 +64,10 @@ app.set('view engine', 'pug');
 app.use(express.static('public')); //Load files from 'public' -> (CSS, image, JS...)
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(function(req,res,next){
+  res.locals.session = req.session;
+  next();
+});
 
 var createRouter = require('./routes/create');
 var indexRouter = require("./routes/index")
@@ -84,7 +88,7 @@ app.get("*", function (req, res) {
 // Application https port 9898
 var httpsServer = https.createServer(credentials, app)
 httpsServer.listen(9898)
-
+console.log("Listening on : https://localhost:9898/")
 
 // (async function () {
   // var user = await User.create({"fullName":"Tom"})
