@@ -2,7 +2,7 @@ include header.pug
 
 div(class="container w-50 page")
     div(class="progress mt-3 mb-2")
-        <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+        <div class="progress-bar" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
 
     h2 Etape 3 : Remplissez les versions des questionnaires
 
@@ -12,6 +12,11 @@ div(class="container w-50 page")
             div(class="col p-0" id="filename")
                 b= uploadedFilename
 
+        div(class="row row-cols-auto my-2") 
+            div(class="col") Nom du cours : 
+
+            div(class="col p-0" id="lesson")
+                b= lesson
 
         div() Liste des énoncés :
         div(class="w-50 mb-2" id="files")
@@ -45,6 +50,7 @@ div(class="container w-50 page")
                                         )
 
                             td(class="px-0 mx-0")
+                                button(class="btn btn-secondary btn-sm removeChoice" type="button") -
                                 button(class="btn btn-secondary btn-sm addChoice" type="button") +
 
                 div(class="btn-group mb-5" role="group")

@@ -1,0 +1,15 @@
+1. Set a default URL
+    L'URL doit être placé en-dessous de toutes les routes. Cette route sera retournée pour dire qu'aucune route
+    ne correspond à la requête.
+    
+    La route par défaut en mode hors connexion renvoie TOUJOURS à la page de connexion.
+
+2. Page d'importation de l'Excel.
+- Les informations des fichiers et des versions sont maintenant dans la session et plus dans l'URL. On évite qu'un utilisateur puisse chipoter à ça !
+    - Ajout d'un champ require dans le pug.
+    - Le requiered peut être retiré par l'utilisateur, et ça peut causer une erreur.==> Non résolu, car pas trouvé de solution, est ce vraiment important ???
+
+
+    - Une terminaison .xlsx avec un fichier qui ne l'est pas, peut faire crasher le serveur.
+    - Seul la précense de la colonne versions est checkée à cette étape
+3. Utilisation de express-flash pour transmettre les messages d'erreurs

@@ -1,0 +1,20 @@
+# Run : docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
+# The restart: always will start the container from boot !
+version: '3.1'
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 1880:8080

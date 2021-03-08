@@ -28,7 +28,19 @@ document.querySelectorAll(".addChoice").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.parentNode.parentNode
         var row = table.rows[item.parentNode.parentNode.rowIndex]
-        row.insertCell(4).innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
+        row.insertCell(row.cells.length - 2).innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
+    })
+})
+
+//Remove a choice to a question
+document.querySelectorAll(".removeChoice").forEach(item=>{
+    item.addEventListener("click",function(){
+        var table = item.parentNode.parentNode.parentNode
+        var row = table.rows[item.parentNode.parentNode.rowIndex]
+        var nbCell = row.cells.length
+        if(nbCell > 4){
+            row.deleteCell(row.cells.length - 2)
+        }
     })
 })
 
@@ -48,13 +60,29 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
         button.classList.add("btn", "btn-secondary", "btn-sm", "addChoice-0")
         button.innerHTML = "+"
 
-        row.insertCell(4).appendChild(button)
+        var removeButton = document.createElement("button")
+        removeButton.classList.add("btn", "btn-secondary", "btn-sm", "removeChoice-0")
+        removeButton.innerHTML = "-"
+
+        row.insertCell(4).appendChild(removeButton)
+        row.cells[4].appendChild(button)
+        
+        removeButton.parentNode.classList.add("px-0", "mx-0")
         button.parentNode.classList.add("px-0", "mx-0")
+
 
         button.addEventListener("click",function(){
             var row2 = table.rows[button.parentNode.parentNode.rowIndex]
             var cell2 = row2.insertCell(4)
             cell2.innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>" 
+        })
+
+        removeButton.addEventListener("click",function(){
+            var row = table.rows[button.parentNode.parentNode.rowIndex]
+            var nbCell = row.cells.length
+            if(nbCell > 4){
+                row.deleteCell(row.cells.length - 2)
+            }
         })
     })
 })
@@ -92,5 +120,5 @@ document.getElementById("send").addEventListener("click", function(){
 
     var files = document.getElementById("filesList")
 
-    post("/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "files":JSON.stringify(files.value)})
+    post("/create/quest", {"liste":JSON.stringify(responseObject), "filename":document.getElementById("filename").innerText, "lesson":document.getElementById("lesson").innerText, "files":JSON.stringify(files.value)})
 })

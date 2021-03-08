@@ -1,111 +1,106 @@
 const express = require("express")
 const path = require("path")
 const bodyParser = require('body-parser');
-const url = require('url')
+const createError = require('http-errors');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const flash = require('express-flash');
+const msal = require('@azure/msal-node');
+const https = require('https');
+const fs = require("fs");
+const acces = require('./node_scripts/hasAcces')
+const Sequelize = require('sequelize');
+const { User, Exam, Copy } = require("./node_scripts/database/models");
 
-const functions = require("./node_scripts/functions")
-const QCM_automatisation = require("./node_scripts/QCM_automatisation")
-var multer  = require('multer') // Specific import for files 
-var storage = multer.diskStorage(
-    {
-        destination: './uploads/',
-        filename: function(req, file, cb){
-            cb(null, file.originalname)
-        }
+require('dotenv').config();
+
+
+var credentials = {
+  key: fs.readFileSync("certificates/key.pem"),
+  cert: fs.readFileSync("certificates/cert.pem")
+}
+
+app = express()
+app.locals.users = {};   //base de données NULLE A CHIER des users
+
+//Configuration de msal
+const msalConfig = {
+    auth: {
+      clientId: process.env.OAUTH_APP_ID,
+      authority: process.env.OAUTH_AUTHORITY,
+      clientSecret: process.env.OAUTH_APP_SECRET
+    },
+    system: {
+      loggerOptions: {
+        loggerCallback(loglevel, message, containsPii) {
+          console.log(message);
+        },
+        piiLoggingEnabled: false,
+        logLevel: msal.LogLevel.Verbose,
+      }
     }
-)
-var upload = multer({ storage: storage})
+  };
+  
+  // Create msal application object
+  app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
+  // </MsalInitSnippet>
+  
+  // <SessionSnippet>
+  // Session middleware
+  // NOTE: Uses default in-memory session store, which is not
+  // suitable for production
+  app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    unset: 'destroy'
+  }));
 
+  app.use(flash());
 
 // Initializing the app
-app = express()
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(express.static('public')); //Load files from 'public' -> (CSS, image, JS...)
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// Main route
-app.get("/",function(req,res){
-    res.redirect("/create/Step1")
-})
+var createRouter = require('./routes/create');
+var indexRouter = require("./routes/index")
+var authRouter = require("./routes/auth")
+app.use('/create', createRouter);
+app.use('',indexRouter)
+app.use('/auth',authRouter)
 
-// Download final pdf route 
-app.get("/create/downloadresult", (req, res) => {
-  res.download(
-    path.join('downloads', "ResultatFinal.pdf" ),
-    (err) => {
-      if (err) res.status(404).send("<h1>File Not found: 404</h1>");
-    }
-  );
+//Si aucune route n'est trouvée
+app.get("*", function (req, res) {
+  res.status("404")
+  res.render("error");   
 });
 
-app.get("/create/downloadcorrection", (req, res) => {
-    res.download(
-        path.join('downloads', "Correction.pdf" ),
-        (err) => {
-            if (err) res.status(404).send("<h1>File Not found: 404</h1>");
-        }
-    );
-})
+// Application http port 9898
+// app.listen(9898)
 
-// Route to upload file
-app.get("/create/Step1",function(req,res){
-    res.render('uploadFile', {title:"QCM CREATOR"})
-})
+// Application https port 9898
+var httpsServer = https.createServer(credentials, app)
+httpsServer.listen(9898)
 
-// Route to upload questions
-app.get("/create/Step2",function(req,res){
-    var versions = JSON.parse(req.query.versions)
-    res.render('loadQuestions', {title:"QCM CREATOR", "uploadedFilename":req.query.filename, "versions":versions})
-})
 
-// Route to load the answers
-app.get("/create/Step3", function(req, res){
-    res.render('loadAnswers', {title:"QCM CREATOR", "uploadedFilename": req.query.filename, "versions":JSON.parse(req.query.versions), "files":JSON.parse(req.query.files)})
-})
+// (async function () {
+  // var user = await User.create({"fullName":"Tom"})
+  // var exam = await Exam.create({"name":"Exam 1", "numberOfVersion":4, "userId":user.id})
+  // var copyA = await Copy.create({"version":"A", "userId":user.id, "examId":exam.id})
+  // var copyB = await Copy.create({"version":"B", "userId":user.id, "examId":exam.id})
+  
+  // var examS = (await Exam.findAll())[0]
+  // console.log(await examS.getUser())
+  // console.log(await examS.getCopies())
 
-// Route to the download page
-app.get("/create/Step4",function(req,res){
-    res.render('downloadPDF')
-})
+  // var userS = (await User.findAll())[0]
+  // console.log(await userS.getExams())
+  // console.log(await userS.getCopies())
 
-// Route to send answers
-app.post("/quest", upload.single("studentList"), async (req, res, next)=>{
-    const filename = req.body.filename
-    const students = await functions.importStudents("./uploads/"+filename)
-    const answers = JSON.parse(req.body.liste)
-    const files = JSON.parse(req.body.files)
-
-    QCM_automatisation.createInvoice(students, 'Math', answers, files).then(res.redirect("./create/Step4"));
-})
-
-// Route to upload the student list file
-app.post("/sendList", upload.single("studentList"), async function(req, res, next) {
-    var versions = await functions.getVersions("./uploads/"+req.file.originalname)
-
-    res.redirect(url.format({
-        pathname:"/create/Step2",
-        query: { filename: req.file.originalname, versions:JSON.stringify(versions)}
-    }))     
-})
-
-// Route to upload the question files
-app.post("/sendQuestions", upload.array("question", 4), async (req, res, next)=>{
-    var files = {}
-    var liste = JSON.parse(req.body.versions)
-
-    var i;
-    for (i = 0; i < liste.length; i++) {
-        files[liste[i]] = req.files[i].filename
-    }
-
-    res.redirect(url.format({
-        pathname:"/create/Step3",
-        query: { filename: req.body.listeEtu, versions:req.body.versions, files:JSON.stringify(files)}
-    }))
-
-})
-
-// Application port 8000
-app.listen(8000)
+  // var copyS = (await Copy.findAll())[0]
+  // console.log(await copyS.getUser())
+  // console.log(await copyS.getExam())
+// })()

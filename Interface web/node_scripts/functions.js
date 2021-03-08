@@ -21,7 +21,7 @@ async function importStudents(path){
       var indexEtu = row.values.indexOf("etudiant")
       var indexVersion = row.values.indexOf("version")
 
-      if (indexMatr>=0 && indexEtu >=0 && indexVersion >= 0){
+      if (indexMatr >= 0 && indexEtu >= 0 && indexVersion >= 0){
         target = rowNumber
         matricule = indexMatr
         student = indexEtu
@@ -40,14 +40,18 @@ async function importStudents(path){
     return table
 }
 
-async function getVersions(path){
+async function getExcelInfo(path){
   /**
    * Function that returns the number of version in a list
    * Return structure : ["A", "B", ... ]
    */
+  console.log("I'm called 1")
+  const workbook = new ExcelJS.Workbook();
+  console.log(path)
+  await workbook.xlsx.readFile(path);
+    console.log("Coucou")
 
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(path);
+
     const worksheet = workbook.worksheets[0];
 
     var target = 10000
@@ -66,13 +70,19 @@ async function getVersions(path){
           versions.push(row.values[version])
         }
       }
-    });
+    })
+    lesson = worksheet.getCell("A1").value
 
-    return versions
+    if(versions){
+      return [null, null,versions,lesson]
+    }
+    return ["Il manque un champ 'version' dans le fichier Excel", "Erreur auto-générée", null]
+
+
 }
 
 exports.importStudents = importStudents
-exports.getVersions = getVersions
+exports.getExcelInfo = getExcelInfo
 
 //table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
-//versions = getVersions("./exemple_liste.xlsx").then(versions => { console.log(versions)})
+//versions = getExcelInfo("./exemple_liste.xlsx").then(versions => { console.log(versions)})
