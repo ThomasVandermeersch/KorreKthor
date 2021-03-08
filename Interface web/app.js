@@ -6,9 +6,15 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('express-flash');
 const msal = require('@azure/msal-node');
+const https = require('https');
+const fs = require("fs");
 
 require('dotenv').config();
 
+var credentials = {
+  key: fs.readFileSync("certificates/key.pem"),
+  cert: fs.readFileSync("certificates/cert.pem")
+}
 
 app = express()
 app.locals.users = {};   //base de données NULLE A CHIER des users
@@ -73,4 +79,7 @@ app.get("*", acces.hasAcces, function (req, res) {
 });
 
 // Application port 8000
-app.listen(9898)
+// app.listen(9898)
+
+var httpsServer = https.createServer(credentials, app)
+httpsServer.listen(9898)
