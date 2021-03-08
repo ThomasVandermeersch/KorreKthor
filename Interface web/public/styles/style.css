@@ -1,0 +1,20 @@
+.download{
+    display: flex;
+    float: right;
+}
+
+.bouton{
+    margin-right: 1rem;
+}
+
+.page{
+    position: relative;
+    min-height: 75vh;
+}
+
+.footer {
+    position: absolute;
+    bottom: -15vh;
+    left: -50%;
+    width: 200%;
+}

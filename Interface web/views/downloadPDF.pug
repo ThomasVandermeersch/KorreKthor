@@ -1,0 +1,15 @@
+include header.pug
+div(class="container w-50 page")
+    div(class="progress mt-3 mb-2")
+        <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+
+    h2 Etape 4 : La création du QCM est à présent terminée.
+    p Vous pouvez télécharger les questionnaires ci-dessous.
+
+    div(class="download")
+        a(href="./downloadresult" class="bouton")
+            button(class="btn btn-success float-end") Download exams file
+        a(href="./downloadcorrection" class="bouton")
+            button(class="btn btn-success float-end") Download corrections file
+
+    include footer.pug
