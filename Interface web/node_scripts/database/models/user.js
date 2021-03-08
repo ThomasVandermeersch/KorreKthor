@@ -23,17 +23,20 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     fullName: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
     },
     matricule: {
-        type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     authorizations:{
-        type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
     },
     role:{
-        type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
     },
   }, {
     sequelize,

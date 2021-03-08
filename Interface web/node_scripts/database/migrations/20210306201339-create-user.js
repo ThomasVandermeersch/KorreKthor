@@ -10,8 +10,11 @@ module.exports = {
       fullName: {
         type: DataTypes.STRING
       },
+      email: {
+        type: DataTypes.STRING,
+      },
       matricule: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING,
       },
       authorizations: {
         type: DataTypes.INTEGER

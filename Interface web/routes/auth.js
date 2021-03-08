@@ -1,5 +1,6 @@
-/* GET auth callback. */
+const { User, Exam, Copy } = require("../node_scripts/database/models");
 
+/* GET auth callback. */
 const router = require('express-promise-router')();
 
 router.get("/login",function(req,res){
@@ -60,10 +61,39 @@ router.get('/callback',
       console.log("On arrive ici 2       ????????????????,")
       // Add the user to user storage
       console.log(req.app.locals.users)*/
-      req.app.locals.users[req.session.userId] = {
-        displayName: response.account.name,
-        email: response.account.username
-      };
+
+      // Get the matricule and the role 
+      var checkUser = await User.findOne({where:{email:response.account.username}})
+      if (checkUser === null){
+        var matricule;
+        var role;
+        if(response.account.username.startsWith('19')) { 
+          matricule = String(parseInt(response.account.username.split('@')[0], 10) - 176000)
+        }
+        else{
+          matricule = String(response.account.username.split('@')[0])
+          let re = /^\d/
+          if (re.test(matricule)){
+            role = 0
+          }
+          else{
+            role = 1
+          }
+        }
+        
+        var user = await User.create({
+          "fullName":response.account.name, 
+          "email":response.account.username, 
+          "matricule":matricule, 
+          "role":role, 
+          "authorizations":0
+        })
+
+        req.session["userObject"] = user
+      }
+      else{
+        req.session["userObject"] = checkUser
+      }
 
     } catch(error) {
       console.log("Il y a une erreur ")

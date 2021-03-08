@@ -10,6 +10,7 @@ const https = require('https');
 const fs = require("fs");
 const acces = require('./node_scripts/hasAcces')
 const Sequelize = require('sequelize');
+const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 require('dotenv').config();
 
@@ -72,7 +73,8 @@ app.use('',indexRouter)
 app.use('/auth',authRouter)
 
 //Si aucune route n'est trouvée
-app.get("*", acces.hasAcces, function (req, res) {
+app.get("*", function (req, res) {
+  res.status("404")
   res.render("error");   
 });
 
@@ -83,9 +85,8 @@ app.get("*", acces.hasAcces, function (req, res) {
 var httpsServer = https.createServer(credentials, app)
 httpsServer.listen(9898)
 
-const { User, Exam, Copy } = require("./node_scripts/database/models");
 
-(async function () {
+// (async function () {
   // var user = await User.create({"fullName":"Tom"})
   // var exam = await Exam.create({"name":"Exam 1", "numberOfVersion":4, "userId":user.id})
   // var copyA = await Copy.create({"version":"A", "userId":user.id, "examId":exam.id})
@@ -102,4 +103,4 @@ const { User, Exam, Copy } = require("./node_scripts/database/models");
   // var copyS = (await Copy.findAll())[0]
   // console.log(await copyS.getUser())
   // console.log(await copyS.getExam())
-})()
+// })()
