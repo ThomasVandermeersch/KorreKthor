@@ -153,23 +153,4 @@ router.post("/sendAdvancedCotationCriteria", acces.hasAcces,(req,res)=>{
     res.redirect('/create/Step5')
 })
 
-router.post("/blabla", upload.single("file"), async (req, res) => {
-	const formData = {
-		my_field: "file",
-		my_file: fs.createReadStream('uploads/Math.pdf'),
-	}
-	request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
-		console.log(typeof body)
-		JSON.parse(body).forEach(copy => {
-			console.log(copy.student.name)
-			if (copy.error === "None"){
-				resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
-				console.log(correction.correctionNormal(copy.answers, resp, 1, 0, 0))
-			}
-		})
-
-	res.send({"message":"done"})
-	})
-})
-
 module.exports = router;
