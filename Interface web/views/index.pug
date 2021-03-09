@@ -1,6 +1,5 @@
 include header.pug
 
-h1= 'Bienvenue ' + name
+div(class="container w-60 page")
 
-a(href="/create/Step1")
-    button() Je crée mon premier QCM
+    h1= 'Bienvenue ' + session.userObject.fullName

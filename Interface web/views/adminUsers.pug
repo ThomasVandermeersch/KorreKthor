@@ -1,0 +1,50 @@
+include header.pug
+
+h1 Bienvenue sur l'interface Admin
+
+
+table(class="table tableClass mt-0 p-0")
+    thead
+        tr
+            td 
+                b Matricule 
+            td 
+                b Nom 
+            td 
+                b Email 
+            td 
+                b Role 
+            td 
+                b Privilèges             
+            td 
+                b Actions 
+
+    tbdoy
+        for user in users
+            tr
+                td= user.matricule
+                td= user.fullName 
+                td= user.email 
+                if user.role == 1
+                    td Prof 
+                else 
+                    td Etudiant
+                
+                if user.authorizations == 0
+                    td Create + Admin
+                else if user.authorizations == 1
+                    td Create
+                
+                else if user.authorizations == 2
+                    td Admin
+                
+                else 
+                    td Aucuns
+                td
+                    //- On ne peut pas modifier un Admin, sauf si c'est nous.
+                    if (user.authorizations != 0 && user.authorizations != 2) || user.email == session.userObject.email
+                        a(href="/admin/" + user.matricule)
+                            button(type="button" class="btn btn-secondary addQuestion") Modifier
+
+h3     PS : Vous ne pouvez pas modifier un User Admin autre que vous.
+            
