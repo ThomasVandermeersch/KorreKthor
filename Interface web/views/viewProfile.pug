@@ -23,11 +23,11 @@ table(id=questID class="table tableClass mt-0 p-0")
 
     tr
         td Privilège 
-        if session.userObject.role == 0
+        if session.userObject.authorizations == 0
             td Admin + Create
-        else if  session.userObject.role == 1
+        else if  session.userObject.authorizations == 1
             td Create
-        else if session.userObject.role == 2
+        else if session.userObject.authorizations == 2
             td Admin
         else 
             td Aucuns
