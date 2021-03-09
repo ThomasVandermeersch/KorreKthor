@@ -23,10 +23,14 @@ table(id=questID class="table tableClass mt-0 p-0")
 
     tr
         td Privilège 
-        if session.userObject.role == 1
-            td Aucuns
-        else 
+        if session.userObject.role == 0
+            td Admin + Create
+        else if  session.userObject.role == 1
+            td Create
+        else if session.userObject.role == 2
             td Admin
+        else 
+            td Aucuns
 
                                 
 include footer.pug
