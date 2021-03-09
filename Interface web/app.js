@@ -72,9 +72,11 @@ app.use(function(req,res,next){
 var createRouter = require('./routes/create');
 var indexRouter = require("./routes/index")
 var authRouter = require("./routes/auth")
+var uploadRouter = require("./routes/upload")
 app.use('/create', createRouter);
 app.use('',indexRouter)
 app.use('/auth',authRouter)
+app.use('/upload', uploadRouter)
 
 //Si aucune route n'est trouvée
 app.get("*", function (req, res) {
