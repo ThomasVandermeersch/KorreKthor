@@ -9,12 +9,12 @@ def extractTextAndImg(path):
     """
     file = fitz.open(path)
 
-    print("Nbr of pages", file.pages())
+    print("Nbr of pages:", file.page_count)
 
-    if file.pages() != 0 :
+    if file.page_count != 0 :
         for pageNumber, page in enumerate(file.pages(), start = 1):
             fromPath = "From_PDF/" + str(pageNumber) + ".png"
-            print("Extracting", fromPath)
+            print(" Extracting", fromPath)
 
             # Save image to From_PDF/
             img = page.getImageList()

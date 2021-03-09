@@ -45,6 +45,3 @@ def compute(pdf):
     print(json.dumps(jsonToSend))
     print("\nTranslation done!\n")
     return json.dumps(jsonToSend)
-
-
-compute("SAVE.pdf")
