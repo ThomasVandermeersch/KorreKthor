@@ -1,11 +1,13 @@
 Comment,Description,Designator,Value,Footprint,Quantity
 
+"Cap Pol1","Polarized Capacitor (Radial)","C1","10u","Rad5.2","1"
+"Cap","Capacitor","C2","100n","RAD-0.2","1"
 "1N4004","1 Amp General Purpose Rectifier","D1, D2","","DO-41","2"
-"ON","Typical INFRARED GaAs LED","D3","","LED_3MM","1"
+"Power","Typical INFRARED GaAs LED","D3","","LED_3MM","1"
 "LED +","Typical INFRARED GaAs LED","D4","","LED_5mm","1"
 "status","Typical INFRARED GaAs LED","D5","","LED RGB","1"
-"Relay-SPST","Single-Pole Single-Throw Relay","K1, K2","","MODULE4","2"
-"Buzzer","Magnetic Transducer Buzzer","LS1","","ABSM-1574","1"
+"Relay-SPST","Single-Pole Single-Throw Relay","K1, K2","","RELAY_OJE-SH_series","2"
+"Buzzer","Magnetic Transducer Buzzer","LS1","","Buzzer","1"
 "Ruban LED, Servo Base, Servo Bras","Header, 3-Pin","P1, P3, P5","","Conn_1X3","3"
 "Power Supply, Pompe, Valve","Header, 2-Pin","P2, P6, P8","","Bornier_1X2","3"
 "Rasberry Pi Connector","Header, 20-Pin, Dual row","P7","","HDR2X20","1"
@@ -14,5 +16,5 @@ Comment,Description,Designator,Value,Footprint,Quantity
 "Res1","Resistor","R1, R2","3.9K","AXIAL-0.3","2"
 "Res1","Resistor","R3","1k","AXIAL-0.3","1"
 "Res1","Resistor","R4, R5, R6, R7","100","AXIAL-0.3","4"
-"Shutdown, Start/Stop, Button +, Button ++","Switch","S1, S2, S3, S4","","SPST-2","4"
+"Shutdown, Start/Stop, Button +, Button ++","Switch","S1, S2, S3, S4","","SW_1825910-6-4","4"
 "HW-411_Buck_converter","Buck converter board","U1","","HW-411_Buck_converter","1"
