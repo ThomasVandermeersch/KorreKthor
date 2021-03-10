@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [KorreKthor.PrjPcb]
+   Generated File[mergePCB.TXT]
+   Generated File[mergePCB.LDP]
+   Generated File[mergePCB.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 17:02:58 On 10-03-21
