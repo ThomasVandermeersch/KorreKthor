@@ -42,7 +42,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
       const files = JSON.parse(fileVersions)
 
       // QRCode generator
-      studentJson = { "name": student.name, "matricule": student.matricule, "lesson": lesson.name, "version": student.version, "lessonId": lesson.id }
+      studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
       QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
         doc.image('pre_pdf/' + student.matricule + ".png", 50, 115, { scale: 0.45 });
         doc.pipe(writeStream);
@@ -77,7 +77,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
           examPath = `./downloads/Exam_${lesson.id}.pdf`;
           await m.save(examPath); //save under given name
 
-          removeUnnecessary();
+          // removeUnnecessary();
 
           ret = {
             correction: correctionPath,

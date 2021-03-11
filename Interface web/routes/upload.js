@@ -28,10 +28,11 @@ router.post("/scans", upload.single("file"), async (req, res) => {
         }
         else{
             var exam;
+            console.log(body)
             JSON.parse(body).foreach(async (copy) => {
                 if (copy.error === "None"){
                     if (exam == undefined){
-                        exam = await Exam.findOne({where:{id:copy.lessonId}})
+                        exam = await Exam.findOne({where:{id:copy.qrcode.lessonId}})
                     }
 
                     // resp = JSON.parse(exam.corrections[copy.version])
@@ -39,8 +40,8 @@ router.post("/scans", upload.single("file"), async (req, res) => {
                     result = correction.correctionNormal(copy.answers, resp, 1, 0, 0)
                     
                     if (points != null){
-                        user = await User.findOne({where:{matricule:copy.matricule}})
-                        await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.version, "result": result, "file":`uploads/${req.file.originalname}`})
+                        user = await User.findOne({where:{matricule:copy.qrcode.matricule}})
+                        await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.qrcode.version, "result": result, "file":`uploads/${req.file.originalname}`})
                     }
                 }
             })
