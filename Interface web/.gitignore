@@ -4,3 +4,4 @@ package-lock.json
 pre_pdf/
 .env
 certificates/
+downloads/

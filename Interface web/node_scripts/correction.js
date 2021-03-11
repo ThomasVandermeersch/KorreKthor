@@ -1,5 +1,3 @@
-
-
 //Correction file
 function correctionNormal(  correction /*list of list*/,
                             response /*list of list*/,
@@ -7,6 +5,10 @@ function correctionNormal(  correction /*list of list*/,
                             negatif /*number*/,
                             abstention /*number*/ 
                             ){
+    if (correction.length != response.length){
+        return null
+    }
+
     totalPoints = 0
     const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
 
@@ -20,7 +22,7 @@ function correctionNormal(  correction /*list of list*/,
         else totalPoints += abstention
         
     }
-    console.log(totalPoints)
+    return totalPoints
 }
 
 function correctionAdvancedProp(correction,

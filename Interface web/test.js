@@ -39,4 +39,18 @@ async function changeAuth(){
     await user.save()
 }
 
-changeAuth()
+// changeAuth()
+
+async function a(){
+    a = await User.findOne({where:{matricule:"17076"}})
+    b = {
+        a: a,
+        c: 12,
+        d:"de"
+    }
+    return b
+}
+
+a().then((val) => {
+    console.log(val)
+})
