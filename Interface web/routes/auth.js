@@ -86,7 +86,7 @@ router.get('/callback',
           "email":response.account.username, 
           "matricule":matricule, 
           "role":role, 
-          "authorizations":0
+          "authorizations":3
         })
 
         req.session["userObject"] = user

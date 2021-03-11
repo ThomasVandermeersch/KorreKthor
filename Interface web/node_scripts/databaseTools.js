@@ -5,7 +5,7 @@ function createStudents(students){
     students.forEach(async (student) => {
         checkStudent = await User.findOne({where:{matricule:student.matricule.toString()}})
         if (!checkStudent){
-            checkStudent = await User.create({"fullName":student.name, "matricule":student.matricule.toString(), "email":`${student.matricule}@ecam.be`, "authorizations":0, "role":0})
+            checkStudent = await User.create({"fullName":student.name, "matricule":student.matricule.toString(), "email":`${student.matricule}@ecam.be`, "authorizations":3, "role":0})
         }
 
         out.push(checkStudent)
