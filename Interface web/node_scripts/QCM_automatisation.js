@@ -12,10 +12,8 @@ async function createInvoice(students, lesson, answers, fileVersions) {
    * Temps files are located in ./pre_pdf, ./result_pdf
    */
 
-  var pre_pdf = "pre_pdf/"
-  if (!fs.existsSync(pre_pdf)) {
-    fs.mkdirSync(pre_pdf)
-  }
+
+  setUp()
 
   generateCorection(answers);
 
@@ -63,7 +61,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
           correctionPath = `./downloads/Correction_${lesson.id}.pdf`;
           await c.save(correctionPath);
 
-
+          
           sources.forEach(path => {
             index = sources.indexOf(path);
             console.log(files[students[index].version]);
@@ -77,7 +75,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
           examPath = `./downloads/Exam_${lesson.id}.pdf`;
           await m.save(examPath); //save under given name
 
-          // removeUnnecessary();
+          removeUnnecessary();
 
           ret = {
             correction: correctionPath,
@@ -93,7 +91,26 @@ async function createInvoice(students, lesson, answers, fileVersions) {
   })
 }
 
+function setUp(){
+  /**
+   * This function creates the files environement
+   */
+
+  var pre_pdf = "pre_pdf/"
+  if (!fs.existsSync(pre_pdf)) {
+    fs.mkdirSync(pre_pdf)
+  }
+
+  var downloads = "downloads/"
+  if (!fs.existsSync(downloads)) {
+    fs.mkdirSync(downloads)
+  }
+}
+
 function removeUnnecessary() {
+  /**
+   * This function removes the files after generations
+   */
   fs.rmdir("pre_pdf/", { recursive: true }, (err) => {
     if (err) {
       throw err;
