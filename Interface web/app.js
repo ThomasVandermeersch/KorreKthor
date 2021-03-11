@@ -1,16 +1,16 @@
 const express = require("express")
 const path = require("path")
 const bodyParser = require('body-parser');
-const createError = require('http-errors');
-const cookieParser = require('cookie-parser');
+// const createError = require('http-errors');
+// const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('express-flash');
 const msal = require('@azure/msal-node');
 const https = require('https');
 const fs = require("fs");
-const acces = require('./node_scripts/hasAcces')
-const Sequelize = require('sequelize');
-const { User, Exam, Copy } = require("./node_scripts/database/models");
+// const acces = require('./node_scripts/hasAcces')
+// const Sequelize = require('sequelize');
+// const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 require('dotenv').config();
 
@@ -93,6 +93,7 @@ app.get("*", function (req, res) {
 var httpsServer = https.createServer(credentials, app)
 httpsServer.listen(9898)
 console.log("Listening on : https://localhost:9898/")
+console.log("PostgrSQL host : " + process.env.POSTGRES_HOST )
 
 // (async function () {
   // var user = await User.create({"fullName":"Tom"})

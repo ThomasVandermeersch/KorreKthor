@@ -2,8 +2,9 @@ const router = require('express-promise-router')();
 const request = require('request');
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
+const { User, Exam, Copy } = require("../node_scripts/database/models");
 
-var multer  = require('multer') // Specific import for files 
+var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
@@ -23,14 +24,24 @@ router.post("/scans", upload.single("file"), async (req, res) => {
 	request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
         if (err){
             res.status("500")
-            res.send({"error":"something went wrong", "errorCode":1000})
+            res.send({"error":"something went wrong with the correction server.", "errorCode":1000})
         }
         else{
-            JSON.parse(body).forEach(copy => {
+            var exam;
+            JSON.parse(body).foreach(async (copy) => {
                 if (copy.error === "None"){
-                    console.log(copy.student)
+                    if (exam == undefined){
+                        exam = await Exam.findOne({where:{id:copy.lessonId}})
+                    }
+
+                    // resp = JSON.parse(exam.corrections[copy.version])
                     resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
-                    console.log(correction.correctionNormal(copy.answers, resp, 1, 0, 0))
+                    result = correction.correctionNormal(copy.answers, resp, 1, 0, 0)
+                    
+                    if (points != null){
+                        user = await User.findOne({where:{matricule:copy.matricule}})
+                        await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.version, "result": result, "file":`uploads/${req.file.originalname}`})
+                    }
                 }
             })
 

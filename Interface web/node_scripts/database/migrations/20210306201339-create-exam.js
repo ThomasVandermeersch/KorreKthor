@@ -16,10 +16,16 @@ module.exports = {
           allowNull: false
       },
       versionsFiles:{
-          type: DataTypes.ARRAY(DataTypes.STRING),
+          type: DataTypes.STRING,
       },
-      correctionFiles:{
-          type: DataTypes.ARRAY(DataTypes.STRING),
+      corrections:{
+        type: DataTypes.STRING(2048),
+      },
+      correctionCriterias:{
+        type: DataTypes.STRING(1024)
+      },
+      correctionFile:{
+          type: DataTypes.STRING,
       },
       examFile:{
           type: DataTypes.STRING,
