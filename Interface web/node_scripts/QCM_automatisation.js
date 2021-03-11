@@ -24,7 +24,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
   return new Promise((resolve, reject) => {
     students.forEach(async (student) => {
       let doc = new PDFDocument();
-      let writeStream = fs.createWriteStream(pre_pdf + (student.matricule).toString() + ".pdf")
+      let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
       generateHeader(doc); //Mise des carés et d'un titre
       generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
