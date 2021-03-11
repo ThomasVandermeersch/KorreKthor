@@ -19,13 +19,14 @@ def extractTextAndImg(path):
             # Save image to From_PDF/
             img = page.getImageList()
             xref = img[pageNumber-1][0]
+            # xref = img[0][0]
             pix = fitz.Pixmap(file, xref)
             pix.writePNG(fromPath)
 
             # Rename the file with the student infos
             student = decodeQRCode(fromPath)
             if student:
-                toPath = f"From_PDF/{student['lesson']}_{student['version']}_{student['matricule']}.png"
+                toPath = f"From_PDF/{student['lessonId']}_{student['version']}_{student['matricule']}.png"
                 os.rename(fromPath, toPath)
 
         return True

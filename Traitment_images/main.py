@@ -39,7 +39,7 @@ def compute(pdf):
                         if qrcode == None:
                             jsonToSend.append({"error" : f"{img} has no Enable QR Code"})
                         
-                        jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
+                        jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img, "error" : "None"})
 
 
     print(json.dumps(jsonToSend))
