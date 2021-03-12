@@ -1,11 +1,16 @@
 const { User, Exam, Copy } = require("../node_scripts/database/models");
+const convertMatricule = require('./convertMatricule')
 
 function createStudents(students){
     var out = []
     students.forEach(async (student) => {
-        checkStudent = await User.findOne({where:{matricule:student.matricule.toString()}})
+        var matricule = convertMatricule.convertMatricule(student.matricule)
+
+        checkStudent = await User.findOne({where:{matricule:matricule}})
         if (!checkStudent){
-            checkStudent = await User.create({"fullName":student.name, "matricule":student.matricule.toString(), "email":`${student.matricule}@ecam.be`, "authorizations":3, "role":0})
+            var email = convertMatricule.matriculeToEmail(student.matricule)
+
+            checkStudent = await User.create({"fullName":student.name, "matricule": matricule, "email": email, "authorizations":3, "role":0})
         }
 
         out.push(checkStudent)

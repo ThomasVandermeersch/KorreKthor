@@ -1,5 +1,5 @@
 const { User, Exam, Copy } = require("../node_scripts/database/models");
-
+const convertMatricule = require('./../node_scripts/convertMatricule')
 /* GET auth callback. */
 const router = require('express-promise-router')();
 
@@ -65,21 +65,13 @@ router.get('/callback',
       // Get the matricule and the role 
       var checkUser = await User.findOne({where:{email:response.account.username}})
       if (checkUser === null){
-        var matricule;
         var role;
-        if(response.account.username.startsWith('19')) { 
-          matricule = String(parseInt(response.account.username.split('@')[0], 10) - 176000)
-        }
-        else{
-          matricule = String(response.account.username.split('@')[0])
-          let re = /^\d/
-          if (re.test(matricule)){
-            role = 0
-          }
-          else{
-            role = 1
-          }
-        }
+        
+        var matricule = convertMatricule.emailToMatricule(response.account.username)
+        let re = /^\d/
+        
+        if (re.test(matricule)) role = 0
+        else role = 1
         
         var user = await User.create({
           "fullName":response.account.name, 

@@ -27,30 +27,37 @@ async function hello(){
 }
 
 
-//hello()
+hello()
 
 //0 ==> admin + create
 //1 ==> create
 //2 ==> admin
 //3 ==> rien
 async function changeAuth(){
-    var user = await User.findOne({where:{matricule:'17076'}})
-    user.authorizations = 1
-    await user.save()
+    //var user = await User.findOne({where:{matricule:'17030'}})
+    var users = await User.findAll()
+
+    users.forEach(user=>{
+        user.destroy()
+    })
+    user.authorizations = 0
+    // console.log(user)
+    // await user.save()
 }
 
-// changeAuth()
 
-async function a(){
-    a = await User.findOne({where:{matricule:"17076"}})
-    b = {
-        a: a,
-        c: 12,
-        d:"de"
-    }
-    return b
-}
+//changeAuth()
 
-a().then((val) => {
-    console.log(val)
-})
+// async function a(){
+//     a = await User.findOne({where:{matricule:"17076"}})
+//     b = {
+//         a: a,
+//         c: 12,
+//         d:"de"
+//     }
+//     return b
+// }
+
+// a().then((val) => {
+//     console.log(val)
+// })
