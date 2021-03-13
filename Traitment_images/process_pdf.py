@@ -1,5 +1,6 @@
 import fitz
 import os
+from pathlib import Path
 
 from process_img import decodeQRCode
 
@@ -7,6 +8,9 @@ def extractTextAndImg(path):
     """
     Extract each page of the pdf provided by path param to a .png file.
     """
+
+    Path("From_PDF/").mkdir(parents=True, exist_ok=True)
+
     file = fitz.open(path)
 
     print("Nbr of pages:", file.page_count)
@@ -25,8 +29,9 @@ def extractTextAndImg(path):
 
             # Rename the file with the student infos
             student = decodeQRCode(fromPath)
-            if student:
-                toPath = f"From_PDF/{student['lessonId']}_{student['version']}_{student['matricule']}.png"
+            if student and "version" in student and "matricule" in student:# and "lessonId" in student:
+                toPath = f"From_PDF/{student['version']}_{student['matricule']}.png"
+                # toPath = f"From_PDF/{student['lessonId']}_{student['version']}_{student['matricule']}.png"
                 os.rename(fromPath, toPath)
 
         return True
