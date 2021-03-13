@@ -38,8 +38,8 @@ def compute(pdf):
 
                         if qrcode and "version" in qrcode and "matricule" in qrcode:# and "lessonId" in qrcode:
                             jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img, "error" : "None"})
-                        
-                        jsonToSend.append({"error" : f"{img} has no correct QR Code"})
+                        else:
+                            jsonToSend.append({"error" : f"{img} has no correct QR Code"})
                         
 
 
