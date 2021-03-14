@@ -29,9 +29,9 @@ def extractTextAndImg(path):
 
             # Rename the file with the student infos
             student = decodeQRCode(fromPath)
-            if student and "version" in student and "matricule" in student:# and "lessonId" in student:
-                toPath = f"From_PDF/{student['version']}_{student['matricule']}.png"
-                # toPath = f"From_PDF/{student['lessonId']}_{student['version']}_{student['matricule']}.png"
+            if student and "version" in student and "matricule" in student and "lessonId" in student:
+                # toPath = f"From_PDF/{student['version']}_{student['matricule']}.png"
+                toPath = f"From_PDF/{student['lessonId']}_{student['version']}_{student['matricule']}.png"
                 os.rename(fromPath, toPath)
 
         return True
