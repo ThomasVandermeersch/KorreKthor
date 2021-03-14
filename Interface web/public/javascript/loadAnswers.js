@@ -28,7 +28,9 @@ document.querySelectorAll(".addChoice").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.parentNode.parentNode
         var row = table.rows[item.parentNode.parentNode.rowIndex]
-        row.insertCell(row.cells.length - 2).innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
+        if (row.cells.length <= 12){
+            row.insertCell(row.cells.length - 2).innerHTML +=  `<input type='checkbox' class='form-check-input checkboxClass'  id='question' name='${row.cells.length-4}' value='yes'>`
+        }
     })
 })
 
@@ -37,9 +39,8 @@ document.querySelectorAll(".removeChoice").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.parentNode.parentNode
         var row = table.rows[item.parentNode.parentNode.rowIndex]
-        var nbCell = row.cells.length
-        if(nbCell > 4){
-            row.deleteCell(row.cells.length - 2)
+        if(row.cells.length > 4){
+            row.deleteCell(row.cells.length - 3)
         }
     })
 })
@@ -49,41 +50,44 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
     item.addEventListener("click", function(){
         var table = item.parentNode.parentNode.childNodes[1]
         var nbRows = table.rows.length
-        var row = table.insertRow()
-        row.insertCell(0).innerHTML = "Question " + (nbRows + 1)
 
-        for(let i=1; i < 4; i++ ){
-            row.insertCell(i).innerHTML = "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>"
-        }
+        if (nbRows < 20){
+            var row = table.insertRow()
+            row.insertCell(0).innerHTML = "Question " + (nbRows + 1)
 
-        var button = document.createElement("button")
-        button.classList.add("btn", "btn-secondary", "btn-sm", "addChoice-0")
-        button.innerHTML = "+"
-
-        var removeButton = document.createElement("button")
-        removeButton.classList.add("btn", "btn-secondary", "btn-sm", "removeChoice-0")
-        removeButton.innerHTML = "-"
-
-        row.insertCell(4).appendChild(removeButton)
-        row.cells[4].appendChild(button)
-        
-        removeButton.parentNode.classList.add("px-0", "mx-0")
-        button.parentNode.classList.add("px-0", "mx-0")
-
-
-        button.addEventListener("click",function(){
-            var row2 = table.rows[button.parentNode.parentNode.rowIndex]
-            var cell2 = row2.insertCell(4)
-            cell2.innerHTML +=  "<input type='checkbox' class='form-check-input checkboxClass'  id='subscribeNews' name='subscribe' value='newsletter'>" 
-        })
-
-        removeButton.addEventListener("click",function(){
-            var row = table.rows[button.parentNode.parentNode.rowIndex]
-            var nbCell = row.cells.length
-            if(nbCell > 4){
-                row.deleteCell(row.cells.length - 2)
+            for(let i=1; i < 4; i++ ){
+                row.insertCell(i).innerHTML = `<input type='checkbox' class='form-check-input checkboxClass'  id='question' name='${i-1}' value='yes'>`
             }
-        })
+
+            var button = document.createElement("button")
+            button.classList.add("btn", "btn-secondary", "btn-sm", "addChoice-0")
+            button.innerHTML = "+"
+
+            var removeButton = document.createElement("button")
+            removeButton.classList.add("btn", "btn-secondary", "btn-sm", "removeChoice-0")
+            removeButton.innerHTML = "-"
+
+            row.insertCell(4).appendChild(removeButton)
+            row.insertCell(5).appendChild(button)
+            
+            removeButton.parentNode.classList.add("px-0", "mx-0")
+            button.parentNode.classList.add("px-0", "mx-0")
+
+
+            button.addEventListener("click",function(){
+                var row2 = table.rows[button.parentNode.parentNode.rowIndex]
+                if (row2.cells.length <= 12){
+                    row.insertCell(row.cells.length - 2).innerHTML +=  `<input type='checkbox' class='form-check-input checkboxClass'  id='question' name='${row2.cells.length-4}' value='yes'>`
+                }
+            })
+
+            removeButton.addEventListener("click",function(){
+                var row = table.rows[button.parentNode.parentNode.rowIndex]
+                if(row.cells.length > 4){
+                    row.deleteCell(row.cells.length - 3)
+                }
+            })
+        }
     })
 })
 

@@ -10,13 +10,13 @@ div(class="container w-50 page")
         div(class="row mt-3")
             div(class="col-md-12")
                 label(for="fileForm" class="form-label") Veuillez entrer le fichier Excel avec la liste d'élèves.
-            div(class="col-md-10")
+            div(class="col-md-9")
                 input(class="form-control" id="fileForm" type="file" name="studentList" required)
                 if messages.errormsg
                     div(class="alert alert-danger" role="alert")
                         p= messages.errormsg
-            div(class="col-md-2")
-                input(class="btn btn-warning" type="submit", value="Submit file")
+            div(class="col-md-3")
+                input(class="btn btn-warning float-end" type="submit", value="Submit file")
 
 
     include footer.pug

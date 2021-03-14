@@ -26,9 +26,9 @@ var upload = multer({ storage: storage})
 
 // Download final pdf route 
 router.get("/downloadresult", acces.hasAcces, async (req, res) => {
-    var exam = await Exam.findOne({whene:{id:req.session.examId}})
+    var exam = await Exam.findOne({where:{id:req.session.examId}})
     res.download(
-        exam.examFile,
+        path.resolve(exam.examFile),
         (err) => {
             if (err) res.status(404).send("<h1>File Not found: 404</h1>");
         }
@@ -37,9 +37,9 @@ router.get("/downloadresult", acces.hasAcces, async (req, res) => {
 
 
 router.get("/downloadcorrection", acces.hasAcces, async (req, res) => {
-    var exam = await Exam.findOne({whene:{id:req.session.examId}})
+    var exam = await Exam.findOne({where:{id:req.session.examId}})
     res.download(
-        exam.correctionFile,
+        path.resolve(exam.correctionFile),
         (err) => {
             if (err) res.status(404).send("<h1>File Not found: 404</h1>");
         }
@@ -99,7 +99,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     console.log(studentObjects)
 
     var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers)})
-
+    console.log(exam.id)
     var lesson = {
         name: lessonName,
         id: exam.id
@@ -116,7 +116,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         exam.examFile = ret.exam
         exam.correctionFile = ret.correction
         exam.save()
-
+        console.log(exam.id)
         req.session["examId"] = exam.id
         
         //redirect
