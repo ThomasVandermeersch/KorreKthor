@@ -140,7 +140,7 @@ router.post("/sendList",acces.hasAcces, upload.single("studentList"), async func
                 excelFile = {
                     filename: req.file.originalname,
                     versions: JSON.stringify(versions[2]),
-                    lesson: JSON.stringify(versions[3])
+                    lesson: versions[3]
                 }
 
                 req.session["excelFile"] = excelFile

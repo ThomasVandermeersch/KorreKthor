@@ -1,0 +1,28 @@
+include header.pug
+
+div(class="container")
+    if exams.length
+        h1= "Exams"
+        each exam in exams
+            div(class="exam row mb-3" onClick=`getExam("${ exam.id }")`)
+                div(class="lesson col-md-3")= exam.name
+                div(class="versions col-1")= exam.numberOfVersion
+                div(class="created col-md-5")= exam.createdAt
+    
+    if copies.lenght
+        h1= "Copies"
+        each copy in copies
+            div(class="exam row mb-3" onClick=`getCopy("${ exam.id }")`)
+                div(class="lesson col-md-4")= copy.name
+                div(class="versions col-sm-1")= copy.version
+                div(class="created col-md-7")= copy.createdAt
+            
+        
+script.
+    function getExam(id){
+        window.location.href = `/see/exam/${id}`
+    }
+
+    function getCopy(id){
+        window.location.href = `/see/copy/${id}`
+    }
