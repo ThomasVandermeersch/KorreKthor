@@ -69,16 +69,20 @@ app.use(function(req,res,next){
   next();
 });
 
+// Import routes
 var createRouter = require('./routes/create');
 var indexRouter = require("./routes/index")
 var authRouter = require("./routes/auth")
 var uploadRouter = require("./routes/upload")
 var adminRouter = require("./routes/admin")
+var seeRouter = require("./routes/see")
+
 app.use('/create', createRouter);
 app.use('',indexRouter)
 app.use('/auth',authRouter)
 app.use('/upload', uploadRouter)
 app.use('/admin',adminRouter)
+app.use('/see',seeRouter)
 
 
 

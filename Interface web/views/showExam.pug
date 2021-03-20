@@ -1,0 +1,11 @@
+include header.pug
+
+div(class="container")
+    h1(class="name")= `Exam ${exam.name}`
+    div(class="specs row")
+        div(class="id col-4")= exam.id
+        div(class="verison col-2")= exam.numberOfVersion
+        div(class="correcitonFile")= exam.correctionFile
+        div(class="examFile")= exam.examFile
+        div(class="criteria")= exam.correctionCriterias
+        div(class="created")= exam.createdAt
