@@ -80,6 +80,8 @@ app.use('/auth',authRouter)
 app.use('/upload', uploadRouter)
 app.use('/admin',adminRouter)
 
+
+
 //Si aucune route n'est trouvée
 app.get("*", function (req, res) {
   res.status("404")

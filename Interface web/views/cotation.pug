@@ -6,85 +6,11 @@ div(class="container w-50 page")
 
     h2 Etape 4 : Entrer les critères de correction 
     
-    div(class="row mt-3")
-        div
-            label(for="fileForm" class="form-label") Choisissez une option
-        div
-            select(class="form-select", id="correctionType")
-                option(value="normal") Normal
-                option(value="advanced") Advanced
-
-        div(id='normal')
-            br
-            form(action="/create/sendNormalCotationCriteria", method="POST" , class="form-inline")
-                div(class="form-group row")
-                    div(class="form-group col-md-6")
-                        label(for="inputEmail4") Une bonne réponse rapporte (pts)
-                        input(type="number",name="ptsRight" class="form-control", value=1, min=0, step=1)
-    
-                    div(class="form-group col-md-6")
-                        label(for="inputPassword4") Une mauvaise réponse fait perdre (pts)
-                        input(type="number",name = "ptsWrong" class="form-control", value=0, min=0, step=0.25)
-                    
-                    div(class="form-group col-md-6")
-                        label(for="inputPassword4") Une abstention rapporte (pts)
-                        input(type="number",name="ptsAbs", class="form-control", value=0, min=0, step=0.5)
-
-                div(class="row mt-3")
-                    div(class="col-12")
-                        input(class="btn btn-warning float-end" type="submit", value="Enregistrer et confirmer")
-
-
-        div(id='advanced',style="display: none;")
-            br
-            p Ce type de QCM s'utilise lorsqu'il y a plusieurs choix possibles. Entrez le nombre de points que rapportent/perdent la proposition.
-            
-            form(action="/create/sendAdvancedCotationCriteria", method="POST" , class="form-inline")
-                div(class="form-group row")
-                    div(class="form-group col-md-6")
-                        label() Toutes les réponses sont correctes (pts)
-                        input(type="number",name="allGood" class="form-control", value=1, min=0, step=1)
-    
-                    div(class="form-group col-md-6")
-                        label() Une des réponse est incorrecte (pts)
-                        input(type="number",name="oneWrong", class="form-control", value=0.75, step=0.25)
-                    
-                    div(class="form-group col-md-6")
-                        label() Deux réponses sont incorrectes (pts)
-                        input(type="number",name="twoWrong", class="form-control", value=0.50, step=0.25)
-                    
-                    div(class="form-group col-md-6")
-                        label() Trois réponses sont incorrectes (pts)
-                        input(type="number",name="threeWrong", class="form-control", value=0.25, step=0.25)
-
-                    div(class="form-group col-md-6")
-                        label(f) Plus de trois réponses sont incorrectes (pts)
-                        input(type="number",name="threeMoreWrong" class="form-control", value=0, step=0.5)
-                
-                br
-                div(class="form-check")
-                    input(type="checkbox",name="isLastExclusive" class="form-check-input", id="checkBoxProposition")
-                    label(class="form-check-label", for="exampleCheck1") La dernière proposition est un tout ou rien
-                
-                div(id="lastPropostion",style="display: none;")
-                    br
-                    p Si la dernière proposition est correcte, toute la correction se fait sur le modèle ci-dessous.
-                    div(class="form-group row")
-                        div(class="form-group col-md-6")
-                            label(for="inputEmail4") La dernière propostion est correcte (pts)
-                            input(type="number",name="lastExclusiveTrue",class="form-control", value=1, min=0, step=1)
-        
-                        div(class="form-group col-md-6")
-                            label(for="inputPassword4") La dernière proposition est incorrecte (pts)
-                            input(type="number",name="lastExclusiveFalse", class="form-control", value=0 step=0.5)
-                
-                div(class="row mt-3")
-                    div(class="col-12")
-                        input(class="btn btn-warning float-end" type="submit", value="Enregistrer et confirmer")
+    include cotationTable.pug
 
         
-        div(class="btn-group mb-5" role="group")
-            a(href="/create/Step5")
-                button(class="btn btn-secondary addQuestion") Passer cette étape 
+    div(class="btn-group mb-5" role="group")
+        a(href="/create/Step5")
+            button(class="btn btn-secondary addQuestion") Passer cette étape 
 
 script(src='/javascript/correction.js')

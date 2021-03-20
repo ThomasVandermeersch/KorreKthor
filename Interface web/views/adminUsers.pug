@@ -39,7 +39,7 @@ table(class="table tableClass mt-0 p-0")
                     td Admin
                 
                 else 
-                    td Aucuns
+                    td Aucun
                 td
                     //- On ne peut pas modifier un Admin, sauf si c'est nous.
                     if (user.authorizations != 0 && user.authorizations != 2) || user.email == session.userObject.email

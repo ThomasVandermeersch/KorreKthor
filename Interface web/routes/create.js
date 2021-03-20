@@ -78,8 +78,19 @@ router.get("/Step3",acces.hasAcces, function(req, res){
 
 //Route de cotation
 router.get("/Step4",acces.hasAcces,function(req,res){
-        res.render('cotation.pug')
-    
+        res.render('cotation.pug',
+            {   type:'normal',
+                ptsRight:9,
+                ptsWrong:10,
+                ptsAbs:12,
+                allGood:1,
+                oneWrong:0.75,
+                twoWrong:0.50,
+                threeWrong:0.25,
+                threeMoreWrong:0.21,
+                isLastExclusive : 'on',
+                lastExclusiveTrue:1,
+                lastExclusiveFalse:0})
 })
 
 // Route to the download page
@@ -178,15 +189,23 @@ router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (re
 
 
 router.post("/sendNormalCotationCriteria", acces.hasAcces, async (req,res)=>{
+    var criteria = req.body
+    console.log("____ CRITERIAS ___")
+    console.log(criteria)
+    console.log("____ EXAM ID ___")
+    console.log(req.session.examId)
+
     var exam = await Exam.findOne({where:{id:req.session.examId}})
-    exam.correctionCriterias = JSON.stringify(req.body)
+    exam.correctionCriterias = JSON.stringify(criteria)
     exam.save()
     res.redirect('/create/Step5')
 })
 
 router.post("/sendAdvancedCotationCriteria", acces.hasAcces, async (req,res)=>{
+    var criteria = req.body
+    criteria['type'] = 'advanced'
     var exam = await Exam.findOne({where:{id:req.session.examId}})
-    exam.correctionCriterias = JSON.stringify(req.body)
+    exam.correctionCriterias = JSON.stringify(criteria)
     exam.save()
     res.redirect('/create/Step5')
 })

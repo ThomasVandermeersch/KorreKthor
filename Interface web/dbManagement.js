@@ -4,11 +4,12 @@
 const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 async function seeUsers(){
-    var users = await User.findAll()
-    var mapping = users.map(user=>(user.dataValues))
-    console.log(mapping)
+    var users = await Exam.findAll()
+    //var mapping = users.map(user=>(user.dataValues))
+    console.log(users)
 }
 
+seeUsers()
 
 
 //0 ==> admin + create
@@ -28,5 +29,5 @@ async function deleteUsers(){
 }
 
 //seeUsers()
-//changeAuth('17030',0)
-deleteUsers()
+changeAuth('17030',0)
+//deleteUsers()

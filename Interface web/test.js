@@ -46,7 +46,7 @@ async function changeAuth(){
 }
 
 
-//changeAuth()
+//angeAuth()
 
 // async function a(){
 //     a = await User.findOne({where:{matricule:"17076"}})
