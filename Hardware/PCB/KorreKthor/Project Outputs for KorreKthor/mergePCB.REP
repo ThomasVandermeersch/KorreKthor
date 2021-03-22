@@ -2,36 +2,37 @@
 FileName = mergePCB.GBR
 AutoAperture = True
 *************************************************************
-Generating : Mechanical 13
-      File : mergePCB.GM13
+Generating : Bottom Layer
+      File : mergePCB.GBL
 
-    Adding Layer      : Mechanical 13
+    Adding Layer      : Bottom Layer
 
-
-Used DCodes :
-    D10
-    D11
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 1
-      File : mergePCB.GM1
-
-    Adding Layer      : Mechanical 1
+    Adding Layer      : Multi-Layer
 
 
 Used DCodes :
-*************************************************************
-
-*************************************************************
-Generating : Keep-Out Layer
-      File : mergePCB.GKO
-
-    Adding Layer      : Keep-Out Layer
-
-
-Used DCodes :
-    D11
+    D37
+    D38
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D54
+    D55
+    D56
+    D57
+    D58
 *************************************************************
 
 *************************************************************
@@ -48,6 +49,27 @@ Used DCodes :
     D16
     D59
     D60
+*************************************************************
+
+*************************************************************
+Generating : Keep-Out Layer
+      File : mergePCB.GKO
+
+    Adding Layer      : Keep-Out Layer
+
+
+Used DCodes :
+    D11
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 1
+      File : mergePCB.GM1
+
+    Adding Layer      : Mechanical 1
+
+
+Used DCodes :
 *************************************************************
 
 *************************************************************
@@ -84,6 +106,57 @@ Used DCodes :
 *************************************************************
 
 *************************************************************
+Generating : Top Layer
+      File : mergePCB.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D37
+    D38
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D54
+    D55
+    D56
+    D57
+*************************************************************
+
+*************************************************************
+Generating : Top Overlay
+      File : mergePCB.GTO
+
+    Adding Layer      : Top Overlay
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+*************************************************************
+
+*************************************************************
 Generating : Top Solder
       File : mergePCB.GTS
 
@@ -117,87 +190,14 @@ Used DCodes :
 *************************************************************
 
 *************************************************************
-Generating : Top Overlay
-      File : mergePCB.GTO
+Generating : Mechanical 13
+      File : mergePCB.GM13
 
-    Adding Layer      : Top Overlay
+    Adding Layer      : Mechanical 13
 
 
 Used DCodes :
     D10
     D11
-    D12
-    D13
-    D14
-    D15
-    D16
-    D17
-*************************************************************
-
-*************************************************************
-Generating : Bottom Layer
-      File : mergePCB.GBL
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D37
-    D38
-    D39
-    D40
-    D41
-    D42
-    D43
-    D44
-    D45
-    D46
-    D47
-    D48
-    D49
-    D50
-    D51
-    D52
-    D53
-    D54
-    D55
-    D56
-    D57
-    D58
-*************************************************************
-
-*************************************************************
-Generating : Top Layer
-      File : mergePCB.GTL
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D37
-    D38
-    D39
-    D40
-    D41
-    D42
-    D43
-    D44
-    D45
-    D46
-    D47
-    D48
-    D49
-    D50
-    D51
-    D52
-    D53
-    D54
-    D55
-    D56
-    D57
 *************************************************************
 
