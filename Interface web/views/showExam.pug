@@ -1,11 +1,42 @@
 include header.pug
 
-div(class="container")
-    h1(class="name")= `Exam ${exam.name}`
-    div(class="specs row")
-        div(class="id col-4")= exam.id
-        div(class="verison col-2")= exam.numberOfVersion
-        div(class="correcitonFile")= exam.correctionFile
-        div(class="examFile")= exam.examFile
-        div(class="criteria")= exam.correctionCriterias
-        div(class="created")= exam.createdAt
+- var correction = JSON.parse(exam.correctionCriterias)
+
+div(class="container w-75")
+    div(class="card mt-2")
+        div(class="card-body")
+            h4(class="card-title") Exam #[strong #{exam.name}] - Créé (gris) | Corrigé (vert)
+            p(class="card-subtitle text-muted")= exam.id
+            p(class="card-subtitle mb-2 text-muted")= exam.createdAt
+
+            div(class="verison") Nombre de versions : #{exam.numberOfVersion}
+            
+            div(class="criteria my-3") 
+                if correction && correction.type
+                    div(class="criteria mb-2") Critère de correction : #[strong #{correction.type}]
+                        
+                        if correction.type == "normal"
+                            div(class="mx-2 w-50")
+                                table(class="table table-sm mb-1")
+                                    tr
+                                        th Reponses correctes (pts)
+                                        td + #{correction.ptsRight}
+                                    tr
+                                        th Abstentions (pts)
+                                        td - #{correction.ptsAbs}
+                                    tr
+                                        th Reponses fausses (pts)
+                                        td - #{correction.ptsWrong}
+                                a(href="#" class="btn btn-sm btn-secondary float-end mx-2") Changer
+                else 
+                    h6(class="text-danger mx-2") Correction error   
+                
+            if exam.correctionFile && exam.examFile
+                div(class="float-end mt-3")
+                    a(href=`/see/exam/${exam.id}/downloadresult` class="btn btn-success mx-2") Fichier d'examen
+                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="btn btn-success") Fichier de correction
+            else 
+                div(class="float-end mt-3")
+                    h6(class="text-danger") Fichiers introuvables
+            
+            
