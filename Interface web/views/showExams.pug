@@ -2,21 +2,39 @@ include header.pug
 
 div(class="container")
     if exams.length
-        h1= "Exams"
-        each exam in exams
-            div(class="exam row mb-3" onClick=`getExam("${ exam.id }")`)
-                div(class="lesson col-md-3")= exam.name
-                div(class="versions col-1")= exam.numberOfVersion
-                div(class="created col-md-5")= exam.createdAt
+        h1= "Examens"
+        table(class="table table-hover")
+            thead(class="thear-dark")
+                tr
+                    th(scope="col")= "Nom"
+                    th(scope="col")= "Etat"
+                    th(scope="col")= "# versions"
+                    th(scope="col")= "Date"
+
+            tbody
+                each exam in exams
+                    tr(onClick=`getExam("${ exam.id }")`)
+                        th= exam.name
+                        td Créé (gris) | Corrigé (vert)
+                        td= exam.numberOfVersion
+                        td 14 03 2021 22:35:41 
+                        //- td= exam.createdAt
     
     if copies.lenght
         h1= "Copies"
-        each copy in copies
-            div(class="exam row mb-3" onClick=`getCopy("${ exam.id }")`)
-                div(class="lesson col-md-4")= copy.name
-                div(class="versions col-sm-1")= copy.version
-                div(class="created col-md-7")= copy.createdAt
-            
+        table(class="table table-hover")
+            thead(class="thear-dark")
+                tr
+                    th(scope="col")= "Nom"
+                    th(scope="col")= "Version"
+                    th(scope="col")= "Date"
+            tbody
+                each copy in copies
+                    tr(onClick=`getCopy("${ copy.id }")`)
+                            th= copy.name
+                            td= copy.numberOfVersion
+                            td= copy.createdAt
+                
         
 script.
     function getExam(id){
