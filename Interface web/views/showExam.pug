@@ -2,7 +2,7 @@ include header.pug
 
 - var correction = JSON.parse(exam.correctionCriterias)
 
-div(class="container w-75 page")
+div(class="container page create")
     div(class="card mt-2")
         div(class="card-body")
             h4(class="card-title") Exam #[strong #{exam.name}] - Créé (gris) | Corrigé (vert)
@@ -16,7 +16,7 @@ div(class="container w-75 page")
                     div(class="criteria mb-2") Critère de correction : #[strong #{correction.type}]
                         
                         if correction.type == "normal"
-                            div(class="mx-2 w-50")
+                            div(class="mx-2 create")
                                 table(class="table table-sm mb-1")
                                     tr
                                         th Reponses correctes (pts)
@@ -27,14 +27,14 @@ div(class="container w-75 page")
                                     tr
                                         th Reponses fausses (pts)
                                         td - #{correction.ptsWrong}
-                                a(href="#" class="btn btn-sm btn-secondary float-end mx-2") Changer
+                                a(href="#" class="btn btn-sm btn-secondary bouton float-end mx-2") Changer
                 else 
                     h6(class="text-danger mx-2") Correction error   
                 
             if exam.correctionFile && exam.examFile
                 div(class="float-end mt-3")
-                    a(href=`/see/exam/${exam.id}/downloadresult` class="btn btn-success mx-2") Fichier d'examen
-                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="btn btn-success") Fichier de correction
+                    a(href=`/see/exam/${exam.id}/downloadresult` class="btn btn-success bouton me-2") Fichier d'examen
+                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="btn bouton btn-success") Fichier de correction
             else 
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables

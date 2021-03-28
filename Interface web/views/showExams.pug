@@ -13,7 +13,7 @@ div(class="container page")
 
             tbody
                 each exam in exams
-                    tr(onClick=`getExam("${ exam.id }")`)
+                    tr(onClick=`getExam("${ exam.id }")` style="cursor: pointer;")
                         th= exam.name
                         td Créé (gris) | Corrigé (vert)
                         td= exam.numberOfVersion
@@ -30,7 +30,7 @@ div(class="container page")
                     th(scope="col")= "Date"
             tbody
                 each copy in copies
-                    tr(onClick=`getCopy("${ copy.id }")`)
+                    tr(onClick=`getCopy("${ copy.id }")` style="cursor: pointer;")
                             th= copy.name
                             td= copy.numberOfVersion
                             td= copy.createdAt

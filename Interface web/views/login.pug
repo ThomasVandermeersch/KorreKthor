@@ -1,10 +1,13 @@
 include header.pug
 
-h1 Bienvenue sur KorreKthor 
+div(class="page container-fluid login")
+    div(class="login-container text-center")
+        h1 Bienvenue sur KorreKthor 
+        br
+        h5 Connectez-vous avec votre compte Office365 !
 
-h2 Connectez-vous avec votre compte Office365
-
-a(href="/auth/signin")
-    button() Je me connecte
+        a(href="/auth/signin" class="btn justify-content-center m-auto" style="display: flex; width:12rem; background-color: #179bdd") 
+            img(src="/img/office.png" class="my-auto" height="25px" )
+            div(class="ms-2 text-white") Je me connecte
 
 include footer.pug
