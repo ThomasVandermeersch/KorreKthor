@@ -6,10 +6,15 @@ const { User, Exam, Copy } = require("./database/models");
 async function correctAll(scanResultString){
     const scanResult = JSON.parse(scanResultString)
     
-    //Step 1 : FIND THE CORRECTION RELATED TO THE EXAMID
+    //Step 1 : FIND THE EXAM RELATED TO THE EXAMID
     const exam = await Exam.findOne({where:{id:scanResult.examID}})
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
+    const questionStatus = {
+        "A": ['normal','normal','cancelled','cancelled','normal'],
+        "B": ['normal','normal','normal','normal','normal'],
+        "C": ['normal','normal','normal','normal','normal'], 
+    }
 
     //Step 2 : CORRECT ALL COPIES
     if(correctionCriterias.type == 'normal'){
@@ -17,6 +22,7 @@ async function correctAll(scanResultString){
             correctionNormal(
                 corrections[copy.version],
                 copy.response,
+                questionStatus[copy.version],
                 parseInt(correctionCriterias.ptsRight,10),
                 parseInt(correctionCriterias.ptsWrong,10),
                 parseInt(correctionCriterias.ptsAbs,10)
@@ -37,9 +43,10 @@ async function correctAll(scanResultString){
         else lastExclusive = false
 
         scanResult.copies.forEach(copy =>{
-            const points = correctionAdvanced(
+            correctionAdvanced(
                 corrections[copy.version],
                 copy.response,
+                questionStatus[copy.version],
                 parseInt(correctionCriterias.allGood,10),
                 parseInt(correctionCriterias.oneWrong,10),
                 parseInt(correctionCriterias.twoWrong,10),
@@ -87,12 +94,13 @@ copies = [
         [ false, false, false ]
       ]}
 ]
-//correctAll(JSON.stringify({examID:"6db05eb7-e5da-495c-ba5f-a834d3f2c5b3","copies":copies}))
+correctAll(JSON.stringify({examID:"6db05eb7-e5da-495c-ba5f-a834d3f2c5b3","copies":copies}))
 
 
 //Correction file
 function correctionNormal(  correction /*list of list*/,
                             response /*list of list*/,
+                            questionStatus, /*list */
                             positif /*number*/,
                             negatif /*number*/,
                             abstention /*number*/ 
@@ -108,21 +116,23 @@ function correctionNormal(  correction /*list of list*/,
         totalPoints = 0
         maxPoints = 0
         const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
-
+        console.log(questionStatus)
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
-            //Vérifier que le nombre de propositions de la correction correspond au nombre
-            //de proposition de la copie
-            if(response[questionIndex].length != correction[questionIndex].length){
-                reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            console.log(questionStatus[questionIndex])
+            if(questionStatus[questionIndex] == 'normal'){
+                //Vérifier que le nombre de propositions de la correction correspond au nombre
+                //de proposition de la copie
+                if(response[questionIndex].length != correction[questionIndex].length){
+                    reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+                }
+                maxPoints += positif
+                // NO ABSTENTION:
+                if(response[questionIndex].some(elem => elem == true)){            
+                    if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
+                    else totalPoints -= negatif
+                }
+                else totalPoints += abstention
             }
-            maxPoints += positif
-            // NO ABSTENTION:
-            if(response[questionIndex].some(elem => elem == true)){            
-                if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
-                else totalPoints -= negatif
-            }
-            else totalPoints += abstention
-            
         }
         resolve([totalPoints,maxPoints])
     });
@@ -179,6 +189,7 @@ function correctionAdvancedProp(correction,
 
 function correctionAdvanced(correction,
                             response,
+                            questionStatus, /*list */
                             eachGood,
                             onefalse,
                             twofalse,
@@ -196,12 +207,14 @@ function correctionAdvanced(correction,
             reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
         }
         for(var questionIndex=0; questionIndex < correction.length; questionIndex++ ){
-            if(response[questionIndex].length != correction[questionIndex].length){
-                reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            if(questionStatus[questionIndex] == 'normal'){
+                if(response[questionIndex].length != correction[questionIndex].length){
+                    reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+                }
+                correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],eachGood,onefalse,twofalse,threefalse,morethanthree,lastProp,lastPropTrue,lastPropFalse)
+                totalPoints += correctProp[0]
+                maxPoints += correctProp[1]
             }
-            correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],eachGood,onefalse,twofalse,threefalse,morethanthree,lastProp,lastPropTrue,lastPropFalse)
-            totalPoints += correctProp[0]
-            maxPoints += correctProp[1]
         }
         resolve([totalPoints,maxPoints])
     })
@@ -259,4 +272,4 @@ const response3 = [
 //correctionAdvanced(correction3,response3,1,0.75,0.5,0.25,0,false,1,0) //should return 2.5
 
 
-exports.correctAll = correctAll
+//exports.correctAll = correctAll

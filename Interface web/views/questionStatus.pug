@@ -1,0 +1,32 @@
+include header.pug 
+
+
+h1 NE PAS OUBLIER D'ENREGISTRER
+form(action="/modifyQuestionStatus", method="POST" , class="form-inline")
+    input(type="hidden" name="questionStatusObject" value=questionStatus)
+
+    each question, versionID in questionStatus
+        h1= 'Version ' +  versionID
+        table(class="table tableClass mt-0 p-0")
+            thead
+                tr
+                    td 
+                        b Question 
+                    td 
+                        b Status
+            each criteria, index in question
+                tr
+                    td= 'Question ' + (index+1)
+                    td
+                        if criteria=='normal'            
+                            select(class="form-select", id="correctionType" name='type')
+                                option(value="normal" name='normal') Normal
+                                option(value="cancelled" name='cancelled') Cancelled
+                                            if criteria=='normal'            
+                        else
+                            select(class="form-select", id="correctionType" name='type')
+                                option(value="cancelled" name='cancelled') Cancelled
+                                option(value="normal" name='normal') Normal
+    div(class="row mt-3")
+            div(class="col-12")
+                input(class="btn btn-warning float-end" type="submit", value="Enregistrer et confirmer")
