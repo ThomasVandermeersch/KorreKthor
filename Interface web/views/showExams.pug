@@ -1,6 +1,6 @@
 include header.pug
 
-div(class="container")
+div(class="container page")
     if exams.length
         h1= "Examens"
         table(class="table table-hover")
@@ -34,7 +34,7 @@ div(class="container")
                             th= copy.name
                             td= copy.numberOfVersion
                             td= copy.createdAt
-                
+include footer.pug    
         
 script.
     function getExam(id){

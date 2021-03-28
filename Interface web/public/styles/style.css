@@ -9,15 +9,15 @@
 
 .page{
     position: relative;
-    min-height: 75vh;
+    min-height: 83vh;
 }
+
 
 .footer {
     position: absolute;
-    bottom: -15vh;
-    left: -50%;
-    width: 200%;
+    bottom: auto;
 }
+
 
 .navbar .dropdown-menu-right { 
     right: 0; 

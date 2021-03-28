@@ -2,7 +2,7 @@ include header.pug
 
 - var correction = JSON.parse(exam.correctionCriterias)
 
-div(class="container w-75")
+div(class="container w-75 page")
     div(class="card mt-2")
         div(class="card-body")
             h4(class="card-title") Exam #[strong #{exam.name}] - Créé (gris) | Corrigé (vert)
@@ -39,4 +39,4 @@ div(class="container w-75")
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
             
-            
+include footer.pug
