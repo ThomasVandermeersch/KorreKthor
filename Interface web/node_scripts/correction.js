@@ -94,7 +94,7 @@ copies = [
         [ false, false, false ]
       ]}
 ]
-correctAll(JSON.stringify({examID:"6db05eb7-e5da-495c-ba5f-a834d3f2c5b3","copies":copies}))
+correctAll(JSON.stringify({examID:"e4fca29a-866c-4d9a-ab59-c8635257263f","copies":copies}))
 
 
 //Correction file

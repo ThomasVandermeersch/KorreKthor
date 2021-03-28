@@ -19,6 +19,7 @@
 
 const { forEach } = require("jszip");
 const { User, Exam, Copy } = require("./node_scripts/database/models");
+const user = require("./node_scripts/database/models/user");
 
 async function hello(){
     var users = await User.findAll()
@@ -27,7 +28,7 @@ async function hello(){
 }
 
 
-hello()
+// hello()
 
 //0 ==> admin + create
 //1 ==> create
@@ -61,3 +62,23 @@ async function changeAuth(){
 // a().then((val) => {
 //     console.log(val)
 // })
+
+// Copy.findAll().then((val)=>{
+//     val.forEach(async(exam)=>{
+//         console.log(exam.id)
+//         a = await exam.getUser()
+//         b = await a.getCopies()
+//         // console.log(a)
+//         console.log(b.length)
+//     })
+    
+// })
+
+Exam.findOne({where:{id:"e4fca29a-866c-4d9a-ab59-c8635257263f"}}).then(async(val) => {
+    a = await val.getUser()
+    console.log(a.fullName)
+    b = await val.getCopies()
+    console.log(b[0].id)
+})
+
+// Copy.create({"version":"A", "userId":"d2179d2b-f26a-4e45-bffb-19f23b5349c0", "examId":"e4fca29a-866c-4d9a-ab59-c8635257263f"})

@@ -1,13 +1,18 @@
 include header.pug
 
 - var correction = JSON.parse(exam.correctionCriterias)
+- var date = new Date(Date.parse(exam.createdAt))
 
 div(class="container page create")
     div(class="card mt-2")
         div(class="card-body")
-            h4(class="card-title") Exam #[strong #{exam.name}] - Créé (gris) | Corrigé (vert)
+            if exam.status == 0
+                h4(class="card-title") Exam #[strong #{exam.name}] - Créé
+            else 
+                h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
+
             p(class="card-subtitle text-muted")= exam.id
-            p(class="card-subtitle mb-2 text-muted")= exam.createdAt
+            p(class="card-subtitle mb-2 text-muted")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
             div(class="verison") Nombre de versions : #{exam.numberOfVersion}
             
@@ -20,23 +25,29 @@ div(class="container page create")
                                 table(class="table table-sm mb-1")
                                     tr
                                         th Reponses correctes (pts)
-                                        td + #{correction.ptsRight}
+                                        td +#{correction.ptsRight}
                                     tr
                                         th Abstentions (pts)
-                                        td - #{correction.ptsAbs}
+                                        td -#{correction.ptsAbs}
                                     tr
                                         th Reponses fausses (pts)
-                                        td - #{correction.ptsWrong}
-                                a(href="#" class="btn btn-sm btn-secondary bouton float-end mx-2") Changer
+                                        td -#{correction.ptsWrong}
+                                a(href="#" class="btn btn-sm btn-secondary float-end bouton mx-2") Changer
                 else 
                     h6(class="text-danger mx-2") Correction error   
-                
+
             if exam.correctionFile && exam.examFile
-                div(class="float-end mt-3")
-                    a(href=`/see/exam/${exam.id}/downloadresult` class="btn btn-success bouton me-2") Fichier d'examen
-                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="btn bouton btn-success") Fichier de correction
+                br
+                div(class="files")
+                    a(href=`/see/exam/${exam.id}/downloadresult` class="bouton") Fichier d'examen
+                    br
+                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="bouton") Fichier de correction
             else 
+                br
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
+                    
+            if exam.status == 1
+                a(href=`/see/copies/${exam.id}` class="btn btn-success bouton float-end") Afficher les copies des étudiants
             
 include footer.pug

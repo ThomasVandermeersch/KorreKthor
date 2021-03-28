@@ -1,0 +1,24 @@
+include header.pug
+
+- var date = new Date(Date.parse(copy.createdAt))
+
+div(class="container page create")
+    div(class="card mt-2")
+        div(class="card-body")
+            h4(class="card-title") Copie d'examen (#[strong #{exam.name}])
+
+            p(class="card-subtitle mb-2 text-muted")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+            
+            if copy.result < 10
+                h4(class="text-danger") Cote : #{copy.result}/20
+            else
+                h4(class="text-success") Cote : #{copy.result}/20
+            
+            div(class="files")
+                    a(href=`/see/copy/${copy.id}/download` class="bouton") Télécharger la copie
+                    
+
+            a(href=`#` class="btn btn-danger bouton float-end") Faire une réclamation
+
+
+include footer.pug  

@@ -3,37 +3,46 @@ include header.pug
 div(class="container page")
     if exams.length
         h1= "Examens"
-        table(class="table table-hover")
+        table(class="table table-hover examsTable")
             thead(class="thear-dark")
                 tr
                     th(scope="col")= "Nom"
                     th(scope="col")= "Etat"
-                    th(scope="col")= "# versions"
-                    th(scope="col")= "Date"
+                    th(scope="col" class="versions")= "# versions"
+                    th(scope="col" class="date")= "Date"
 
             tbody
                 each exam in exams
+                    - var date = new Date(Date.parse(exam.createdAt))
+
                     tr(onClick=`getExam("${ exam.id }")` style="cursor: pointer;")
                         th= exam.name
-                        td Créé (gris) | Corrigé (vert)
-                        td= exam.numberOfVersion
-                        td 14 03 2021 22:35:41 
-                        //- td= exam.createdAt
+                        if exam.status == 0
+                            td(class="text-secondary") Créé
+                        else 
+                            td(class="text-success") Corrigé
+                        td(class="versions")= exam.numberOfVersion
+                        td(class="date")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
     
-    if copies.lenght
+    if copies.length
         h1= "Copies"
-        table(class="table table-hover")
+        table(class="table table-hover copiesTable")
             thead(class="thear-dark")
                 tr
-                    th(scope="col")= "Nom"
-                    th(scope="col")= "Version"
-                    th(scope="col")= "Date"
+                    th(scope="col")= "Examen"
+                    th(scope="col")= "Cote (pts)"
+                    th(scope="col" class="version")= "Version"
+                    th(scope="col" class="date")= "Date"
             tbody
-                each copy in copies
-                    tr(onClick=`getCopy("${ copy.id }")` style="cursor: pointer;")
-                            th= copy.name
-                            td= copy.numberOfVersion
-                            td= copy.createdAt
+                each pair, index in copies
+                    - var date = new Date(Date.parse(pair.copy.createdAt))
+                    
+                    tr(onClick=`getCopy("${ pair.copy.id }")` style="cursor: pointer;")
+                            th= pair.exam.name
+                            th= pair.copy.result
+                            td(class="version")= pair.copy.version
+                            td(class="date")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+
 include footer.pug    
         
 script.

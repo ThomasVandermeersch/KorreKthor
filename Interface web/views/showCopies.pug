@@ -1,0 +1,35 @@
+include header.pug
+
+div(class="container page")
+    div(class="card mt-2")
+        div(class="card-body")
+            h4(class="card-title") Examen : #[strong #{exam.name}]
+            h6(class="") Statistiques :
+            div(class="row")
+                ul(class="col-5 ms-4") 
+                    li Moyenne : #[strong #{stats.mean}] pts
+                    li Variance : #[strong #{stats.var}] pts
+                    li Participation : #[strong #{stats.participants}] étudiands
+                    li Zeros : #[strong #{stats.blancs}] étudiants
+
+                ul(class="col-5") 
+                    li Meilleur question : Question n°#[strong #{stats.bestQuestionNum}] (Nombre de correct : #[strong #{stats.bestQuestionQtt}])
+                    li Pire question :  Question n°#[strong #{stats.worstQuestionNum}] (Nombre de zero : #[strong #{stats.worstQuestionQtt}])
+        
+    
+    table(class="table")
+        thead
+            tr
+                th Nom
+                th Matricule
+                th Cote (pts)
+                //- th Fichier
+        tbody
+            each copy in copies 
+                tr
+                    td= copy.user.fullName
+                    td= copy.user.matricule
+                    td= copy.copy.result
+                    //- td= 
+
+include footer.pug    
