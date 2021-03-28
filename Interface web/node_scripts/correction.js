@@ -1,3 +1,95 @@
+const { reject } = require("async");
+const { resolve } = require("path");
+const { User, Exam, Copy } = require("./database/models");
+
+
+async function correctAll(scanResultString){
+    const scanResult = JSON.parse(scanResultString)
+    
+    //Step 1 : FIND THE CORRECTION RELATED TO THE EXAMID
+    const exam = await Exam.findOne({where:{id:scanResult.examID}})
+    const corrections = JSON.parse(exam.dataValues.corrections)
+    const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
+
+    //Step 2 : CORRECT ALL COPIES
+    if(correctionCriterias.type == 'normal'){
+        scanResult.copies.forEach(copy =>{
+            correctionNormal(
+                corrections[copy.version],
+                copy.response,
+                parseInt(correctionCriterias.ptsRight,10),
+                parseInt(correctionCriterias.ptsWrong,10),
+                parseInt(correctionCriterias.ptsAbs,10)
+            ).then(result =>{
+                //STEP 3 : PU
+                // TO DO -- mettre les points dans la base de données !
+                console.log(result)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        })
+    }
+
+    else{
+        var lastExclusive = null;
+        if(correctionCriterias.isLastExclusive) lastExclusive = true
+        else lastExclusive = false
+
+        scanResult.copies.forEach(copy =>{
+            const points = correctionAdvanced(
+                corrections[copy.version],
+                copy.response,
+                parseInt(correctionCriterias.allGood,10),
+                parseInt(correctionCriterias.oneWrong,10),
+                parseInt(correctionCriterias.twoWrong,10),
+                parseInt(correctionCriterias.threeWrong,10),
+                parseInt(correctionCriterias.threeMoreWrong,10),
+                lastExclusive,
+                parseInt(correctionCriterias.lastExclusiveTrue,10),
+                parseInt(correctionCriterias.lastExclusiveFalse,10)
+            ).then(result =>{
+                //STEP 3 : PU
+                // TO DO -- mettre les points dans la base de données !
+                console.log(result)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        })
+    }
+
+}
+
+
+copies = [
+    {"matricule": 12345, "version": "A", "response": [
+        [ true, false, false ],
+        [ false, true, false ],
+        [ false, false, true ],
+        [ false, false, false, true ],
+        [ false, false, false, false, true ]
+      ]},
+    {"matricule": 12335, "version": "B", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]},
+    
+    
+    {"matricule": 12345, "version": "C", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]}
+]
+//correctAll(JSON.stringify({examID:"6db05eb7-e5da-495c-ba5f-a834d3f2c5b3","copies":copies}))
+
+
 //Correction file
 function correctionNormal(  correction /*list of list*/,
                             response /*list of list*/,
@@ -5,25 +97,37 @@ function correctionNormal(  correction /*list of list*/,
                             negatif /*number*/,
                             abstention /*number*/ 
                             ){
-    if (correction.length != response.length){
-        return null
-    }
-
-    totalPoints = 0
-    const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
-
-    for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
-
-        // NO ABSTENTION:
-        if(response[questionIndex].some(elem => elem == true)){            
-            if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
-            else totalPoints -= negatif
+    
+    
+    return new Promise((resolve, reject) => {
+                                  
+        if (correction.length != response.length){
+            reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
         }
-        else totalPoints += abstention
-        
-    }
-    return totalPoints
+
+        totalPoints = 0
+        maxPoints = 0
+        const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
+
+        for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
+            //Vérifier que le nombre de propositions de la correction correspond au nombre
+            //de proposition de la copie
+            if(response[questionIndex].length != correction[questionIndex].length){
+                reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            }
+            maxPoints += positif
+            // NO ABSTENTION:
+            if(response[questionIndex].some(elem => elem == true)){            
+                if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
+                else totalPoints -= negatif
+            }
+            else totalPoints += abstention
+            
+        }
+        resolve([totalPoints,maxPoints])
+    });
 }
+
 
 function correctionAdvancedProp(correction,
                                 response,
@@ -37,23 +141,24 @@ function correctionAdvancedProp(correction,
                                 lastPropFalse 
                                 ){
     
-    // Si contrainte sur la dernière proposition, et que la dernière proposition devait être cochée !
+    // Si dernière proposition EXCLUSIVE ET DEVAIT être cochée !
     if( lastProp && correction[correction.length - 1]){
         // Si la réponse a été cochée :
         if(response[response.length - 1]){
-            //Vérifier que rien d'autre n'a été cocher
+            //Vérifier que rien d'autre n'a été coché
             for(var propIndex = 0; propIndex< response.length -1; propIndex++)
             {
-                if(response[propIndex]) return lastPropFalse
+                if(response[propIndex]) return [lastPropFalse, lastPropTrue ] //Point obtenu, point max
             }
             
-            return lastPropTrue
+            return [lastPropTrue, lastPropTrue] //point Obtenue , point max
         }
-        else return lastPropFalse
+        else return [lastPropFalse, lastPropTrue ] //point Obtenue , point max
     }
 
+    //Dernière propostion exclusive MAIS ne devait pas être cochée
     else if(lastProp && response[response.length -1]){
-        return lastPropFalse
+        return [lastPropFalse, eachGood ] //point Obtenue , point max
     }
 
     else{
@@ -64,11 +169,11 @@ function correctionAdvancedProp(correction,
             }
         }
 
-        if(nbError == 0) return eachGood
-        if(nbError == 1) return onefalse
-        if(nbError == 2) return twofalse
-        if(nbError == 3) return threefalse
-        if(nbError >  3) return morethanthree
+        if(nbError == 0) return [eachGood, eachGood ]
+        if(nbError == 1) return [onefalse, eachGood ]
+        if(nbError == 2) return [twofalse, eachGood ]
+        if(nbError == 3) return [threefalse, eachGood ]
+        if(nbError >  3) return [morethanthree, eachGood ]
     }
 }
 
@@ -83,11 +188,24 @@ function correctionAdvanced(correction,
                             lastPropTrue,
                             lastPropFalse 
                             ){
-    totalPoints = 0
-    for(var questionIndex=0; questionIndex < correction.length; questionIndex++ ){
-        totalPoints += correctionAdvancedProp(correction[questionIndex],response[questionIndex],eachGood,onefalse,twofalse,threefalse,morethanthree,lastProp,lastPropTrue,lastPropFalse)
-    }
-    console.log(totalPoints)
+    
+    return new Promise((resolve,reject)=>{
+        totalPoints = 0
+        maxPoints = 0
+        if (correction.length != response.length){
+            reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
+        }
+        for(var questionIndex=0; questionIndex < correction.length; questionIndex++ ){
+            if(response[questionIndex].length != correction[questionIndex].length){
+                reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            }
+            correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],eachGood,onefalse,twofalse,threefalse,morethanthree,lastProp,lastPropTrue,lastPropFalse)
+            totalPoints += correctProp[0]
+            maxPoints += correctProp[1]
+        }
+        resolve([totalPoints,maxPoints])
+    })
+
 }
 
 const correction1 = [
@@ -134,9 +252,11 @@ const response3 = [
     [false,false,false] //0.75
 ] // normalment ==> 2.5
 
-exports.correctionNormal = correctionNormal
 
 //correctionNormal(correction1,response1,1,1,0,false)
 //correctionAdvanced(correction1,response1,1,0.75,0.5,0.25,0,true,1,0) //should return 1
 //correctionAdvanced(correction2,response2,1,0.75,0.5,0.25,0,true,1,0) //should return 2.5
 //correctionAdvanced(correction3,response3,1,0.75,0.5,0.25,0,false,1,0) //should return 2.5
+
+
+exports.correctAll = correctAll

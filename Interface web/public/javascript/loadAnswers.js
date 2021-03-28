@@ -106,9 +106,9 @@ document.querySelectorAll(".removeQuestion").forEach(item=>{
 document.getElementById("send").addEventListener("click", function(){
     var responseObject = {}
     document.querySelectorAll(".tableClass").forEach(table =>{
-        responseObject[table.id] = [[]]
+        responseObject[table.id] = []
 
-        for(let i=0; i<table.rows.length -1; i++){
+        for(let i=0; i<table.rows.length ; i++){
             responseObject[table.id].push([])
         }
     })

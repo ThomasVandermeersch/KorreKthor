@@ -27,26 +27,27 @@ router.post("/scans", upload.single("file"), async (req, res) => {
             res.send({"error":"something went wrong with the correction server.", "errorCode":1000})
         }
         else{
-            var exam;
-            console.log(body)
-            JSON.parse(body).foreach(async (copy) => {
-                if (copy.error === "None"){
-                    if (exam == undefined){
-                        exam = await Exam.findOne({where:{id:copy.qrcode.lessonId}})
-                    }
-
-                    // resp = JSON.parse(exam.corrections[copy.version])
-                    resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
-                    result = correction.correctionNormal(copy.answers, resp, 1, 0, 0)
-                    
-                    if (points != null){
-                        user = await User.findOne({where:{matricule:copy.qrcode.matricule}})
-                        await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.qrcode.version, "result": result, "file":`uploads/${req.file.originalname}`})
-                    }
-                }
-            })
-
+            correction.correctAll(body)
             res.send({"message":"done"})
+
+            // var exam;
+            // console.log(body)
+            // JSON.parse(body).foreach(async (copy) => {
+            //     if (copy.error === "None"){
+            //         if (exam == undefined){
+            //             exam = await Exam.findOne({where:{id:copy.qrcode.lessonId}})
+            //         }
+
+            //         // resp = JSON.parse(exam.corrections[copy.version])
+            //         resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
+            //         //result = correction.correctionNormal(copy.answers, resp, 1, 0, 0)
+                    
+            //         if (points != null){
+            //             user = await User.findOne({where:{matricule:copy.qrcode.matricule}})
+            //             await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.qrcode.version, "result": result, "file":`uploads/${req.file.originalname}`})
+            //         }
+            //     }
+            // })
         }
 	})
 })
