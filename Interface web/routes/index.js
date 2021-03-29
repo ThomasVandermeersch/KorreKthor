@@ -37,7 +37,7 @@ app.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
 app.get("/questionStatus/:examId",async (req,res)=>{
         const exam = await Exam.findOne({where:{id:req.params.examId}})
         const questionStatus = JSON.parse(exam.questionStatus)
-        res.render('questionStatus',{questionStatus:questionStatus,examId:req.params.examId})
+        res.render('questionStatus',{questionStatus:questionStatus, exam:exam})
 })
 
 app.post('/modifyQuestionStatus/:examId',async(req,res)=>{

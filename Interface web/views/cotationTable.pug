@@ -23,7 +23,7 @@ div(class="row mt-3")
 
 
 
-        div(id='normal',style=showNormal)
+        div(id='normal', style=showNormal, class="mt-2")
             div(class="form-group row")
                 div(class="form-group col-md-6")
                     label(for="inputEmail4") Une bonne réponse rapporte (pts)
@@ -38,7 +38,7 @@ div(class="row mt-3")
                     input(type="number",name="ptsAbs", class="form-control", value=ptsAbs, min=0, step=0.5)
 
 
-        div(id='advanced',style=showAdvanced)
+        div(id='advanced',style=showAdvanced, class="mt-2")
             p Ce type de QCM s'utilise lorsqu'il y a plusieurs choix possibles. Entrez le nombre de points que rapportent/perdent la proposition. 
             div(class="form-group row")
                 div(class="form-group col-md-6")

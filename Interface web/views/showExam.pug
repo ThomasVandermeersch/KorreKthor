@@ -46,6 +46,8 @@ div(class="container page create")
                 br
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
+            
+            a(href=`/questionStatus/${exam.id}` class="bouton btn btn-warning mt-4") Changer les questions
 
             if exam.status == 1
                 a(href=`/see/copies/${exam.id}` class="btn btn-success bouton float-end") Afficher les copies des étudiants
