@@ -32,7 +32,7 @@ div(class="container page create")
                                     tr
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
-                                a(href="#" class="btn btn-sm btn-secondary float-end bouton mx-2") Changer
+                                a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary float-end bouton mx-2") Changer
                 else 
                     h6(class="text-danger mx-2") Correction error   
 
@@ -46,7 +46,7 @@ div(class="container page create")
                 br
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
-                    
+
             if exam.status == 1
                 a(href=`/see/copies/${exam.id}` class="btn btn-success bouton float-end") Afficher les copies des étudiants
             
