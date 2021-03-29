@@ -13,7 +13,7 @@ const fs = require("fs");
 // const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 require('dotenv').config();
-
+const email = require('./node_scripts/sendEmail')
 
 var credentials = {
   key: fs.readFileSync("certificates/key.pem"),
