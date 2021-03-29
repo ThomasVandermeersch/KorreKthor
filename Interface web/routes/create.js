@@ -104,12 +104,31 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const lessonName = req.session.excelFile.lesson
     const students = await functions.importStudents("uploads/"+filename)
     const answers = JSON.parse(req.body.liste)
+    
+    var questionStatus = {}
+
+    Object.entries(answers).forEach(([key,value]) =>{
+        let array = []
+        for(let i=0 ; i<value.length ;i++){
+            array.push('normal')   
+        }
+        questionStatus[key] = array
+
+    });
+    
+    
+    
+    console.log("---ANSWERS--")
+    console.log(answers)
+    console.log('----QUESTION STATUS ----')
+    console.log(questionStatus)
+    
     const files = JSON.parse(req.body.files)
 
     studentObjects = await databaseTools.createStudents(students)
     console.log(studentObjects)
 
-    var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers)})
+    var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers),"questionStatus":JSON.stringify(questionStatus)})
     console.log(exam.id)
     var lesson = {
         name: lessonName,

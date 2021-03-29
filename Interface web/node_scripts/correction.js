@@ -10,11 +10,8 @@ async function correctAll(scanResultString){
     const exam = await Exam.findOne({where:{id:scanResult.examID}})
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
-    const questionStatus = {
-        "A": ['normal','normal','cancelled','cancelled','normal'],
-        "B": ['normal','normal','normal','normal','normal'],
-        "C": ['normal','normal','normal','normal','normal'], 
-    }
+    const questionStatus = JSON.parse(exam.dataValues.questionStatus)
+
 
     //Step 2 : CORRECT ALL COPIES
     if(correctionCriterias.type == 'normal'){
@@ -96,7 +93,6 @@ copies = [
         [ false, false, false ]
       ]}
 ]
-correctAll(JSON.stringify({examID:"78c170ae-8a10-4b1c-9d7f-d3e038141e68","copies":copies}))
 
 
 //Correction file

@@ -2,7 +2,7 @@ include header.pug
 
 
 h1 NE PAS OUBLIER D'ENREGISTRER
-form(action="/modifyQuestionStatus", method="POST" , class="form-inline")
+form(action="/modifyQuestionStatus/"+examId, method="POST" , class="form-inline")
     input(type="hidden" name="questionStatusObject" value=questionStatus)
 
     each question, versionID in questionStatus

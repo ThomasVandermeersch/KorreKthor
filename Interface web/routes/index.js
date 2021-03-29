@@ -27,16 +27,13 @@ app.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
         res.render('modifyCriteria.pug', correctionCriterias)
 })
 
-app.get("/questionStatus",(req,res)=>{
-        const questionStatus = {
-                "A": ['normal','normal','cancelled','cancelled','normal'],
-                "B": ['normal','normal','normal','normal','normal'],
-                "C": ['normal','normal','normal','normal','normal'], 
-            }
-        res.render('questionStatus',{questionStatus:questionStatus})
+app.get("/questionStatus/:examId",async (req,res)=>{
+        const exam = await Exam.findOne({where:{id:req.params.examId}})
+        const questionStatus = JSON.parse(exam.questionStatus)
+        res.render('questionStatus',{questionStatus:questionStatus,examId:req.params.examId})
 })
 
-app.post('/modifyQuestionStatus',(req,res)=>{
+app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         console.log(req.body.questionStatusObject)
         
         var questionStatus = JSON.parse(req.body.questionStatusObject)
@@ -47,8 +44,10 @@ app.post('/modifyQuestionStatus',(req,res)=>{
                 index += value.length
                 questionStatus[key] = slice
         });
-
-        res.send(questionStatus)
+        var exam = await Exam.findOne({where:{id:req.params.examId}})
+        exam.questionStatus = JSON.stringify(questionStatus)
+        exam.save()
+        res.redirect('/')
 })
 
 app.get('/sendEmail',acces.hasAcces,(req,res)=>{
