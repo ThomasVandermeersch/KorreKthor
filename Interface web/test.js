@@ -20,7 +20,7 @@ const { array } = require("get-stream")
 
 
 // const { forEach } = require("jszip");
-// const { User, Exam, Copy } = require("./node_scripts/database/models");
+const { User, Exam, Copy } = require("./node_scripts/database/models");
 // const user = require("./node_scripts/database/models/user");
 
 // async function hello(){
@@ -83,42 +83,42 @@ const { array } = require("get-stream")
 //     console.log(b[0].id)
 // })
 
-// // Copy.create({"version":"A", "userId":"d2179d2b-f26a-4e45-bffb-19f23b5349c0", "examId":"e4fca29a-866c-4d9a-ab59-c8635257263f"})
+Copy.create({"version":"B", "userId":"7fc00d73-0054-4ab2-98b1-28eb93e27178", "examId":"78c170ae-8a10-4b1c-9d7f-d3e038141e68"})
 
 
-testSet = {
-    A: [
-      [ true, false, false ],
-      [ false, true, false ],
-      [ false, true, false ],
-      [ false, false, true ],
-      [ false, false, true ]
-    ],
-    B: [
-      [ true, false, false ],
-      [ false, true, false ],
-      [ false, false, true ],
-      [ false, false, true ],
-      [ false, false, true ]
-    ],
-    C: [
-      [ true, false, false ],
-      [ false, true, false ],
-      [ false, true, false ],
-      [ false, false, true ],
-      [ false, false, true ]
-    ]
-  }
+// testSet = {
+//     A: [
+//       [ true, false, false ],
+//       [ false, true, false ],
+//       [ false, true, false ],
+//       [ false, false, true ],
+//       [ false, false, true ]
+//     ],
+//     B: [
+//       [ true, false, false ],
+//       [ false, true, false ],
+//       [ false, false, true ],
+//       [ false, false, true ],
+//       [ false, false, true ]
+//     ],
+//     C: [
+//       [ true, false, false ],
+//       [ false, true, false ],
+//       [ false, true, false ],
+//       [ false, false, true ],
+//       [ false, false, true ]
+//     ]
+//   }
 
-var questionStatus = {}
+// var questionStatus = {}
 
-Object.entries(testSet).forEach(([key,value]) =>{
-    let array = []
-    for(let i=0 ; i<value.length ;i++){
-        array.push('normal')   
-    }
-    questionStatus[key] = array
+// Object.entries(testSet).forEach(([key,value]) =>{
+//     let array = []
+//     for(let i=0 ; i<value.length ;i++){
+//         array.push('normal')   
+//     }
+//     questionStatus[key] = array
 
-});
+// });
 
-console.log(questionStatus)
+// console.log(questionStatus)

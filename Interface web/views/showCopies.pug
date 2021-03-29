@@ -17,7 +17,7 @@ div(class="container page")
                     li Pire question :  Question n°#[strong #{stats.worstQuestionNum}] (Nombre de zero : #[strong #{stats.worstQuestionQtt}])
         
     
-    table(class="table")
+    table(class="table table-sm table-hover")
         thead
             tr
                 th Nom
@@ -26,10 +26,15 @@ div(class="container page")
                 //- th Fichier
         tbody
             each copy in copies 
-                tr
+                tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
                     td= copy.user.fullName
                     td= copy.user.matricule
                     td= copy.copy.result
-                    //- td= 
+                    //- td= copy.copy.file
 
 include footer.pug    
+
+script.
+    function getCopyPreview(id){
+        window.location.href = `/see/copy/preview/${id}`
+    }

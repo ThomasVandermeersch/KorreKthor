@@ -55,6 +55,19 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
     }
 })
 
+router.get("/copy/preview/:copyid", acces.hasAcces, async (req, res) => {
+    userid = req.session.userObject.id
+    var copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
+    var exam = await copy.getExam()
+
+    if (copy){
+        res.render("copyPreview", {exam:exam, copy:copy})
+    }
+    else{
+        res.status(404).redirect("/error")
+    }
+})
+
 router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
     var exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
@@ -75,7 +88,7 @@ router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
 router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
     var exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
-    
+    console.log(exam.correctionFile)
     if (exam.correctionFile){
         res.download(
             path.resolve(exam.correctionFile),
