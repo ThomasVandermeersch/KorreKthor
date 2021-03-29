@@ -26,9 +26,11 @@ async function correctAll(scanResultString){
                 parseInt(correctionCriterias.ptsRight,10),
                 parseInt(correctionCriterias.ptsWrong,10),
                 parseInt(correctionCriterias.ptsAbs,10)
-            ).then(result =>{
+            ).then(async result =>{
                 //STEP 3 : PU
                 // TO DO -- mettre les points dans la base de données !
+                // user = await User.findOne({where:{"matricule":copy.matricule}})
+                // await Copy.create({"userId": user.id, "examId":exam.id, "version":copy.version, "result": result, "file":`uploads/${req.file.originalname}`})
                 console.log(result)
             })
             .catch(err=>{
@@ -94,7 +96,7 @@ copies = [
         [ false, false, false ]
       ]}
 ]
-correctAll(JSON.stringify({examID:"e4fca29a-866c-4d9a-ab59-c8635257263f","copies":copies}))
+correctAll(JSON.stringify({examID:"78c170ae-8a10-4b1c-9d7f-d3e038141e68","copies":copies}))
 
 
 //Correction file

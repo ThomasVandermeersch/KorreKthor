@@ -80,9 +80,9 @@ router.get("/Step3",acces.hasAcces, function(req, res){
 router.get("/Step4",acces.hasAcces,function(req,res){
         res.render('cotation.pug',
             {   type:'normal',
-                ptsRight:9,
-                ptsWrong:10,
-                ptsAbs:12,
+                ptsRight:1,
+                ptsWrong:0,
+                ptsAbs:0,
                 allGood:1,
                 oneWrong:0.75,
                 twoWrong:0.50,

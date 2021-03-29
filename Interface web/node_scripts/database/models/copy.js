@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
     },
     result:{
-        type: DataTypes.INTEGER,
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
   }, {
     sequelize,
