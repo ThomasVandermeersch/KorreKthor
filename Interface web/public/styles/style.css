@@ -37,13 +37,14 @@
     .container {
        max-width: none;
    }
-   .userTableClass{
+   .userTableClass, .examsTable, .copiesTable{
        font-size: 13px;
    }
    .userTableClass .email, .userTableClass .authorizations{
         display: none;
    }
 }
+
 @media screen and (max-width:720px){
     .page{
         position: relative;
@@ -55,9 +56,15 @@
     } 
 }
 
-
 @media screen and (max-width:460px){
     .bouton{
         font-size: 60%;
+    }
+    .copiesTable .version, .copiesTable .date{
+        display: none;
+    }
+
+    .examsTable .versions, .examsTable .date{
+        display: none;
     }
 }

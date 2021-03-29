@@ -21,6 +21,10 @@ module.exports = {
       corrections:{
         type: DataTypes.STRING(2048),
       },
+      status:{
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       correctionCriterias:{
         type: DataTypes.STRING(1024)
       },

@@ -68,6 +68,36 @@ async function correctAll(scanResultString){
 
 }
 
+
+copies = [
+    {"matricule": 12345, "version": "A", "response": [
+        [ true, false, false ],
+        [ false, true, false ],
+        [ false, false, true ],
+        [ false, false, false, true ],
+        [ false, false, false, false, true ]
+      ]},
+    {"matricule": 12335, "version": "B", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]},
+    
+    
+    {"matricule": 12345, "version": "C", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]}
+]
+//correctAll(JSON.stringify({examID:"e4fca29a-866c-4d9a-ab59-c8635257263f","copies":copies}))
+
+
+//Correction file
 function correctionNormal(  correction /*list of list*/,
                             response /*list of list*/,
                             questionStatus, /*list */
