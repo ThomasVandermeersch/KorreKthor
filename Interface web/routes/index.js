@@ -51,6 +51,30 @@ app.post('/modifyQuestionStatus',(req,res)=>{
         res.send(questionStatus)
 })
 
+app.get('/sendEmail',acces.hasAcces,(req,res)=>{
+        res.render('emailForm',{
+                destinationName: 'Thomas Vandermeersch',
+                name:req.session.userObject.fullName,
+                examName:'Mécanique des fluides',
+                email: '17030@ecam.be',
+                object: '[CORRECTION ERROR] Mécanique des fluides',
+                url:'www.facebook.com'
+        })
+})
+
+const sendEmail = require('../node_scripts/sendEmail')
+app.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
+        sendEmail.sendEmail(req.body.email,req.session.userObject.email,req.body.object,req.body.message)
+        .then(response=>{
+                console.log(response)
+                res.send("EMAIL SEND")
+        })
+        .catch(err=>{
+                console.log(err)
+                res.status(500).end("ERROR WHILE SENDING EMAIL")
+        })
+        
+})
 
 
 module.exports = router

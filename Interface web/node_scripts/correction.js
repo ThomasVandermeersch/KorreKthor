@@ -108,7 +108,6 @@ function correctionNormal(  correction /*list of list*/,
                             abstention /*number*/ 
                             ){
     
-    
     return new Promise((resolve, reject) => {
                                   
         if (correction.length != response.length){
@@ -223,6 +222,10 @@ function correctionAdvanced(correction,
 
 }
 
+exports.correctAll = correctAll
+
+//------ TEST --------
+
 const correction1 = [
     [ true, false, false],
     [false, false, false],
@@ -267,11 +270,34 @@ const response3 = [
     [false,false,false] //0.75
 ] // normalment ==> 2.5
 
+copies = [
+    {"matricule": 12345, "version": "A", "response": [
+        [ true, false, false ],
+        [ false, true, false ],
+        [ false, false, true ],
+        [ false, false, false, true ],
+        [ false, false, false, false, true ]
+      ]},
+    {"matricule": 12335, "version": "B", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]},
+    
+    
+    {"matricule": 12345, "version": "C", "response": [
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ],
+        [ false, false, false ]
+      ]}
+]
+//correctAll(JSON.stringify({examID:"6db05eb7-e5da-495c-ba5f-a834d3f2c5b3","copies":copies}))
 
 //correctionNormal(correction1,response1,1,1,0,false)
 //correctionAdvanced(correction1,response1,1,0.75,0.5,0.25,0,true,1,0) //should return 1
 //correctionAdvanced(correction2,response2,1,0.75,0.5,0.25,0,true,1,0) //should return 2.5
 //correctionAdvanced(correction3,response3,1,0.75,0.5,0.25,0,false,1,0) //should return 2.5
-
-
-//exports.correctAll = correctAll
