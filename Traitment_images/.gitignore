@@ -2,7 +2,8 @@ virtualenv/
 
 __pycache__/
 *.pyc
-*.cpython*
+*.cpython-39.pyc
 
 saves/
 From_PDF/
+zips/
