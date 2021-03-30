@@ -153,13 +153,13 @@ Here is an example of student list :
 ### Setup
 To setup the python server you need to be in the **Traitement_images/** folder and then run:
 ```cmd
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 > Note : Using a virtual environement is a good practice.
 
 Finally, run :
 ```cmd
-python server.py
+$ python server.py
 ```
 
 ### Run the pdf processing method
@@ -198,7 +198,7 @@ The response is the form :
 
 ### Accessing the zip file 
 
-The zip file is available on `0.0.0.0:8080/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
+The zip file is available on `http://0.0.0.0:8080/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
 ## Code structure
 The main file to run is in "Interface Web"/
 
