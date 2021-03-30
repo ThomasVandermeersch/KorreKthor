@@ -1,4 +1,8 @@
 virtualenv/
 
 __pycache__/
-*.py[cod]
+*.pyc
+*.cpython*
+
+saves/
+From_PDF/

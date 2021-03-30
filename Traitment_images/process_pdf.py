@@ -22,8 +22,8 @@ def extractTextAndImg(path):
 
             # Save image to From_PDF/
             img = page.getImageList()
-            xref = img[pageNumber-1][0]
-            # xref = img[0][0]
+            # xref = img[pageNumber-1][0]
+            xref = img[0][0]
             pix = fitz.Pixmap(file, xref)
             pix.writePNG(fromPath)
 

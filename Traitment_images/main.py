@@ -20,6 +20,7 @@ def compute(pdf):
 
         else :
             print("\nGetting answers...")
+            # Zip folder From_PDF
             listPages = glob.glob('From_PDF/*.png')
 
             if len(listPages) == 0 :
@@ -42,9 +43,9 @@ def compute(pdf):
                             jsonToSend.append({"error" : f"{img} has no correct QR Code"})
                         
 
-
+    # 
     print(json.dumps(jsonToSend))
     print("\nTranslation done!\n")
     return json.dumps(jsonToSend)
 
-compute("scan_result.pdf")
+# compute("scan_result.pdf")
