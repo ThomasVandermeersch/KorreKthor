@@ -19,7 +19,9 @@ div(class="container page")
                         th= exam.name
                         if exam.status == 0
                             td(class="text-secondary") Créé
-                        else 
+                        else if exam.status == 1
+                            td(class="text-warning") Correction en cours...
+                        else
                             td(class="text-success") Corrigé
                         td(class="versions")= exam.numberOfVersion
                         td(class="date")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`

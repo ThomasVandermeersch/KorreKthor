@@ -54,7 +54,7 @@ app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         var exam = await Exam.findOne({where:{id:req.params.examId}})
         exam.questionStatus = JSON.stringify(questionStatus)
         exam.save()
-        res.redirect('/')
+        res.redirect(`/see/exam/${req.params.examId}`)
 })
 
 app.get('/sendEmail',acces.hasAcces,(req,res)=>{

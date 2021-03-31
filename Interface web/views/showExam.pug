@@ -8,7 +8,9 @@ div(class="container page create")
         div(class="card-body")
             if exam.status == 0
                 h4(class="card-title") Exam #[strong #{exam.name}] - Créé
-            else 
+            else if exam.status == 1
+                h4(class="card-title text-warning") Exam #[strong #{exam.name}] - Correction en cours...
+            else
                 h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
 
             p(class="card-subtitle text-muted")= exam.id
@@ -32,7 +34,7 @@ div(class="container page create")
                                     tr
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
-                                a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary float-end bouton mx-2") Changer
+                                a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary float-end bouton mx-2") Changer le critère
                 else 
                     h6(class="text-danger mx-2") Correction error
                     a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary bouton mx-2") Définir une methode de correction
@@ -49,9 +51,11 @@ div(class="container page create")
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
             
-            a(href=`/questionStatus/${exam.id}` class="bouton btn btn-warning mt-4") Changer les questions
+            a(href=`/questionStatus/${exam.id}` class="bouton btn btn-warning mt-4") Changer le statut des questions
 
-            if exam.status == 1
-                a(href=`/see/copies/${exam.id}` class="btn btn-success bouton float-end") Afficher les copies des étudiants
-            
+            if exam.status == 2
+                a(href=`/see/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Afficher les copies des étudiants
+            else if exam.status == 0
+                a(href=`/upload/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Uploader l'examen
+
 include footer.pug
