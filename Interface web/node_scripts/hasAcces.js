@@ -5,7 +5,7 @@ function hasAcces(req,res,next){
     //Si l'utilisateur n'est pas connecté
     if(!req.session.userObject){
 
-        req.session["requestedURL"] = req.baseUrl
+        req.session["requestedURL"] = req.originalUrl
         return res.redirect("/auth/login")
     }
 
