@@ -12,11 +12,12 @@ const email = require('./sendEmail')
 
 async function saveCopy(copy,result,examId){
     console.log(copy.qrcode.matricule)
-    user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
+    var user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
     dbCopy = await Copy.findOne({where:{"examId":examId,"userId": user.id}})
-    
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    console.log(user.fullName)
+
     if(dbCopy){
-        dbCopy.version = 
         dbCopy.version = copy.qrcode.version, 
         dbCopy.result =result, 
         dbCopy.file = copy.file
@@ -113,8 +114,8 @@ async function correctAll(scanResultString){
         }
     })
 
-
-
+    exam.status = 2
+    exam.save()
 }
 
 
