@@ -24,9 +24,10 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
     const copies = []
     for (copy of examCopies){
         user = await copy.getUser()
+        console.log(user.fullName)
         copies.push({"copy":copy, "user":user})
     };
-
+    console.log(copies)
     stats = {"mean": 16, "var":2, "participants":154, "blancs":14, "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
     res.render("showCopies", {exam:exam, copies:copies, stats:stats})
 })
