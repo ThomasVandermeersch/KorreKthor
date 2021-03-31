@@ -1,7 +1,26 @@
 var nodeoutlook = require('nodejs-nodemailer-outlook')
+const { User, Exam, Copy } = require("./database/models");
 
 
 console.log(process.env.EMAIL_ADDRESS)
+
+async function sendResult(copy,result){
+    user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
+    
+    if(user.matricule == '17030' || user.matricule=='17076'){
+            text = 'Bonjour ' + user.fullName + ',\n\n' + 'Vous avez obtenu la note de ' 
+                    + result[0] + '/' + result[1] + ' à votre examen de ' + 'Stabilité'
+            sendEmail(user.email,null,'Résultat QCM',text ,[])
+            console.log('-- SEND EMAIL TO : ' + user.matricule)
+
+    }
+    
+}
+
+
+
+
+
 function sendEmail(to, from, object, text , filePath){
     return new Promise((resolve,reject)=>{
         nodeoutlook.sendEmail({
@@ -25,6 +44,8 @@ function sendEmail(to, from, object, text , filePath){
 }
 
 exports.sendEmail = sendEmail
+exports.sendResult = sendResult
+
 //sendEmail("17030@ecam.be",'Test',"Bonjour Guillaume BOUILLON\n\n Merci d'utiliser Korekkthor !",[])
 
 
