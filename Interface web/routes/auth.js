@@ -95,8 +95,10 @@ router.get('/callback',
         debug: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
     }
-
-    res.redirect('/');
+    
+    //REDIRECTION
+    if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])
+    else res.redirect('/');
   }
 );
 // </CallbackSnippet>

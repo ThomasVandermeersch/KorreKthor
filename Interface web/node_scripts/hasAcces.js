@@ -4,6 +4,8 @@ const user = require("./database/models/user")
 function hasAcces(req,res,next){
     //Si l'utilisateur n'est pas connecté
     if(!req.session.userObject){
+
+        req.session["requestedURL"] = req.baseUrl
         return res.redirect("/auth/login")
     }
 
