@@ -3,6 +3,10 @@ include header.pug
 div(class="container page create")
 
     h1 Envoyez votre email
+    
+    if messages.failEmail
+        div(class="alert alert-danger" role="alert")
+            p= messages.failEmail
 
     form(action="/sendComplainEmail" method="POST")
         div(class="form-group row")
@@ -18,11 +22,12 @@ div(class="container page create")
         div
             textarea(name="message" rows="12" cols="100")
                 ='Bonjour Monsieur ' + destinationName + ',\n\n'
-                ="Je vous écris cet email pour vous faire part d'une erreur dans la correction de mon examen de " + examName + '.\n\n'
-                ="Merci de bien vouloir corriger. \n\n" 
                 ="Cordialement,\n"
                 = name
                 = "\n\n\nLien vers l'examen :  " + url
+        
+        input(id="copyId" type="hidden" name="copyId" value=copyId)
+
         
         div(class="row mt-3")
             div(class="col-12")

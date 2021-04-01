@@ -20,7 +20,10 @@ div(class="container page create")
                     a(href=`/see/copy/${copy.id}/download` class="bouton") Télécharger la copie
                     
 
-            a(href=`#` class="btn btn-danger bouton float-end") Faire une réclamation
+            a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
 
+            if messages.successEmail
+                div(class="alert alert-success" role="alert")
+                    p= messages.successEmail
 
 include footer.pug  

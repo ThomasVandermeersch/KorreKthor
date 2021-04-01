@@ -57,27 +57,50 @@ app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         res.redirect(`/see/exam/${req.params.examId}`)
 })
 
-app.get('/sendEmail',acces.hasAcces,(req,res)=>{
+app.get('/sendEmail/:copyId',acces.hasAcces,async(req,res)=>{
+        const link = 'https://localhost:9898/see/copy/' + req.params.copyId
+        //TO IMPROVE -- UTILISATION DES BASES DE DONNEES RELATIONELLES.
+        console.log('---to copy-----')
+        const copy = await Copy.findOne({where:{id:req.params.copyId}})
+        console.log(copy)
+        console.log('---to exam-----')
+
+        const exam = await Exam.findOne({where:{id:copy.examId}})
+        console.log('--- to user')
+        console.log(exam)
+        const teacher = await User.findOne({where:{id:exam.userId}})
+        console.log(exam)
+        console.log(teacher)
+        object = '[CORR ERROR] : ' + exam.name
         res.render('emailForm',{
-                destinationName: 'Thomas Vandermeersch',
+                destinationName: teacher.fullName,
                 name:req.session.userObject.fullName,
-                examName:'Mécanique des fluides',
-                email: '17030@ecam.be',
-                object: '[CORRECTION ERROR] Mécanique des fluides',
-                url:'www.facebook.com'
+                examName:exam.name,
+                email: teacher.email,
+                object: object,
+                url:link,
+                copyId:copy.id
         })
 })
 
-const sendEmail = require('../node_scripts/sendEmail')
+const sendEmail = require('../node_scripts/sendEmail');
+const exam = require('../node_scripts/database/models/exam');
 app.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
         sendEmail.sendEmail(req.body.email,req.session.userObject.email,req.body.object,req.body.message)
         .then(response=>{
                 console.log(response)
-                res.send("EMAIL SEND")
+                //req.flash('successEmail','Email envoyé');
+                //res.redirect('' )
+                console.log(req.body)
+                console.log(req.body.copyId)
+                req.flash('successEmail','Email envoyé');
+                res.redirect('/see/copy/' + req.body.copyId)
         })
         .catch(err=>{
                 console.log(err)
-                res.status(500).end("ERROR WHILE SENDING EMAIL")
+                req.flash('failEmail',"Erreur dans l'envoi de l'email");
+                res.redirect('/sendEmail/'+ req.body.copyId)
+
         })
         
 })
