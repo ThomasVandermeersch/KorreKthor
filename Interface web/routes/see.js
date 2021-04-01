@@ -92,27 +92,27 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
     }
 })
 
-router.get("/copy/preview/:copyid", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
-    var copy;
-    var exam;
+// router.get("/copy/preview/:copyid", acces.hasAcces, async (req, res) => {
+//     userid = req.session.userObject.id
+//     var copy;
+//     var exam;
 
-    if (req.session.userObject.authorizations == 0){
-        copy = await Copy.findOne({where:{id:req.params.copyid}})
-        exam = await copy.getExam()
-    }
-    else{
-        copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
-        exam = await copy.getExam()
-    }
+//     if (req.session.userObject.authorizations == 0){
+//         copy = await Copy.findOne({where:{id:req.params.copyid}})
+//         exam = await copy.getExam()
+//     }
+//     else{
+//         copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
+//         exam = await copy.getExam()
+//     }
 
-    if (copy){
-        res.render("copyPreview", {exam:exam, copy:copy})
-    }
-    else{
-        res.status(404).redirect("/error")
-    }
-})
+//     if (copy){
+//         res.render("copyPreview", {exam:exam, copy:copy})
+//     }
+//     else{
+//         res.status(404).redirect("/error")
+//     }
+// })
 
 router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -177,7 +177,7 @@ router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
 
     if (copy.file){
         res.download(
-            path.resolve(copy.file),
+            path.resolve(`copies/${copy.file}`),
             (err) => {
                 if (err) res.status(404).render("error");
             }

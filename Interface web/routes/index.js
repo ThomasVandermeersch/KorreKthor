@@ -57,30 +57,35 @@ app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         res.redirect(`/see/exam/${req.params.examId}`)
 })
 
-app.get('/sendEmail/:copyId',acces.hasAcces,async(req,res)=>{
-        const link = 'https://localhost:9898/see/copy/' + req.params.copyId
-        //TO IMPROVE -- UTILISATION DES BASES DE DONNEES RELATIONELLES.
-        console.log('---to copy-----')
-        const copy = await Copy.findOne({where:{id:req.params.copyId}})
-        console.log(copy)
-        console.log('---to exam-----')
 
-        const exam = await Exam.findOne({where:{id:copy.examId}})
-        console.log('--- to user')
-        console.log(exam)
-        const teacher = await User.findOne({where:{id:exam.userId}})
-        console.log(exam)
-        console.log(teacher)
-        object = '[CORR ERROR] : ' + exam.name
-        res.render('emailForm',{
-                destinationName: teacher.fullName,
-                name:req.session.userObject.fullName,
-                examName:exam.name,
-                email: teacher.email,
-                object: object,
-                url:link,
-                copyId:copy.id
-        })
+ app.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
+        var copy;
+        if (req.session.userObject.authorizations == 0){
+                copy = await Copy.findOne({where:{id:req.params.copyid}})
+        }
+        else{
+                copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}})
+        }
+
+        var user = await copy.getUser()
+        var exam = await copy.getExam()
+        var prof = await exam.getUser()
+
+        if (copy && user && exam && prof){
+ 
+                res.render('emailForm',{
+                        destinationName: prof.fullName,
+                        name:req.session.userObject.fullName,
+                        examName:exam.name,
+                        email: prof.email,
+                        object: `[CORRECTION ERROR] ${exam.name}`,
+                        url:`https://localhost:9898/see/copy/${copy.id}`,
+                        copyId:copy.id
+                })
+        }
+        else{
+                res.render("/error")
+        }
 })
 
 const sendEmail = require('../node_scripts/sendEmail');

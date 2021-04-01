@@ -3,7 +3,7 @@ include header.pug
 - var date = new Date(Date.parse(copy.createdAt))
 
 div(class="container page create")
-    div(class="card mt-2")
+    div(class="card my-2")
         div(class="card-body")
             h4(class="card-title") Copie d'examen (#[strong #{exam.name}])
 
@@ -16,14 +16,25 @@ div(class="container page create")
             else
                 h4(class="text-success") Cote : #{point}/20
             
-            div(class="files")
-                    a(href=`/see/copy/${copy.id}/download` class="bouton") Télécharger la copie
+            
+            //div(class="files")
+              //  a(href=`/see/copy/${copy.id}/download` class="bouton") Télécharger la copie 
                     
 
-            a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
+            // a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
+
+          
+            div(class="photo mb-3")
+                img(src=`/see/copy/${copy.id}/download` width="70%" class="border rounded mx-auto d-block")
+
+            if session.userObject.role == 0
+                a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
+            else 
+                a(href=`#` class="btn btn-danger bouton float-end") Modifier la cotation
 
             if messages.successEmail
                 div(class="alert alert-success" role="alert")
                     p= messages.successEmail
+
 
 include footer.pug  

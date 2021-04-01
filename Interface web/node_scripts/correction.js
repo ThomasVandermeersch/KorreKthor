@@ -62,8 +62,9 @@ async function correctAll(scanResultString){
         // }
     //Step 2 : CORRECT ALL COPIES
     scanResult.data.forEach(async (copy) =>{
-        console.log(copy)
         if(correctionCriterias.type == 'normal'){    
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+            console.log(copy)
             correctionNormal(
                     corrections[copy.qrcode.version],
                     copy.answers,
@@ -72,6 +73,8 @@ async function correctAll(scanResultString){
                     parseInt(correctionCriterias.ptsWrong,10),
                     parseInt(correctionCriterias.ptsAbs,10)
             ).then(async result =>{
+                console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+                console.log(result)
                 //When the correction is done, the copy has to be set in the database
                                 
                 // TO DO -- mettre les points dans la base de données !
@@ -81,7 +84,7 @@ async function correctAll(scanResultString){
                 console.log(result)
             })
             .catch(err=>{
-                console.log(err)
+                console.log(err+copy.qrcode.matricule)
             })
         }    
         else{
