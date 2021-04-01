@@ -20,7 +20,8 @@ async function saveCopy(copy,result,examId){
     if(dbCopy){
         dbCopy.version = copy.qrcode.version, 
         dbCopy.result =result, 
-        dbCopy.file = copy.file
+        dbCopy.file = copy.file,
+        dbCopy.answers = JSON.stringify(copy.answers)
         dbCopy.save()
         console.log('Resave copy')
     }
@@ -29,7 +30,8 @@ async function saveCopy(copy,result,examId){
                        "examId":examId, 
                        "version":copy.qrcode.version, 
                        "result": result, 
-                       "file": copy.file
+                       "file": copy.file,
+                       "answers": JSON.stringify(copy.answers)
                     })
     }
 } 

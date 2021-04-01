@@ -17,6 +17,9 @@ module.exports = {
       result:{
         type: DataTypes.ARRAY(DataTypes.INTEGER),
       },
+      answers:{
+        type: DataTypes.STRING(2048),
+      },
       userId: {
         type: DataTypes.UUID,
         allowNull: false

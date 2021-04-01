@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     result:{
         type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
+    answers:{
+      type: DataTypes.STRING(2048),
+    },
   }, {
     sequelize,
     tableName: "copies",

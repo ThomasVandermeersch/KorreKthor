@@ -28,11 +28,6 @@
     bottom: auto;
 }
 
-.image{
-    border-style: solid;
-    border-radius: 5px;
-    border-color: grey;
-}
 
 @media screen and (max-width:991px){
     .create{
@@ -47,7 +42,7 @@
    .userTableClass, .examsTable, .copiesTable{
        font-size: 13px;
    }
-   .userTableClass .email, .userTableClass .authorizations{
+   .userTableClass .email, .userTableClass .authorizations, .hide-sm{
         display: none;
    }
 }

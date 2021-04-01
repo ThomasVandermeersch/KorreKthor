@@ -2,7 +2,7 @@ include header.pug
 
 - var date = new Date(Date.parse(copy.createdAt))
 
-div(class="container page create")
+div(class="container page")
     div(class="card my-2")
         div(class="card-body")
             h4(class="card-title") Copie d'examen (#[strong #{exam.name}])
@@ -23,18 +23,29 @@ div(class="container page create")
 
             // a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
 
-          
-            div(class="photo mb-3")
-                img(src=`/see/copy/${copy.id}/download` width="70%" class="border rounded mx-auto d-block")
+            - var questions = JSON.parse(exam.corrections)[copy.version]
 
-            if session.userObject.role == 0
-                a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
-            else 
-                a(href=`#` class="btn btn-danger bouton float-end") Modifier la cotation
+            div(class="photo my-3 row")
+                div(class="tab col-5 form-check p-0 m-auto")
+                    table(id=questID class="table table-sm tableClass mt-0 p-0")
+                        each val in [...questions.keys()]
+                            tr
+                                td(class="hide-sm") 
+                                    i Question #{val + 1}
+                                
+                                each response in [...questions[val].keys()]
+                                    td
+                                        input(checked=questions[val][response] disabled=session.userObject.role == 0 class="" type="checkbox" name=response value="yes" )
+                    
+                    if session.userObject.role == 0
+                        a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
+                    else 
+                        a(href=`#` class="btn btn-danger bouton float-end") Modifier la cotation
+       
+                img(class="border rounded mx-auto d-block col-5" src=`/see/copy/${copy.id}/download` width="40%")
 
             if messages.successEmail
                 div(class="alert alert-success" role="alert")
                     p= messages.successEmail
-
 
 include footer.pug  
