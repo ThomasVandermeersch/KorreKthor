@@ -1,5 +1,7 @@
 const router = require('express-promise-router')();
 const request = require('request');
+const unzipper = require("unzipper")
+const http = require('http');
 const acces = require('../node_scripts/hasAcces')
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
@@ -31,7 +33,17 @@ function callCorrection(filename){
             res.status(500).send({"error":"something went wrong with the correction server.", "errorCode":1000})
         }
         else{
-            console.log("enterning correctAll")
+            zipFile = JSON.parse(body).zipFile
+            const file = fs.createWriteStream(`zips/${zipFile}`);
+            
+            http.get(`http://localhost:8080/static/${zipFile}`, function(response) {
+                response.pipe(file);
+            });
+            
+            file.on("finish", function(){
+                fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' }));
+            })
+            
             correction.correctAll(body)
             console.log("done")
         }

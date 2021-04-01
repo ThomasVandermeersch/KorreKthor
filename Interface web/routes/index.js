@@ -57,15 +57,32 @@ app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         res.redirect(`/see/exam/${req.params.examId}`)
 })
 
-app.get('/sendEmail',acces.hasAcces,(req,res)=>{
-        res.render('emailForm',{
-                destinationName: 'Thomas Vandermeersch',
-                name:req.session.userObject.fullName,
-                examName:'Mécanique des fluides',
-                email: '17030@ecam.be',
-                object: '[CORRECTION ERROR] Mécanique des fluides',
-                url:'www.facebook.com'
-        })
+app.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
+        var copy;
+        if (req.session.userObject.authorizations == 0){
+                copy = await Copy.findOne({where:{id:req.params.copyid}})
+        }
+        else{
+                copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}})
+        }
+
+        var user = await copy.getUser()
+        var exam = await copy.getExam()
+        var prof = await exam.getUser()
+
+        if (copy && user && exam && prof){
+                res.render('emailForm',{
+                        destinationName: prof.fullName,
+                        name: user.fullName,
+                        examName: exam.name,
+                        email: prof.email,
+                        object: `[CORRECTION ERROR] ${exam.name}`,
+                        url:`https://localhost:9898/see/copy/${copy.id}`
+                })
+        }
+        else{
+                res.render("/error")
+        }
 })
 
 const sendEmail = require('../node_scripts/sendEmail')

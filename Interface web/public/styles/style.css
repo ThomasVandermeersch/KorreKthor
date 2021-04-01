@@ -27,6 +27,13 @@
     position: absolute;
     bottom: auto;
 }
+
+.image{
+    border-style: solid;
+    border-radius: 5px;
+    border-color: grey;
+}
+
 @media screen and (max-width:991px){
     .create{
         width: 90%;

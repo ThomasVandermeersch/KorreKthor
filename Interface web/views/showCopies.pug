@@ -23,7 +23,6 @@ div(class="container page")
                 th Nom
                 th Matricule
                 th Cote (pts)
-                //- th Fichier
         tbody
             each copy in copies 
                 - var point = (copy.copy.result[0]/copy.copy.result[1])*20
@@ -32,11 +31,10 @@ div(class="container page")
                     td= copy.user.fullName
                     td= copy.user.matricule
                     td #{point}/20
-                    //- td= copy.copy.file
 
 include footer.pug    
 
 script.
     function getCopyPreview(id){
-        window.location.href = `/see/copy/preview/${id}`
+        window.location.href = `/see/copy/${id}`
     }

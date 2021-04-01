@@ -6,23 +6,25 @@ div(class="container page create")
 
     form(action="/sendComplainEmail" method="POST")
         div(class="form-group row")
-            label(class="col-sm-2 col-form-label") Destinataire :
-            div(class="col-sm-10")
-                input(type='email' value=email name='email')
+            label(class="col-sm-2 col-md-3 col-form-label") Destinataire :
+            div(class="col-sm-10 col-md-9")
+                input(type='email' class="form-control" value=email name='email')
         
-        div(class="form-group row")
-            label(class="col-sm-2 col-form-label") Objet :
-            div(class="col-sm-10")
-                input(type=text value=object size="20" name='object')
+        div(class="form-group my-2 row")
+            label(class="col-sm-2 col-md-3 col-form-label") Objet :
+            div(class="col-sm-10 col-md-9")
+                input(type=text  class="form-control" value=object size="20" name='object')
 
         div
-            textarea(name="message" rows="12" cols="100")
-                ='Bonjour Monsieur ' + destinationName + ',\n\n'
-                ="Je vous écris cet email pour vous faire part d'une erreur dans la correction de mon examen de " + examName + '.\n\n'
-                ="Merci de bien vouloir corriger. \n\n" 
-                ="Cordialement,\n"
-                = name
-                = "\n\n\nLien vers l'examen :  " + url
+            textarea(name="message" class="form-control" rows="10" cols="100")
+                //- ='Bonjour Monsieur ' + destinationName + ',\n\n'
+                //- ="Je vous écris cet email pour vous faire part d'une erreur dans la correction de mon examen de " + examName + '.\n\n'
+                //- ="Merci de bien vouloir corriger. \n\n" 
+                //- ="Cordialement,\n"
+                //- = name
+                = "\n\n\n\n"
+                = "-----"
+                = "\nLien vers l'examen :  " + url
         
         div(class="row mt-3")
             div(class="col-12")

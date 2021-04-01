@@ -5,3 +5,5 @@ pre_pdf/
 .env
 certificates/
 downloads/
+zips/*
+copies/*
