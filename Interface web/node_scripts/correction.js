@@ -270,6 +270,7 @@ function correctionAdvanced(correction,
 }
 
 exports.correctAll = correctAll
+exports.correctionNormal = correctionNormal
 
 //------ TEST --------
 

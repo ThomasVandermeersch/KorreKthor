@@ -1,4 +1,4 @@
-
+const { User, Exam, Copy } = require("./node_scripts/database/models");
 
 // // email = "17976@ecam.be"
 // // if(email.startsWith('19')) { 
@@ -20,7 +20,7 @@ const { array } = require("get-stream")
 
 
 // const { forEach } = require("jszip");
-const { User, Exam, Copy } = require("./node_scripts/database/models");
+
 // const user = require("./node_scripts/database/models/user");
 
 // async function hello(){
@@ -122,3 +122,45 @@ Copy.create({"version":"B", "userId":"7fc00d73-0054-4ab2-98b1-28eb93e27178", "ex
 // });
 
 // console.log(questionStatus)
+
+const corrector = require('./node_scripts/correction')
+//Correction array
+correction = [[true, false, false],
+              [false,false, true],
+              [false,true,false],
+              [false,true,true,false]
+            ]
+
+
+response1 = [[true, false, false],
+[false,false, true],
+[false,true,false],
+[false,true,true,false]
+]
+
+
+response2 = [[true, false, false], //good
+[false,false, false], //abs
+[true,false,false], //incorrect
+[false,true,true,false]
+]
+
+response3 = [[true, false, false],
+[false,false, true],
+[false,true,true],
+[false,true,true,false]
+]
+
+
+//Response 1 : Tout est correct
+questionStatus = ['normal','normal','normal','normal']
+
+corrector.correctionNormal(correction,response1,questionStatus,1,0,0)
+    .then(result=>console.log('Should return 4 --- Return : ' + result[0]))
+    .catch(err=> console.log(err))
+
+
+//Shoud return 4
+corrector.correctionNormal(correction,response2,questionStatus,1,0,0)
+    .then(result=>console.log('Should return 4 --- Return : ' + result[0]))
+    .catch(err=> console.log(err)) //Shoud return 5
