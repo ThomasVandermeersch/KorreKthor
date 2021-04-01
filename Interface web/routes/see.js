@@ -84,6 +84,7 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
         var exam = await copy.getExam()
     }
     
+    console.log(copy.answers)
     if (copy && exam){
         res.render("showCopy", {exam:exam, copy:copy})
     }
@@ -91,28 +92,6 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
         res.status(404).redirect("/error")
     }
 })
-
-// router.get("/copy/preview/:copyid", acces.hasAcces, async (req, res) => {
-//     userid = req.session.userObject.id
-//     var copy;
-//     var exam;
-
-//     if (req.session.userObject.authorizations == 0){
-//         copy = await Copy.findOne({where:{id:req.params.copyid}})
-//         exam = await copy.getExam()
-//     }
-//     else{
-//         copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
-//         exam = await copy.getExam()
-//     }
-
-//     if (copy){
-//         res.render("copyPreview", {exam:exam, copy:copy})
-//     }
-//     else{
-//         res.status(404).redirect("/error")
-//     }
-// })
 
 router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id

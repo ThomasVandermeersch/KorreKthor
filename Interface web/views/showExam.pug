@@ -34,7 +34,23 @@ div(class="container page create")
                                     tr
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
+                        
                                 a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary float-end bouton mx-2") Changer le critère
+                        else 
+                            div(class="mx-2 create")
+                                table(class="table table-sm mb-1")
+                                    tr
+                                        th Reponses correctes (pts)
+                                        td +#{correction.ptsRight}
+                                    tr
+                                        th Abstentions (pts)
+                                        td -#{correction.ptsAbs}
+                                    tr
+                                        th Reponses fausses (pts)
+                                        td -#{correction.ptsWrong}
+                        
+                                a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary float-end bouton mx-2") Changer le critère
+
                 else 
                     h6(class="text-danger mx-2") Correction error
                     a(href=`/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary bouton mx-2") Définir une methode de correction

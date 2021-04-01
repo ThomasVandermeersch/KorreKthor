@@ -23,7 +23,7 @@ div(class="container page")
 
             // a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
 
-            - var questions = JSON.parse(exam.corrections)[copy.version]
+            - var questions = JSON.parse(copy.answers)
 
             div(class="photo my-3 row")
                 div(class="tab col-5 form-check p-0 m-auto")
