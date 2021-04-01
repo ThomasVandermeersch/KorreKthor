@@ -24,7 +24,7 @@ div(class="container page")
                         else
                             td(class="text-success") Corrigé
                         td(class="versions")= exam.numberOfVersion
-                        td(class="date")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+                        td(class="date")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
     
     if copies.length
         h1= "Copies"
@@ -38,12 +38,13 @@ div(class="container page")
             tbody
                 each pair, index in copies
                     - var date = new Date(Date.parse(pair.copy.createdAt))
+                    - var point = (pair.copy.result[0]/pair.copy.result[1])*20
                     
                     tr(onClick=`getCopy("${ pair.copy.id }")` style="cursor: pointer;")
                             th= pair.exam.name
-                            th= pair.copy.result
+                            th #{point}/20
                             td(class="version")= pair.copy.version
-                            td(class="date")= `${date.getDay()+1}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+                            td(class="date")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
 include footer.pug    
         

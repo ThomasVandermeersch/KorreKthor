@@ -32,7 +32,7 @@ async function createInvoice(students, lesson, answers, fileVersions) {
       doc.fontSize(10)
       doc.text(`Nom et prénom: ${student.name}`, 140, 120);
       doc.text(`Matricule: ${student.matricule}`, 140, 135);
-      doc.text(`Date: ${date.getDay() + 1}/${date.getMonth() + 1}/${date.getFullYear()}`, 140, 150);
+      doc.text(`Date: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`, 140, 150);
       doc.text(`Cours: ${lesson.name}`, 140, 165);
       doc.text(`Version: ${student.version}`, 140, 180);
 

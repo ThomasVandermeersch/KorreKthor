@@ -26,10 +26,12 @@ div(class="container page")
                 //- th Fichier
         tbody
             each copy in copies 
+                - var point = (copy.copy.result[0]/copy.copy.result[1])*20
+
                 tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
                     td= copy.user.fullName
                     td= copy.user.matricule
-                    td= copy.copy.result
+                    td #{point}/20
                     //- td= copy.copy.file
 
 include footer.pug    
