@@ -119,3 +119,5 @@ console.log("PostgrSQL host : " + process.env.POSTGRES_HOST )
   // console.log(await copyS.getUser())
   // console.log(await copyS.getExam())
 // })()
+
+const test = require('./test')
