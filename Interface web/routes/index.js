@@ -2,7 +2,7 @@
 const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
 const { User, Exam, Copy } = require("../node_scripts/database/models");
-
+const corrector = require('../node_scripts/correction')
 app.get("/", acces.hasAcces, function(req,res){
         //res.render('index',{name:"Beta"})    
         res.render('index',{name:req.session.userObject.fullName})    
@@ -86,6 +86,39 @@ app.post('/modifyQuestionStatus/:examId',async(req,res)=>{
         else{
                 res.render("/error")
         }
+})
+
+app.post('/modifyImageTreatment/:copyId',acces.hasAcces, async (req,res)=>{
+        console.log(req.body)
+        var copy = await Copy.findOne({where:{id:req.params.copyId}})
+        const exam = await Exam.findOne({where:{id:copy.examId}})
+        copy.answers = req.body.response
+        
+        const corrections = JSON.parse(exam.corrections)
+        const correction = corrections[copy.version]
+        const correctionCriterias = JSON.parse(exam.correctionCriterias)
+        var questionStatus = JSON.parse(exam.questionStatus)
+        questionStatus = questionStatus[copy.version]
+        // console.log('---correction---')
+        // console.log(correction)
+        // console.log('---correction---')
+        // console.log(req.)
+        corrector.correctionNormal( 
+                correction,JSON.parse(req.body.response),questionStatus,           
+                parseInt(correctionCriterias.ptsRight,10),
+                parseInt(correctionCriterias.ptsWrong,10),
+                parseInt(correctionCriterias.ptsAbs,10)
+        )
+        .then(async (newResult) =>{
+            console.log(newResult)
+            copy.result = newResult      
+            await copy.save()
+            req.flash('successAnswerChange','Les réponses ont été correctement enregistrées');
+            res.redirect('/see/copy/'+req.params.copyId)
+        })
+        .catch(err=>{
+                console.log(err + ' ---Not normal to have an error here because lists have to match')
+        })
 })
 
 const sendEmail = require('../node_scripts/sendEmail');

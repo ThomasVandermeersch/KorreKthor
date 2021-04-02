@@ -274,6 +274,7 @@ function correctionAdvanced(correction,
 
 }
 
+exports.saveCopy = saveCopy
 exports.correctAll = correctAll
 exports.correctionNormal = correctionNormal
 

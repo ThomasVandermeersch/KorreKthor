@@ -27,7 +27,7 @@ div(class="container page")
 
             div(class="photo my-3 row")
                 div(class="tab col-5 form-check p-0 m-auto")
-                    table(id=questID class="table table-sm tableClass mt-0 p-0")
+                    table(id='tableId' class="table table-sm tableClass mt-0 p-0")
                         each val in [...questions.keys()]
                             tr
                                 td(class="hide-sm") 
@@ -40,12 +40,18 @@ div(class="container page")
                     if session.userObject.role == 0
                         a(href=`/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
                     else 
-                        a(href=`#` class="btn btn-danger bouton float-end") Modifier la cotation
+                        button(id='submitButton' class="btn btn-danger bouton float-end") Modifier la cotation
        
                 img(class="border rounded mx-auto d-block col-5" src=`/see/copy/${copy.id}/download` width="40%")
-
+            
             if messages.successEmail
                 div(class="alert alert-success" role="alert")
                     p= messages.successEmail
+            
+            if messages.successAnswerChange
+                div(class="alert alert-success" role="alert")
+                    p= messages.successAnswerChange
 
+input(id="copyId",type="hidden", value=copy.id)
+script(src='/javascript/correctImageProcess.js')
 include footer.pug  
