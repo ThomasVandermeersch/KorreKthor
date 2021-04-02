@@ -24,9 +24,9 @@ app.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
         var a = await exam.getUser()
         var b = await req.session.userObject
 
-        if (a.id !== b.id){
-                return res.status(403).render('noAcces')
-        }
+        // if (a.id !== b.id){
+        //         return res.status(403).render('noAcces')
+        // }
 
         var correctionCriterias = JSON.parse(exam.correctionCriterias)
         req.session['examId'] = req.params.examId        

@@ -9,6 +9,7 @@ const fs = require("fs");
 const { User, Exam, Copy } = require("../node_scripts/database/models");
 const correction = require("../node_scripts/correction")
 const databaseTools = require("../node_scripts/databaseTools")
+const corrector = require('../node_scripts/correction')
 
 var multer  = require('multer'); // Specific import for files 
 const exam = require('../node_scripts/database/models/exam');
@@ -216,8 +217,15 @@ router.post("/sendNormalCotationCriteria", acces.hasAcces, async (req,res)=>{
 
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     exam.correctionCriterias = JSON.stringify(criteria)
-    exam.save()
-    res.redirect('/create/Step5')
+    await exam.save()
+
+    corrector.reCorrect(req.session.examId).then(suc=>{
+        res.redirect('/create/Step5')
+    })
+    .catch(err=>{
+            console.log(err)
+            res.end('Problem')
+    })
 })
 
 router.post("/sendAdvancedCotationCriteria", acces.hasAcces, async (req,res)=>{
