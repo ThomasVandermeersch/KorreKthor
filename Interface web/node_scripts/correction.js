@@ -2,6 +2,7 @@ const { reject } = require("async");
 const { sendEmail } = require("nodejs-nodemailer-outlook");
 const { resolve } = require("path");
 const { User, Exam, Copy } = require("./database/models");
+const exam = require("./database/models/exam");
 
 const email = require('./sendEmail')
 
@@ -34,7 +35,38 @@ async function saveCopy(copy,result,examId){
                        "answers": JSON.stringify(copy.answers)
                     })
     }
-} 
+}
+
+
+//called to recorrect after criteria changes
+async function reCorrect(examId){
+    return new Promise(async(resolve,reject)=>{
+        const exam = await Exam.findOne({where:{id:examId}})
+        const copies = await Copy.findAll({where:{examId:examId}})
+        const corrections = JSON.parse(exam.corrections)
+        const questionStatus = JSON.parse(exam.questionStatus)
+        const correctionCriterias = JSON.parse(exam.correctionCriterias)
+        
+        copies.forEach((copy)=>{
+            
+            console.log(corrections[copy.version])
+            console.log(copy.answers)
+            correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
+            .then(async result=>{
+                console.log('OK')
+                dbCopy = await Copy.findOne({where:{id:copy.id}})
+                dbCopy.result = result
+                await dbCopy.save()
+            })
+            .catch(err=>{
+                reject(err)
+                console.log('KO')
+            })
+        })
+        resolve('DOne')
+
+    })
+}
 
 async function correctAll(scanResultString){
     const scanResult = JSON.parse(scanResultString)
@@ -159,8 +191,8 @@ function correctionCopy(  correction /*list of list*/,
                             correctionCriterias,
                             ){
     
-    console.log('---Correction criterias---')
-    console.log(correctionCriterias)
+    // console.log('---Correction criterias---')
+    // console.log(correctionCriterias)
     return new Promise((resolve, reject) => {                                  
         if (correction.length != response.length){
             reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
@@ -299,6 +331,7 @@ function correctionAdvanced(correction,
 exports.saveCopy = saveCopy
 exports.correctAll = correctAll
 exports.correctionCopy = correctionCopy
+exports.reCorrect = reCorrect
 
 //------ TEST --------
 
