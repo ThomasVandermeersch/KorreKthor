@@ -91,7 +91,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.8, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.8):
+def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.8, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.9):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -123,7 +123,10 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     w, h = fullTemplate.shape[::-1]
 
     for i in fullListe:
-        cv2.rectangle(img, i, (i[0] + w, i[1] + h), (0,255,0), 1)
+        cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
+
+    for i in emptyListe:
+        cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
 
     boolArray = getBoolArray(emptyListe, fullListe, 25)
     return boolArray
@@ -171,6 +174,9 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     if len(emptyListe) == 0 and len(fullListe) == 0:
         return None
 
+    print(emptyListe)
+    print(fullListe)
+    
     xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else [(), ()]
     xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else [(), ()]
 
@@ -190,20 +196,26 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     y = 0
     c = 0
     for i in ySortedListe:
+        print("bool", boolArray)
+        print("i", i)
         if abs(y-i) > minDistance:
             y = i
             sub = []
             if c:
+                print("c", c)
                 for i in range(c):
                     sub.append(False)
                 boolArray.append(sub)
             c = 0
         c += 1
+        print("add 1 to C =" + str(c))
 
     sub = []
     for i in range(c):
         sub.append(False)
-    boolArray.append(sub)     
+    boolArray.append(sub)  
+
+    print("bool end", boolArray)   
 
     # get the size of the biggest liste in the boolArray
     maxVal = len(max(boolArray, key = lambda i: len(i)))
