@@ -7,7 +7,7 @@ const email = require('./sendEmail')
 
 
 //copiesObject = {"zipFile": "78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip", "data": [{"qrcode": {"matricule": 17076, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, true], [true, true], [true, false, false], [true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_17076.png", "error": "None"}, {"qrcode": {"matricule": 14136, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false, false], [false, false, false], [false, true, false, false], [true, false, false, false], [false, false, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_14136.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_15154.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, false], [false, true, true], [false, true, false], [false, true, true], [false, false, true], [false, true, false, false, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17036.png", "error": "None"}, {"qrcode": {"matricule": 17338, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [true, false, false, false], [false, true, false, false], [false, true, true, false], [false, true, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_17338.png", "error": "None"}, {"qrcode": {"matricule": 17325, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false], [false, true, false], [true, false, false], [false, true, false], [false, false, true], [true, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17325.png", "error": "None"}, {"qrcode": {"matricule": 16027, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [false, true], [false, false, true], [false, true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_16027.png", "error": "None"}, {"qrcode": {"matricule": 19371, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, true], [false, false, true], [false, true, false], [false, true, true, false], [false, true, false], [false, false, true, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_19371.png", "error": "None"}, {"qrcode": {"matricule": 19286, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false], [false, true], [false, false, true], [false, true, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_19286.png", "error": "None"}]}
-
+//correctAll(JSON.stringify(copiesObject))
 
 
 async function saveCopy(copy,result,examId){
@@ -64,16 +64,17 @@ async function correctAll(scanResultString){
         // }
     //Step 2 : CORRECT ALL COPIES
     scanResult.data.forEach(async (copy) =>{
-        if(correctionCriterias.type == 'normal'){    
+        
+        
+        
+       // if(correctionCriterias.type == 'normal'){    
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
             console.log(copy)
-            correctionNormal(
+            correctionCopy(
                     corrections[copy.qrcode.version],
                     copy.answers,
                     questionStatus[copy.qrcode.version],
-                    parseInt(correctionCriterias.ptsRight,10),
-                    parseInt(correctionCriterias.ptsWrong,10),
-                    parseInt(correctionCriterias.ptsAbs,10)
+                    correctionCriterias
             ).then(async result =>{
                 console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
                 console.log(result)
@@ -88,36 +89,36 @@ async function correctAll(scanResultString){
             .catch(err=>{
                 console.log(err+copy.qrcode.matricule)
             })
-        }    
-        else{
-            var lastExclusive = null;
-            if(correctionCriterias.isLastExclusive) lastExclusive = true
-            else lastExclusive = false
+        })    
+    //     else{
+    //         var lastExclusive = null;
+    //         if(correctionCriterias.isLastExclusive) lastExclusive = true
+    //         else lastExclusive = false
             
-            correctionAdvanced(
-                corrections[copy.qrcode.version],
-                copy.answers,
-                questionStatus[copy.version],
-                parseInt(correctionCriterias.allGood,10),
-                parseInt(correctionCriterias.oneWrong,10),
-                parseInt(correctionCriterias.twoWrong,10),
-                parseInt(correctionCriterias.threeWrong,10),
-                parseInt(correctionCriterias.threeMoreWrong,10),
-                lastExclusive,
-                parseInt(correctionCriterias.lastExclusiveTrue,10),
-                parseInt(correctionCriterias.lastExclusiveFalse,10)
-            ).then(result =>{
-                //STEP 3 : PU
-                // TO DO -- mettre les points dans la base de données !
-                saveCopy(copy,result,exam.id)
-                console.log(result)
-            })
-            .catch(err=>{
-                console.log(err)
-            })
+    //         correctionAdvanced(
+    //             corrections[copy.qrcode.version],
+    //             copy.answers,
+    //             questionStatus[copy.version],
+    //             parseInt(correctionCriterias.allGood,10),
+    //             parseInt(correctionCriterias.oneWrong,10),
+    //             parseInt(correctionCriterias.twoWrong,10),
+    //             parseInt(correctionCriterias.threeWrong,10),
+    //             parseInt(correctionCriterias.threeMoreWrong,10),
+    //             lastExclusive,
+    //             parseInt(correctionCriterias.lastExclusiveTrue,10),
+    //             parseInt(correctionCriterias.lastExclusiveFalse,10)
+    //         ).then(result =>{
+    //             //STEP 3 : PU
+    //             // TO DO -- mettre les points dans la base de données !
+    //             saveCopy(copy,result,exam.id)
+    //             console.log(result)
+    //         })
+    //         .catch(err=>{
+    //             console.log(err)
+    //         })
            
-        }
-    })
+    //     }
+    // })
 
     exam.status = 2
     exam.save()
@@ -152,16 +153,15 @@ copies = [
 
 
 //Correction file
-function correctionNormal(  correction /*list of list*/,
+function correctionCopy(  correction /*list of list*/,
                             response /*list of list*/,
                             questionStatus, /*list */
-                            positif /*number*/,
-                            negatif /*number*/,
-                            abstention /*number*/ 
+                            correctionCriterias,
                             ){
     
-    return new Promise((resolve, reject) => {
-                                  
+    console.log('---Correction criterias---')
+    console.log(correctionCriterias)
+    return new Promise((resolve, reject) => {                                  
         if (correction.length != response.length){
             reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
         }
@@ -169,22 +169,35 @@ function correctionNormal(  correction /*list of list*/,
         totalPoints = 0
         maxPoints = 0
         const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
-        console.log(questionStatus)
+        
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
-            console.log(questionStatus[questionIndex])
             if(questionStatus[questionIndex] == 'normal'){
                 //Vérifier que le nombre de propositions de la correction correspond au nombre
                 //de proposition de la copie
                 if(response[questionIndex].length != correction[questionIndex].length){
                     reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
                 }
-                maxPoints += positif
-                // NO ABSTENTION:
-                if(response[questionIndex].some(elem => elem == true)){            
-                    if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
-                    else totalPoints -= negatif
+
+                // --- > Normal correction
+                if(correctionCriterias.type == 'normal'){    
+                    const positif = parseInt(correctionCriterias.ptsRight,10)
+                    const negatif =  parseInt(correctionCriterias.ptsWrong,10)
+                    const abstention = parseInt(correctionCriterias.ptsAbs,10)
+                    
+                    
+                    maxPoints += positif
+                    // NO ABSTENTION:
+                    if(response[questionIndex].some(elem => elem == true)){            
+                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
+                        else totalPoints -= negatif
+                    }
+                    else totalPoints += abstention
                 }
-                else totalPoints += abstention
+                else{
+                    correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],correctionCriterias)
+                    totalPoints += correctProp[0]
+                    maxPoints += correctProp[1]
+                }
             }
         }
         resolve([totalPoints,maxPoints])
@@ -194,16 +207,24 @@ function correctionNormal(  correction /*list of list*/,
 
 function correctionAdvancedProp(correction,
                                 response,
-                                eachGood,
-                                onefalse,
-                                twofalse,
-                                threefalse,
-                                morethanthree,
-                                lastProp,
-                                lastPropTrue,
-                                lastPropFalse 
+                                correctionCriterias
                                 ){
     
+    
+    var lastExclusive = null;
+    if(correctionCriterias.isLastExclusive) lastExclusive = true
+    else lastExclusive = false
+    console.log(correctionCriterias)
+    
+    const eachGood = parseInt(correctionCriterias.allGood,10)
+    const onefalse = parseInt(correctionCriterias.oneWrong,10)
+    const twofalse = parseInt(correctionCriterias.twoWrong,10)
+    const threefalse = parseInt(correctionCriterias.threeWrong,10)
+    const morethanthree = parseInt(correctionCriterias.threeMoreWrong,10)
+    const lastProp = lastExclusive
+    const lastPropTrue = parseInt(correctionCriterias.lastExclusiveTrue,10)
+    const lastPropFalse = parseInt(correctionCriterias.lastExclusiveFalse,10)
+
     // Si dernière proposition EXCLUSIVE ET DEVAIT être cochée !
     if( lastProp && correction[correction.length - 1]){
         // Si la réponse a été cochée :
@@ -260,6 +281,7 @@ function correctionAdvanced(correction,
             reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
         }
         for(var questionIndex=0; questionIndex < correction.length; questionIndex++ ){
+            
             if(questionStatus[questionIndex] == 'normal'){
                 if(response[questionIndex].length != correction[questionIndex].length){
                     reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
@@ -276,7 +298,7 @@ function correctionAdvanced(correction,
 
 exports.saveCopy = saveCopy
 exports.correctAll = correctAll
-exports.correctionNormal = correctionNormal
+exports.correctionCopy = correctionCopy
 
 //------ TEST --------
 

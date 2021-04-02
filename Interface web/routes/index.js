@@ -103,11 +103,9 @@ app.post('/modifyImageTreatment/:copyId',acces.hasAcces, async (req,res)=>{
         // console.log(correction)
         // console.log('---correction---')
         // console.log(req.)
-        corrector.correctionNormal( 
-                correction,JSON.parse(req.body.response),questionStatus,           
-                parseInt(correctionCriterias.ptsRight,10),
-                parseInt(correctionCriterias.ptsWrong,10),
-                parseInt(correctionCriterias.ptsAbs,10)
+        corrector.correctionCopy( 
+                correction,JSON.parse(req.body.response),questionStatus,correctionCriterias           
+
         )
         .then(async (newResult) =>{
             console.log(newResult)
