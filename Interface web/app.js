@@ -120,4 +120,4 @@ console.log("PostgrSQL host : " + process.env.POSTGRES_HOST )
   // console.log(await copyS.getExam())
 // })()
 
-const test = require('./test')
+//const test = require('./test')
