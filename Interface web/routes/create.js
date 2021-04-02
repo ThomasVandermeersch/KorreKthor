@@ -91,7 +91,8 @@ router.get("/Step4",acces.hasAcces,function(req,res){
                 threeMoreWrong:0.21,
                 isLastExclusive : 'on',
                 lastExclusiveTrue:1,
-                lastExclusiveFalse:0})
+                lastExclusiveFalse:0,
+                redirection:'create'})
 })
 
 // Route to the download page
@@ -208,7 +209,7 @@ router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (re
 })
 
 
-router.post("/sendNormalCotationCriteria", acces.hasAcces, async (req,res)=>{
+router.post("/sendNormalCotationCriteria/:redirection", acces.hasAcces, async (req,res)=>{
     var criteria = req.body
     console.log("____ CRITERIAS ___")
     console.log(criteria)
@@ -220,7 +221,8 @@ router.post("/sendNormalCotationCriteria", acces.hasAcces, async (req,res)=>{
     await exam.save()
 
     corrector.reCorrect(req.session.examId).then(suc=>{
-        res.redirect('/create/Step5')
+        if(req.params.redirection == 'create') res.redirect('/create/Step5')
+        else res.redirect('/see/exam/' + req.session.examId)
     })
     .catch(err=>{
             console.log(err)

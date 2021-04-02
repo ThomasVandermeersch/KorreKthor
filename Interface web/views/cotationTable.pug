@@ -1,5 +1,5 @@
 div(class="row mt-3")
-    form(action="/create/sendNormalCotationCriteria", method="POST" , class="form-inline")
+    form(action="/create/sendNormalCotationCriteria/"+redirection, method="POST" , class="form-inline")
         if type=='normal'
             - var showNormal = "display"
             - var showAdvanced = "display: none;"

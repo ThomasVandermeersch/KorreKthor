@@ -29,6 +29,7 @@ app.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
         // }
 
         var correctionCriterias = JSON.parse(exam.correctionCriterias)
+        correctionCriterias['redirection'] = 'modify'
         req.session['examId'] = req.params.examId        
         console.log(correctionCriterias)
         res.render('modifyCriteria.pug', correctionCriterias)
