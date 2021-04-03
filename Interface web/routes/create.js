@@ -49,13 +49,13 @@ router.get("/downloadcorrection", acces.hasAcces, async (req, res) => {
 
 // Route to upload file
 router.get("/Step1",acces.hasAcces, function(req,res){
-    res.render('uploadFile', {title:"QCM CREATOR"})
+    res.render('create/uploadFile', {title:"QCM CREATOR"})
 
 })
 
 // Route to upload questions
 router.get("/Step2", acces.hasAcces, function(req,res){
-    res.render('loadQuestions', 
+    res.render('create/loadQuestions', 
             {title:"QCM CREATOR", 
                 uploadedFilename :req.session.excelFile.filename, 
                 versions: JSON.parse(req.session.excelFile.versions),
@@ -66,7 +66,7 @@ router.get("/Step2", acces.hasAcces, function(req,res){
 // Route to load the answers
 router.get("/Step3",acces.hasAcces, function(req, res){
 
-        res.render('loadAnswers', 
+        res.render('create/loadAnswers', 
                     {title:"QCM CREATOR", 
                     uploadedFilename: req.session.excelFile.filename,
                     versions :JSON.parse(req.session.excelFile.versions), 
@@ -79,7 +79,7 @@ router.get("/Step3",acces.hasAcces, function(req, res){
 
 //Route de cotation
 router.get("/Step4",acces.hasAcces,function(req,res){
-        res.render('cotation.pug',
+        res.render('create/cotation.pug',
             {   type:'normal',
                 ptsRight:1,
                 ptsWrong:0,
@@ -97,7 +97,7 @@ router.get("/Step4",acces.hasAcces,function(req,res){
 
 // Route to the download page
 router.get("/Step5",acces.hasAcces, function(req,res){
-    res.render('downloadPDF')
+    res.render('create/downloadPDF')
 })
 
 // Route to send answers
