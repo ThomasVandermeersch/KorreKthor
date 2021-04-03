@@ -1,4 +1,4 @@
-include header.pug
+include ../header.pug
 
 - var date = new Date(Date.parse(copy.createdAt))
 
@@ -54,4 +54,4 @@ div(class="container page")
 
 input(id="copyId",type="hidden", value=copy.id)
 script(src='/javascript/correctImageProcess.js')
-include footer.pug  
+include ../footer.pug  

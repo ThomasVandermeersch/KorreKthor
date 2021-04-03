@@ -23,7 +23,7 @@ router.get("/", acces.hasAcces, async (req, res) => {
         var exam = await copy.getExam()
         copies.push({"copy":copy, "exam":exam})
     };
-    res.render("showExams", {exams:exams, copies:copies})
+    res.render("see/showExams", {exams:exams, copies:copies})
 })
 
 router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
@@ -49,7 +49,7 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
     };
 
     stats = {"mean": 16, "var":2, "participants":154, "blancs":14, "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
-    res.render("showCopies", {exam:exam, copies:copies, stats:stats})
+    res.render("see/showCopies", {exam:exam, copies:copies, stats:stats})
 })
 
 router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
@@ -63,7 +63,7 @@ router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
     }
 
     if (exam){
-        res.render("showExam", {exam:exam})
+        res.render("see/showExam", {exam:exam})
     }
     else{
         res.status(404).redirect("/error")
@@ -86,7 +86,7 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
     
     console.log(copy.answers)
     if (copy && exam){
-        res.render("showCopy", {exam:exam, copy:copy})
+        res.render("see/showCopy", {exam:exam, copy:copy})
     }
     else{
         res.status(404).redirect("/error")

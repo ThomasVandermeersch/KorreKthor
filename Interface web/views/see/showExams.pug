@@ -1,4 +1,4 @@
-include header.pug
+include ../header.pug
 
 div(class="container page")
     if exams.length
@@ -46,7 +46,7 @@ div(class="container page")
                             td(class="version")= pair.copy.version
                             td(class="date")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
-include footer.pug    
+include ../footer.pug    
         
 script.
     function getExam(id){

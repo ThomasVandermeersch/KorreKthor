@@ -1,4 +1,4 @@
-include header.pug
+include ../header.pug
 
 - var correction = JSON.parse(exam.correctionCriterias)
 - var date = new Date(Date.parse(exam.createdAt))
@@ -74,4 +74,4 @@ div(class="container page create")
             else if exam.status == 0
                 a(href=`/upload/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Uploader l'examen
 
-include footer.pug
+include ../footer.pug
