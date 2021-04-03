@@ -94,7 +94,7 @@ app.use('/correction',correctionRouter)
 //Si aucune route n'est trouvée
 app.get("*", function (req, res) {
   res.status("404")
-  res.render("error");   
+  res.render("index/error");   
 });
 
 // Application http port 9898
