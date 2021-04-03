@@ -53,7 +53,10 @@ const msalConfig = {
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    unset: 'destroy'
+    unset: 'destroy',
+    cookie: {
+      expires: 1000 * 60 * 45 //La sesssion expire après 45 minutes d'inactivité
+    }
   }));
 
   app.use(flash());
