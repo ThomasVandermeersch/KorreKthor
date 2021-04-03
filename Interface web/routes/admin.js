@@ -6,7 +6,7 @@ const acces = require('../node_scripts/hasAcces')
 
 router.get('/', acces.hasAcces, async (req,res)=>{
     
-    var users = await User.findAll()
+    var users = await User.findAll({order:[['matricule', 'ASC']]})
     var mapping = users.map(user=>(user.dataValues))
     
     res.render('admin/adminUsers',{users:mapping})
