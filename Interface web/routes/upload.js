@@ -52,7 +52,7 @@ function callCorrection(filename){
 
 router.get("/copies/:examid", acces.hasAcces, async(req, res) => {
     var exam = await Exam.findOne({where:{id:req.params.examid}})
-    res.render("uploadScans", {exam:exam})
+    res.render("upload/uploadScans", {exam:exam})
 })
 
 router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, res) => {
