@@ -42,5 +42,5 @@ document.getElementById('submitButton').addEventListener("click",function(){
     }
     console.log(JSON.stringify(responseList))
     console.log(document.getElementById('copyId').value)
-    post("/modifyImageTreatment/"+document.getElementById('copyId').value,{"hello": "bonjour les amis","response":JSON.stringify(responseList)})
+    post("/correction/modifyImageTreatment/"+document.getElementById('copyId').value,{"hello": "bonjour les amis","response":JSON.stringify(responseList)})
 })

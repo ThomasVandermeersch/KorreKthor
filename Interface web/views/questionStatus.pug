@@ -4,7 +4,7 @@ div(class="container page create")
 
     h2(class="mb-3") Modifier les questions de #[strong #{exam.name}]
 
-    form(action="/modifyQuestionStatus/"+exam.id, method="POST" , class="form-inline")
+    form(action="/correction/modifyQuestionStatus/"+exam.id, method="POST" , class="form-inline")
         input(type="hidden" name="questionStatusObject" value=questionStatus)
 
         each question, versionID in questionStatus

@@ -73,12 +73,13 @@ app.use(function(req,res,next){
 });
 
 // Import routes
-var createRouter = require('./routes/create');
+var createRouter = require("./routes/create");
 var indexRouter = require("./routes/index")
 var authRouter = require("./routes/auth")
 var uploadRouter = require("./routes/upload")
 var adminRouter = require("./routes/admin")
 var seeRouter = require("./routes/see")
+var correctionRouter = require("./routes/correction")
 
 app.use('/create', createRouter);
 app.use('',indexRouter)
@@ -86,6 +87,7 @@ app.use('/auth',authRouter)
 app.use('/upload', uploadRouter)
 app.use('/admin',adminRouter)
 app.use('/see',seeRouter)
+app.use('/correction',correctionRouter)
 
 
 
