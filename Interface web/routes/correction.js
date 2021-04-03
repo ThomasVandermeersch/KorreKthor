@@ -2,27 +2,28 @@ const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
 const { User, Exam, Copy } = require("../node_scripts/database/models");
 const corrector = require('../node_scripts/correction')
+const sendEmail = require('../node_scripts/sendEmail');
 
 router.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
     var exam = await Exam.findOne({where:{id:req.params.examId}})
     var a = await exam.getUser()
     var b = await req.session.userObject
 
-    // if (a.id !== b.id){
-    //         return res.status(403).render('noAcces')
-    // }
+//     if (a.id !== b.id){
+//             return res.status(403).render('index/noAcces')
+//     }
 
     var correctionCriterias = JSON.parse(exam.correctionCriterias)
     correctionCriterias['redirection'] = 'modify'
     req.session['examId'] = req.params.examId        
     console.log(correctionCriterias)
-    res.render('modifyCriteria.pug', correctionCriterias)
+    res.render('correction/modifyCriteria.pug', correctionCriterias)
 })
 
 router.get("/questionStatus/:examId",async (req,res)=>{
     const exam = await Exam.findOne({where:{id:req.params.examId}})
     const questionStatus = JSON.parse(exam.questionStatus)
-    res.render('questionStatus',{questionStatus:questionStatus, exam:exam})
+    res.render('correction/questionStatus',{questionStatus:questionStatus, exam:exam})
 })
 
 router.post('/modifyQuestionStatus/:examId',async(req,res)=>{
@@ -47,7 +48,6 @@ router.post('/modifyQuestionStatus/:examId',async(req,res)=>{
             console.log(err)
             res.end('Problem')
     })
-
 })
 
 
@@ -66,7 +66,7 @@ router.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
 
     if (copy && user && exam && prof){
 
-            res.render('emailForm',{
+            res.render('correction/complainEmail',{
                     destinationName: prof.fullName,
                     name:req.session.userObject.fullName,
                     examName:exam.name,
@@ -77,7 +77,7 @@ router.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
             })
     }
     else{
-            res.render("/error")
+            res.render("index/error")
     }
 })
 
@@ -111,8 +111,6 @@ router.post('/modifyImageTreatment/:copyId',acces.hasAcces, async (req,res)=>{
             console.log(err + ' ---Not normal to have an error here because lists have to match')
     })
 })
-
-const sendEmail = require('../node_scripts/sendEmail');
 
 router.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
     sendEmail.sendEmail(req.body.email,req.session.userObject.email,req.body.object,req.body.message)
