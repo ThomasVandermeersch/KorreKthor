@@ -9,12 +9,12 @@ router.get('/', acces.hasAcces, async (req,res)=>{
     var users = await User.findAll()
     var mapping = users.map(user=>(user.dataValues))
     
-    res.render('adminUsers',{users:mapping})
+    res.render('admin/adminUsers',{users:mapping})
 })
 
 router.get('/:matricule', acces.hasAcces, async (req,res)=>{
     var user = await User.findOne({where:{matricule:req.params.matricule}})
-    res.render('adminModifyUser', {user:user})
+    res.render('admin/adminModifyUser', {user:user})
 })
 
 router.post('/modifyUser', acces.hasAcces, async(req,res)=>{
