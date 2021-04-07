@@ -10,12 +10,12 @@ router.get("/", acces.hasAcces, async (req, res) => {
     var examCopies;
 
     if (req.session.userObject.authorizations == 0){
-        exams = await Exam.findAll()
-        examCopies = await Copy.findAll()
+        exams = await Exam.findAll({order:["createdAt"]})
+        examCopies = await Copy.findAll({order:["createdAt"]})
     }
     else {
-        exams = await Exam.findAll({where:{userId:userid}})
-        examCopies = await Copy.findAll({where:{userId:userid}})
+        exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
+        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"]})
     }   
     
     const copies = []
