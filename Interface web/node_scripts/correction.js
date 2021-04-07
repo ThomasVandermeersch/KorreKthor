@@ -10,13 +10,33 @@ const email = require('./sendEmail')
 //copiesObject = {"zipFile": "78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip", "data": [{"qrcode": {"matricule": 17076, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, true], [true, true], [true, false, false], [true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_17076.png", "error": "None"}, {"qrcode": {"matricule": 14136, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false, false], [false, false, false], [false, true, false, false], [true, false, false, false], [false, false, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_14136.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_15154.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, false], [false, true, true], [false, true, false], [false, true, true], [false, false, true], [false, true, false, false, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17036.png", "error": "None"}, {"qrcode": {"matricule": 17338, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [true, false, false, false], [false, true, false, false], [false, true, true, false], [false, true, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_17338.png", "error": "None"}, {"qrcode": {"matricule": 17325, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false], [false, true, false], [true, false, false], [false, true, false], [false, false, true], [true, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17325.png", "error": "None"}, {"qrcode": {"matricule": 16027, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [false, true], [false, false, true], [false, true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_16027.png", "error": "None"}, {"qrcode": {"matricule": 19371, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, true], [false, false, true], [false, true, false], [false, true, true, false], [false, true, false], [false, false, true, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_19371.png", "error": "None"}, {"qrcode": {"matricule": 19286, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false], [false, true], [false, false, true], [false, true, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_19286.png", "error": "None"}]}
 //correctAll(JSON.stringify(copiesObject))
 
-
-async function saveCopy(copy,result,examId){
-    console.log(copy.qrcode.matricule)
+async function saveErrorCopy(copy, error, examId){
     var user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
     dbCopy = await Copy.findOne({where:{"examId":examId,"userId": user.id}})
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    console.log(user.fullName)
+
+    if(dbCopy){
+        dbCopy.version = copy.qrcode.version, 
+        dbCopy.result = [0, 0], 
+        dbCopy.file = copy.file,
+        dbCopy.answers = JSON.stringify({"error":error})
+        dbCopy.save()
+        console.log('Resave copy')
+    }
+    else{
+        Copy.create({"userId": user.id, 
+                    "examId": examId, 
+                    "version": copy.qrcode.version, 
+                    "result": [0, 0], 
+                    "file": copy.file,
+                    "answers": JSON.stringify({"error":error})
+                })
+    }
+}
+
+
+async function saveCopy(copy,result,examId){
+    var user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
+    dbCopy = await Copy.findOne({where:{"examId":examId,"userId": user.id}})
 
     if(dbCopy){
         dbCopy.version = copy.qrcode.version, 
@@ -27,13 +47,13 @@ async function saveCopy(copy,result,examId){
         console.log('Resave copy')
     }
     else{
-            Copy.create({"userId": user.id, 
-                       "examId":examId, 
-                       "version":copy.qrcode.version, 
-                       "result": result, 
-                       "file": copy.file,
-                       "answers": JSON.stringify(copy.answers)
-                    })
+        Copy.create({"userId": user.id, 
+                    "examId":examId, 
+                    "version":copy.qrcode.version, 
+                    "result": result, 
+                    "file": copy.file,
+                    "answers": JSON.stringify(copy.answers)
+                })
     }
 }
 
@@ -58,99 +78,47 @@ async function reCorrect(examId){
                 dbCopy.result = result
                 await dbCopy.save()
             })
-            .catch(err=>{
-                reject(err)
+            .catch(async err=>{
                 console.log('KO')
+                dbCopy = await Copy.findOne({where:{id:copy.id}})
+                dbCopy.result = [0, 0]
+                dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
+                reject(err)
             })
         })
-        resolve('DOne')
+        resolve('Done')
 
     })
 }
 
 async function correctAll(scanResultString){
     const scanResult = JSON.parse(scanResultString)
-    
 
-    // const examId = null;
-    // const exam = null;
-    // const corrections = null;
-    // const correctionCriterias = null;
-    // const questionStatus = null;
-    
+    // FIND THE EXAM RELATED TO THE EXAMID
+    const id = scanResult.zipFile.split('.')[0]
+    var exam = await Exam.findOne({where:{id:id}})
+    const examId = exam.id
+    const corrections = JSON.parse(exam.dataValues.corrections)
+    const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
+    const questionStatus = JSON.parse(exam.dataValues.questionStatus)
 
-    //if(copy.qrcode.lessonId != examId){
-        // FIND THE EXAM RELATED TO THE EXAMID
-            console.log("hello1")
-            const id = scanResult.zipFile.split('.')[0]
-            var exam = await Exam.findOne({where:{id:id}})
-            const examId = exam.id
-            const corrections = JSON.parse(exam.dataValues.corrections)
-            const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
-            const questionStatus = JSON.parse(exam.dataValues.questionStatus)
-            console.log("hello")
-        // }
-        // else{
-        //     //Check check
-        //     console.log("Change of exam ID")
-        // }
     //Step 2 : CORRECT ALL COPIES
     scanResult.data.forEach(async (copy) =>{
-        
-        
-        
-       // if(correctionCriterias.type == 'normal'){    
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-            console.log(copy)
-            correctionCopy(
-                    corrections[copy.qrcode.version],
-                    copy.answers,
-                    questionStatus[copy.qrcode.version],
-                    correctionCriterias
-            ).then(async result =>{
-                console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-                console.log(result)
-                //When the correction is done, the copy has to be set in the database
-                                
-                // TO DO -- mettre les points dans la base de données !
-
-                saveCopy(copy,result,exam.id)
-                //email.sendResult(copy,result)
-                console.log(result)
-            })
-            .catch(err=>{
-                console.log(err+copy.qrcode.matricule)
-            })
-        })    
-    //     else{
-    //         var lastExclusive = null;
-    //         if(correctionCriterias.isLastExclusive) lastExclusive = true
-    //         else lastExclusive = false
-            
-    //         correctionAdvanced(
-    //             corrections[copy.qrcode.version],
-    //             copy.answers,
-    //             questionStatus[copy.version],
-    //             parseInt(correctionCriterias.allGood,10),
-    //             parseInt(correctionCriterias.oneWrong,10),
-    //             parseInt(correctionCriterias.twoWrong,10),
-    //             parseInt(correctionCriterias.threeWrong,10),
-    //             parseInt(correctionCriterias.threeMoreWrong,10),
-    //             lastExclusive,
-    //             parseInt(correctionCriterias.lastExclusiveTrue,10),
-    //             parseInt(correctionCriterias.lastExclusiveFalse,10)
-    //         ).then(result =>{
-    //             //STEP 3 : PU
-    //             // TO DO -- mettre les points dans la base de données !
-    //             saveCopy(copy,result,exam.id)
-    //             console.log(result)
-    //         })
-    //         .catch(err=>{
-    //             console.log(err)
-    //         })
-           
-    //     }
-    // })
+        correctionCopy(
+                corrections[copy.qrcode.version],
+                copy.answers,
+                questionStatus[copy.qrcode.version],
+                correctionCriterias
+        ).then(async result =>{
+            saveCopy(copy,result,exam.id)
+            //email.sendResult(copy,result)
+            console.log(result)
+        })
+        .catch(err=>{
+            console.log(err+copy.qrcode.matricule)
+            saveErrorCopy(copy, "correction copy error", exam.id)
+        })
+    })    
 
     exam.status = 2
     exam.save()
@@ -328,6 +296,7 @@ function correctionAdvanced(correction,
 
 }
 
+exports.saveErrorCopy = saveErrorCopy
 exports.saveCopy = saveCopy
 exports.correctAll = correctAll
 exports.correctionCopy = correctionCopy

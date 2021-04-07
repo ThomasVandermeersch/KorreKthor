@@ -5,8 +5,7 @@ div(class="container page create")
     h1 Envoyez votre email
     
     if messages.failEmail
-        div(class="alert alert-danger" role="alert")
-            p= messages.failEmail
+        div(class="alert alert-danger" role="alert")= messages.failEmail
 
     form(action="/correction/sendComplainEmail" method="POST")
         div(class="form-group row")
