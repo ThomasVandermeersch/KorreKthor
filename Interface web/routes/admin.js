@@ -1,20 +1,23 @@
 const router = require('express-promise-router')();
-const { User, Exam, Copy } = require("../node_scripts/database/models");
-const user = require('../node_scripts/database/models/user');
+const { User } = require("../node_scripts/database/models");
 const acces = require('../node_scripts/hasAcces')
 
-
-router.get('/', acces.hasAcces, async (req,res)=>{
-    
-    var users = await User.findAll({order:[['matricule', 'ASC']]})
-    var mapping = users.map(user=>(user.dataValues))
-    
-    res.render('admin/adminUsers',{users:mapping})
+router.get('/', acces.hasAcces, (req,res)=>{
+    User.findAll({order:[['matricule', 'ASC']]})
+        .then(users =>res.render('admin/adminUsers',{users:users}))
+        .catch(err =>{
+            console.log(" --- DATABASE ERROR -- ADMIN/ ---\n " + err)
+            res.send('Database error !')
+        })
 })
 
-router.get('/:matricule', acces.hasAcces, async (req,res)=>{
-    var user = await User.findOne({where:{matricule:req.params.matricule}})
-    res.render('admin/adminModifyUser', {user:user})
+router.get('/:matricule', acces.hasAcces, (req,res)=>{
+    User.findOne({where:{matricule:req.params.matricule}})
+        .then(user => res.render('admin/adminModifyUser', {user:user}))
+        .catch(err => {
+            console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
+            res.end('Database error')
+        })
 })
 
 router.post('/modifyUser', acces.hasAcces, async(req,res)=>{
