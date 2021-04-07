@@ -13,7 +13,14 @@ router.get('/', acces.hasAcces, (req,res)=>{
 
 router.get('/:matricule', acces.hasAcces, (req,res)=>{
     User.findOne({where:{matricule:req.params.matricule}})
-        .then(user => res.render('admin/adminModifyUser', {user:user}))
+        .then(user =>{
+            if (user.authorizations == 0 || user.authorizations == 2){
+                res.render('index/noAcces')
+            }
+            else{
+                res.render('admin/adminModifyUser', {user:user})
+            }
+        })
         .catch(err => {
             console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
             res.end('Database error')
