@@ -1,7 +1,7 @@
 const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
 const path = require("path")
-const { Exam, Copy } = require("../node_scripts/database/models");
+const { Exam, Copy, User } = require("../node_scripts/database/models");
 
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -10,11 +10,11 @@ router.get("/", acces.hasAcces, async (req, res) => {
 
     if (req.session.userObject.authorizations == 0){
         exams = await Exam.findAll({order:["createdAt"]})
-        examCopies = await Copy.findAll({order:["createdAt"]})
+        examCopies = await Copy.findAll({order:["createdAt"], include:[{model:User, as:'user'}]})
     }
     else {
         exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
-        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"]})
+        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}]})
     }   
     
     const copies = []

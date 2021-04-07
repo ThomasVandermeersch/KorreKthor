@@ -224,4 +224,9 @@ response4 = [[true, false, false],
 // corrector.correctAll(JSON.stringify(body))
 
 
+Copy.findAll({include:[{model:User, as:'user'}]}).then(resp => {
+  console.log(resp[0].user.fullName)
+})
+
+
 

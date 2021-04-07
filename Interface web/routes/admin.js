@@ -14,7 +14,7 @@ router.get('/', acces.hasAcces, (req,res)=>{
 router.get('/:matricule', acces.hasAcces, (req,res)=>{
     User.findOne({where:{matricule:req.params.matricule}})
         .then(user =>{
-            if (user.authorizations == 0 || user.authorizations == 2){
+            if (user.id != req.session.userObject.id && (user.authorizations == 0 || user.authorizations == 2)){
                 res.render('index/noAcces')
             }
             else{
