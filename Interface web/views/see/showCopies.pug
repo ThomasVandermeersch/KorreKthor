@@ -25,7 +25,7 @@ div(class="container page")
                 th Cote (pts)
         tbody
             each copy in copies 
-                - var point = (copy.copy.result[0]/copy.copy.result[1])*20
+                - var point = Math.round(((copy.copy.result[0]/copy.copy.result[1])*20)*100)/100
 
                 tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
                     td= copy.user.fullName

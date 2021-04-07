@@ -7,9 +7,9 @@ div(class="container page")
         div(class="card-body")
             h4(class="card-title") Copie d'examen (#[strong #{exam.name}])
 
-            p(class="card-subtitle mb-2 text-muted")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+            p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
             
-            - var point = (copy.result[0]/copy.result[1])*20
+            - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
             
             if point < 10
                 h4(class="text-danger") Cote : #{point}/20
@@ -45,12 +45,10 @@ div(class="container page")
                 img(class="border rounded mx-auto d-block col-5" src=`/see/copy/${copy.id}/download` width="40%")
             
             if messages.successEmail
-                div(class="alert alert-success" role="alert")
-                    p= messages.successEmail
+                div(class="alert alert-success" role="alert")= messages.successEmail
             
             if messages.successAnswerChange
-                div(class="alert alert-success" role="alert")
-                    p= messages.successAnswerChange
+                div(class="alert alert-success" role="alert")= messages.successAnswerChange
 
 input(id="copyId",type="hidden", value=copy.id)
 script(src='/javascript/correctImageProcess.js')

@@ -24,7 +24,7 @@ div(class="container page")
                         else
                             td(class="text-success") Corrigé
                         td(class="versions")= exam.numberOfVersion
-                        td(class="date")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+                        td(class="date")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
     
     if copies.length
         h1= "Copies"
@@ -38,13 +38,13 @@ div(class="container page")
             tbody
                 each pair, index in copies
                     - var date = new Date(Date.parse(pair.copy.createdAt))
-                    - var point = (pair.copy.result[0]/pair.copy.result[1])*20
+                    - var point = Math.round(((pair.copy.result[0]/pair.copy.result[1])*20)*100)/100
                     
                     tr(onClick=`getCopy("${ pair.copy.id }")` style="cursor: pointer;")
                             th= pair.exam.name
                             th #{point}/20
                             td(class="version")= pair.copy.version
-                            td(class="date")= `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+                            td(class="date")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
 
 include ../footer.pug    
         
