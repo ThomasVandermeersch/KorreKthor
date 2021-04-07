@@ -3,16 +3,11 @@ const path = require("path")
 const functions = require("../node_scripts/functions")
 const QCM_automatisation = require("../node_scripts/QCM_automatisation")
 const acces = require('../node_scripts/hasAcces')
-const request = require('request');
-const FormData = require('form-data');
-const fs = require("fs");
-const { User, Exam, Copy } = require("../node_scripts/database/models");
-const correction = require("../node_scripts/correction")
+const { Exam } = require("../node_scripts/database/models");
 const databaseTools = require("../node_scripts/databaseTools")
 const corrector = require('../node_scripts/correction')
 
 var multer  = require('multer'); // Specific import for files 
-const exam = require('../node_scripts/database/models/exam');
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
@@ -65,13 +60,12 @@ router.get("/Step2", acces.hasAcces, function(req,res){
 
 // Route to load the answers
 router.get("/Step3",acces.hasAcces, function(req, res){
-
-        res.render('create/loadAnswers', 
-                    {title:"QCM CREATOR", 
-                    uploadedFilename: req.session.excelFile.filename,
-                    versions :JSON.parse(req.session.excelFile.versions), 
-                    files :JSON.parse(req.session.pdffiles),
-                    lesson : req.session.excelFile.lesson
+    res.render('create/loadAnswers', 
+                {title:"QCM CREATOR", 
+                uploadedFilename: req.session.excelFile.filename,
+                versions :JSON.parse(req.session.excelFile.versions), 
+                files :JSON.parse(req.session.pdffiles),
+                lesson : req.session.excelFile.lesson
     })
     
 })
@@ -79,20 +73,20 @@ router.get("/Step3",acces.hasAcces, function(req, res){
 
 //Route de cotation
 router.get("/Step4",acces.hasAcces,function(req,res){
-        res.render('create/cotation.pug',
-            {   type:'normal',
-                ptsRight:1,
-                ptsWrong:0,
-                ptsAbs:0,
-                allGood:1,
-                oneWrong:0.75,
-                twoWrong:0.50,
-                threeWrong:0.25,
-                threeMoreWrong:0.21,
-                isLastExclusive : 'on',
-                lastExclusiveTrue:1,
-                lastExclusiveFalse:0,
-                redirection:'create'})
+    res.render('create/cotation.pug',
+        {   type:'normal',
+            ptsRight:1,
+            ptsWrong:0,
+            ptsAbs:0,
+            allGood:1,
+            oneWrong:0.75,
+            twoWrong:0.50,
+            threeWrong:0.25,
+            threeMoreWrong:0.21,
+            isLastExclusive : 'on',
+            lastExclusiveTrue:1,
+            lastExclusiveFalse:0,
+            redirection:'create'})
 })
 
 // Route to the download page
@@ -105,8 +99,12 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const filename = req.body.filename
     const lessonName = req.session.excelFile.lesson
     const students = await functions.importStudents("uploads/"+filename)
+
+    if (!students){
+        res.render("index/error")
+    }
+
     const answers = JSON.parse(req.body.liste)
-    
     var questionStatus = {}
 
     Object.entries(answers).forEach(([key,value]) =>{
@@ -118,20 +116,12 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
 
     });
     
-    
-    
-    console.log("---ANSWERS--")
-    console.log(answers)
-    console.log('----QUESTION STATUS ----')
-    console.log(questionStatus)
-    
     const files = JSON.parse(req.body.files)
 
     studentObjects = await databaseTools.createStudents(students)
-    console.log(studentObjects)
 
     var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers),"questionStatus":JSON.stringify(questionStatus)})
-    console.log(exam.id)
+    
     var lesson = {
         name: lessonName,
         id: exam.id
@@ -148,7 +138,6 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         exam.examFile = ret.exam
         exam.correctionFile = ret.correction
         exam.save()
-        console.log(exam.id)
         req.session["examId"] = exam.id
         
         //redirect
@@ -158,33 +147,32 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
 
 // Route to upload the student list file
 router.post("/sendList",acces.hasAcces, upload.single("studentList"), async function(req, res, next) {
-        const pathTofile = "uploads/"+req.file.originalname // file path
-        var ext = path.extname(pathTofile); // file extension
+    const pathTofile = "uploads/"+req.file.originalname // file path
+    var ext = path.extname(pathTofile); // file extension
 
-        if(ext ==".xlsx"){  
-            var versions = await functions.getExcelInfo(pathTofile)
-            if(versions[0]){
-                req.flash('errormsg',versions[0]);
-                console.log(versions[1] ) //log de l'erreur détaillée
-                res.redirect("/create/Step1")
-            }
-            else{ 
-                excelFile = {
-                    filename: req.file.originalname,
-                    versions: JSON.stringify(versions[2]),
-                    lesson: versions[3]
-                }
-
-                req.session["excelFile"] = excelFile
-                
-                res.redirect("/create/Step2")
-            }
-        }
-        else{
-            req.flash('errormsg', 'File must be .xlsx');
+    if(ext == ".xlsx"){  
+        var versions = await functions.getExcelInfo(pathTofile)
+        
+        if(versions[0]){
+            req.flash('errormsg', versions[0]);
+            console.log(versions[1] ) //log de l'erreur détaillée
             res.redirect("/create/Step1")
         }
-    
+        else{ 
+            excelFile = {
+                filename: req.file.originalname,
+                versions: JSON.stringify(versions[2]),
+                lesson: versions[3]
+            }
+
+            req.session["excelFile"] = excelFile
+            res.redirect("/create/Step2")
+        }
+    }
+    else{
+        req.flash('errormsg', 'File must be .xlsx');
+        res.redirect("/create/Step1")
+    }
 })
 
 // Route to upload the question files
@@ -211,14 +199,10 @@ router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (re
 
 router.post("/sendNormalCotationCriteria/:redirection", acces.hasAcces, async (req,res)=>{
     var criteria = req.body
-    console.log("____ CRITERIAS ___")
-    console.log(criteria)
-    console.log("____ EXAM ID ___")
-    console.log(req.session.examId)
 
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     exam.correctionCriterias = JSON.stringify(criteria)
-    await exam.save()
+    exam.save()
 
     corrector.reCorrect(req.session.examId).then(suc=>{
         if(req.params.redirection == 'create') res.redirect('/create/Step5')

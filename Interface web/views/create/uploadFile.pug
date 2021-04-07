@@ -12,8 +12,9 @@ div(class="container page create")
                 label(for="fileForm" class="form-label") Veuillez entrer le fichier Excel avec la liste d'élèves.
             div(class="col-6 col-md-9")
                 input(class="form-control" id="fileForm" type="file" name="studentList" required)
+                
                 if messages.errormsg
-                    div(class="alert alert-danger" role="alert")= messages.errormsg
+                    div(class="alert alert-danger mt-2" role="alert")= messages.errormsg
             
             div(class="col-5 col-md-3")
                 input(class="btn btn-warning float-end" type="submit", value="Submit file")

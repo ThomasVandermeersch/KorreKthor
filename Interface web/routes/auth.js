@@ -1,4 +1,4 @@
-const { User, Exam, Copy } = require("../node_scripts/database/models");
+const { User } = require("../node_scripts/database/models");
 const convertMatricule = require('./../node_scripts/convertMatricule')
 /* GET auth callback. */
 const router = require('express-promise-router')();
@@ -15,7 +15,6 @@ router.get('/signin',
       scopes: process.env.OAUTH_SCOPES.split(','),
       redirectUri: process.env.OAUTH_REDIRECT_URI
     };
-    //console.log(urlParameters)
 
     try {
       const authUrl = await req.app.locals
@@ -24,7 +23,6 @@ router.get('/signin',
     }
 
     catch (error) {
-      console.log(`Erroooor: ${error}`);
       req.flash('error_msg', {
         message: 'Error getting auth URL ',
         debug: JSON.stringify(error, Object.getOwnPropertyNames(error))
@@ -37,7 +35,6 @@ router.get('/signin',
 // <CallbackSnippet>
 router.get('/callback',
   async function(req, res) {
-    //console.log(req.query)
     const tokenRequest = {
       code: req.query.code,
       scopes: process.env.OAUTH_SCOPES.split(','),
@@ -49,18 +46,7 @@ router.get('/callback',
         .msalClient.acquireTokenByCode(tokenRequest);
 
       // Save the user's homeAccountId in their session
-
       req.session.userId = response.account.homeAccountId;
-      //console.log(req.session.userId)
-      //console.log(response)
-      //console.log(response.accessToken)
-      
-      
-      /*const user = await graph.getUserDetails(response.accessToken);
-      console.log(user)
-      console.log("On arrive ici 2       ????????????????,")
-      // Add the user to user storage
-      console.log(req.app.locals.users)*/
 
       // Get the matricule and the role 
       var checkUser = await User.findOne({where:{email:response.account.username}})
@@ -88,10 +74,9 @@ router.get('/callback',
       }
 
     } catch(error) {
-      console.log("Il y a une erreur ")
       console.log(error)
       req.flash('error_msg', {
-        message: 'Error completing authentication  HERE',
+        message: 'Error completing authentication HERE',
         debug: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
     }
@@ -101,6 +86,7 @@ router.get('/callback',
     else res.redirect('/');
   }
 );
+
 // </CallbackSnippet>
 router.get('/logout',
   async function(req, res) {

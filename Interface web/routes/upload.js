@@ -5,7 +5,7 @@ const http = require('http');
 const acces = require('../node_scripts/hasAcces')
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
-const { User, Exam, Copy } = require("../node_scripts/database/models");
+const { Exam } = require("../node_scripts/database/models");
 
 var multer  = require('multer'); // Specific import for files 
 const exam = require('../node_scripts/database/models/exam');
@@ -26,10 +26,8 @@ function callCorrection(filename){
 		my_file: fs.createReadStream(`uploads/${filename}`),
 	}
     
-    console.log("making a post")
     request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
         if (err){
-            console.log("error 500")
             res.status(500).send({"error":"something went wrong with the correction server.", "errorCode":1000})
         }
         else{
@@ -45,7 +43,6 @@ function callCorrection(filename){
             })
             
             correction.correctAll(body)
-            console.log("done")
         }
     })
 }
@@ -56,9 +53,14 @@ router.get("/copies/:examid", acces.hasAcces, async(req, res) => {
 })
 
 router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, res) => {
-    // var user = await User.findOne({where:{id:req.session.userObject.id}})
-    var exam = await Exam.findOne({where:{id:req.body.examid, userId:req.session.userObject.id }})
-    
+    var exam;
+    if (req.session.userObject.authorizations == 0){
+        exam = await Exam.findOne({where:{id:req.body.examid}})
+    }
+    else{
+        exam = await Exam.findOne({where:{id:req.body.examid, userId:req.session.userObject.id }})
+    }
+
     if (!exam){
         res.status(500).render("error")
     }
@@ -68,46 +70,16 @@ router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, r
 
     res.redirect("/see")
     
-    // Call correction
     callCorrection(req.file.originalname)
 })
 
-router.post("/scans", upload.single("file"), async (req, res) => {
-	const formData = {
-		my_field: "file",
-		my_file: fs.createReadStream(`uploads/${req.file.originalname}`),
-	}
-
-	request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
-        if (err){
-            res.status("500")
-            res.send({"error":"something went wrong with the correction server.", "errorCode":1000})
-        }
-        else{
-            correction.correctAll(body)
-            res.send({"message":"done"})
-
-            // var exam;
-            // console.log(body)
-            // JSON.parse(body).foreach(async (copy) => {
-            //     if (copy.error === "None"){
-            //         if (exam == undefined){
-            //             exam = await Exam.findOne({where:{id:copy.qrcode.lessonId}})
-            //         }
-
-            //         // resp = JSON.parse(exam.corrections[copy.version])
-            //         resp = [[true, false, false], [true, false, false], [true, false, false], [true, false, false], [true, false, true]]
-            //         //result = correction.correctionNormal(copy.answers, resp, 1, 0, 0)
-                    
-            //         if (points != null){
-            //             user = await User.findOne({where:{matricule:copy.qrcode.matricule}})
-            //             await Copy.create({"userId": user.id,"examId":exam.id, "version":copy.qrcode.version, "result": result, "file":`uploads/${req.file.originalname}`})
-            //         }
-            //     }
-            // })
-        }
-	})
+router.post("/scans/robot", upload.single("file"), async (req, res) => {
+	if (req.params.token == "secretToken"){
+        callCorrection(req.file.originalname)
+    }
+    else{
+        res.end("Error, you're not allowed to do that, please check you token")
+    }
 })
-
 
 module.exports = router;

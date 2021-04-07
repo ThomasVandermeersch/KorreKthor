@@ -1,8 +1,7 @@
 const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
 const path = require("path")
-const { User, Exam, Copy } = require("../node_scripts/database/models");
-const user = require('../node_scripts/database/models/user');
+const { Exam, Copy } = require("../node_scripts/database/models");
 
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -27,9 +26,7 @@ router.get("/", acces.hasAcces, async (req, res) => {
 })
 
 router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
-
-    var exams;
+    var exam;
     var examCopies;
 
     if (req.session.userObject.authorizations == 0){
@@ -37,7 +34,7 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
         examCopies = await exam.getCopies()
     }
     else {
-        exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
+        exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
         examCopies = await exam.getCopies()
     } 
 
@@ -53,13 +50,12 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
 })
 
 router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
     var exam;
     if (req.session.userObject.authorizations == 0){
         var exam = await Exam.findOne({where:{id:req.params.examid}})
     }
     else{
-        var exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
+        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
     }
 
     if (exam){
@@ -71,7 +67,6 @@ router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
 })
 
 router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
     var exam;
     var copy;
 
@@ -80,11 +75,10 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
         var exam = await copy.getExam()
     }
     else{
-        var copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
+        var copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}})
         var exam = await copy.getExam()
     }
     
-    console.log(copy.answers)
     if (copy && exam){
         res.render("see/showCopy", {exam:exam, copy:copy})
     }
@@ -94,14 +88,13 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
 })
 
 router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
     var exam;
 
     if (req.session.userObject.authorizations == 0){
         exam = await Exam.findOne({where:{id:req.params.examid}})
     }
     else{
-        exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
+        exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
     }
     
     if (exam.examFile){
@@ -118,15 +111,13 @@ router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
 });
 
 router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
-    
     var exam;
     
     if (req.session.userObject.authorizations == 0){
         exam = await Exam.findOne({where:{id:req.params.examid}})
     }
     else{
-        exam = await Exam.findOne({where:{id:req.params.examid, userId:userid}})
+        exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
     }
     
     if (exam.correctionFile){
@@ -143,15 +134,13 @@ router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) 
 });
 
 router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
-    userid = req.session.userObject.id
-
     var copy;
     
     if (req.session.userObject.authorizations == 0){
         copy = await Copy.findOne({where:{id:req.params.copyid}})
     }
     else{
-        copy = await Copy.findOne({where:{id:req.params.copyid, userId:userid}})
+        copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}})
     }
 
     if (copy.file){
