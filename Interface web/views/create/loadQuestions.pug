@@ -30,7 +30,7 @@ div(class="container page create")
                     input(class="form-control" id="fileForm"+questID type="file" name="question" required)
 
         if messages.errormsg
-            div(class="alert alert-danger" role="alert")= messages.errormsg
+            div(class="alert alert-danger mt-2" role="alert")= messages.errormsg
         
         
         input(id="versions" type="hidden" name="versions", value=versions)

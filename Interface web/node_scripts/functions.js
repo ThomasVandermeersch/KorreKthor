@@ -27,9 +27,6 @@ async function importStudents(path){
           student = indexEtu
           version = indexVersion
         }
-        else{
-          return None
-        }
 
         if (target < rowNumber){
           studentDict = {}
@@ -40,10 +37,15 @@ async function importStudents(path){
         }
       });
 
+      if (table.length < 0){
+        return null
+      }
       return table
+
     }
-    catch{
-      return None
+    catch (err) {
+      console.log(err)
+      return null
     }
 }
 
@@ -70,19 +72,26 @@ async function getExcelInfo(path){
       }
 
       if (target < rowNumber){
-        if (!versions.includes(row.values[version])){
+        if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
+          console.log(row.values[version])
           versions.push(row.values[version])
         }
       }
-    })  
+    })
 
     lesson = worksheet.getCell("A1").value
+
+    if (version == 0) {
+      return ["Il manque un champ 'version' dans le fichier Excel", "version row not found", null]
+    }
 
     if(versions.length > 0){
       return [null, null, versions, lesson]
     }
-    return ["Il manque un champ 'version' dans le fichier Excel", "Erreur auto-générée", null]
+
+    return ["Il n'y a aucune version dans le fichier excel", "version row found but no cols found", null]
   }
+
   catch{
     return ["Internal error", "Error in getExcelInfo method"]
   }

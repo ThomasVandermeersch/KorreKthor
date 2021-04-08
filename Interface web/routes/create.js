@@ -100,8 +100,11 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const lessonName = req.session.excelFile.lesson
     const students = await functions.importStudents("uploads/"+filename)
 
-    if (!students){
-        res.render("index/error")
+    console.log(students)
+    
+    if (!students || students.length < 1){
+        req.flash('errormsg', "Somthing went wrong with the student list");
+        res.redirect("/create/Step1")
     }
 
     const answers = JSON.parse(req.body.liste)
@@ -127,22 +130,29 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         id: exam.id
     }
 
-    QCM_automatisation.createInvoice(students, lesson, answers, files).then((ret) => {
-        // handle errors
-        if (ret.error){
+    QCM_automatisation.createInvoice(students, lesson, answers, files)
+        .then((ret) => {
+            // handle errors
+            if (ret.error){
+                exam.destroy()
+                res.send({"error":"somthing went wrong while creating exam.", "code":1001})
+            }
+            
+            // update model
+            exam.examFile = ret.exam
+            exam.correctionFile = ret.correction
+            exam.save()
+            req.session["examId"] = exam.id
+            
+            //redirect
+            res.redirect("/create/Step4")
+        })
+        .catch((ret) => {
             exam.destroy()
-            res.send({"error":"somthing went wrong while creating exam.", "code":1001})
-        }
-        
-        // update model
-        exam.examFile = ret.exam
-        exam.correctionFile = ret.correction
-        exam.save()
-        req.session["examId"] = exam.id
-        
-        //redirect
-        res.redirect("/create/Step4")
-    });
+            console.log(ret)
+            req.flash('errormsg', ret.error);
+            res.redirect("/create/Step2")
+        })
 })
 
 // Route to upload the student list file

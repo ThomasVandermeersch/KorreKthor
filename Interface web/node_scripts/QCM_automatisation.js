@@ -12,7 +12,6 @@ async function createInvoice(students, lesson, answers, fileVersions) {
    * Temps files are located in ./pre_pdf, ./result_pdf
    */
 
-
   setUp()
 
   generateCorection(answers);
@@ -63,13 +62,15 @@ async function createInvoice(students, lesson, answers, fileVersions) {
 
           
           sources.forEach(path => {
-            index = sources.indexOf(path);
-            console.log(files[students[index].version]);
-
-
-            m.add("uploads/" + files[students[index].version]);
-            m.add(path);
-
+            try{
+              index = sources.indexOf(path);
+              m.add("uploads/" + files[students[index].version]);
+              m.add(path);
+            }
+            catch (err){
+              console.log(err)
+              reject({error:`File ${files[students[index].version]} is not correct`})
+            }
           });
 
           examPath = `./downloads/Exam_${lesson.id}.pdf`;
