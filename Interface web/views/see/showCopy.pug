@@ -55,7 +55,7 @@ div(class="container page")
                                         td(style="text-align:center")
                                             input(checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
                     
-                    if session.userObject.role == 0
+                    if session.userObject.role == 0 && session.userObject.authorizations == 3
                         a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
                     else 
                         button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Modifier la cotation

@@ -2,6 +2,7 @@ const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
 const path = require("path")
 const { Exam, Copy, User } = require("../node_scripts/database/models");
+const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
 
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -37,7 +38,8 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
         copies.push({"copy":copy, "user":user})
     };
 
-    stats = {"mean": 16, "var":2, "participants":154, "blancs":14, "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
+    var mean = computeMean(examCopies)
+    stats = {"mean": mean, "var":computeVariance(examCopies, mean), "participants":computeParticipants(examCopies), "blancs":computeZero(examCopies), "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
     res.render("see/showCopies", {exam:exam, copies:copies, stats:stats})
 })
 
