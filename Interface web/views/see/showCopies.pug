@@ -29,7 +29,10 @@ div(class="container page")
                 - var answers = JSON.parse(copy.copy.answers)
 
                 tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
-                    td= copy.user.fullName
+                    if copy.user.fullName == ""
+                        td(class="text-danger") Action requise
+                    else
+                        td= copy.user.fullName
                     td= copy.user.matricule
                     if "error" in answers
                         th 

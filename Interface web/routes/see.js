@@ -70,12 +70,12 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
     var exam;
     var copy;
 
-    if (req.session.userObject.authorizations == 0){
-        var copy = await Copy.findOne({where:{id:req.params.copyid}})
+    if (req.session.userObject.authorizations == 0 || req.session.userObject.role == 1){
+        var copy = await Copy.findOne({where:{id:req.params.copyid}, include:[{model:User, as:'user'}]})
         var exam = await copy.getExam()
     }
     else{
-        var copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}})
+        var copy = await Copy.findOne({where:{id:req.params.copyid, userId:req.session.userObject.id}, include:[{model:User, as:'user'}]})
         var exam = await copy.getExam()
     }
     
@@ -136,7 +136,7 @@ router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) 
 router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
     var copy;
     
-    if (req.session.userObject.authorizations == 0){
+    if (req.session.userObject.authorizations == 0 || req.session.userObject.role == 1){
         copy = await Copy.findOne({where:{id:req.params.copyid}})
     }
     else{
@@ -153,6 +153,25 @@ router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
     }
     else {
         res.status(404).render("error");
+    }
+});
+
+router.post("/updateUser/", acces.hasAcces, async (req, res) => {
+    if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
+        User.findOne({where:{matricule:req.body.matricule}}).then((user) => {
+            user.fullName = "dddddd"
+            user.email = ""
+            user.matricule = req.body.matricule
+            user.save()
+
+            res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
+
+        }).catch((err) => {
+            res.render("index/error")
+        })
+    }
+    else{
+        res.render("index/noAcces")
     }
 });
 

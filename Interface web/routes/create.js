@@ -101,7 +101,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const students = await functions.importStudents("uploads/"+filename)
 
     console.log(students)
-    
+
     if (!students || students.length < 1){
         req.flash('errormsg', "Somthing went wrong with the student list");
         res.redirect("/create/Step1")
@@ -127,10 +127,11 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     
     var lesson = {
         name: lessonName,
-        id: exam.id
+        id: exam.id,
+        versions: JSON.parse(req.session.excelFile.versions)
     }
 
-    QCM_automatisation.createInvoice(students, lesson, answers, files)
+    QCM_automatisation.createInvoice(students, lesson, answers, files, req.session.extraCopies)
         .then((ret) => {
             // handle errors
             if (ret.error){
@@ -160,6 +161,8 @@ router.post("/sendList",acces.hasAcces, upload.single("studentList"), async func
     const pathTofile = "uploads/"+req.file.originalname // file path
     var ext = path.extname(pathTofile); // file extension
 
+    req.session["extraCopies"] = req.body.extraCopies
+
     if(ext == ".xlsx"){  
         var versions = await functions.getExcelInfo(pathTofile)
         
@@ -186,7 +189,7 @@ router.post("/sendList",acces.hasAcces, upload.single("studentList"), async func
 })
 
 // Route to upload the question files
-router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (req, res, next)=>{
+router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (req, res)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
     req.session.excelFile["lesson"] = req.body.lesson

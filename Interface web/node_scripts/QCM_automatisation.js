@@ -2,9 +2,10 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
+const { User } = require("../node_scripts/database/models");
 
 
-async function createInvoice(students, lesson, answers, fileVersions) {
+async function createInvoice(students, lesson, answers, fileVersions, extraCopies) {
   /**
    * Function that create a printable pdf for teachers
    * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
@@ -16,6 +17,15 @@ async function createInvoice(students, lesson, answers, fileVersions) {
 
   generateCorection(answers);
 
+  extraStudents = []
+  for (var i=0; i<extraCopies; i++){
+    User.create({"fullName":"", "matricule": `${lesson.id}_${i}`, "email": "", "authorizations":3, "role":0})
+    student = {"extra": true, "name":"", "matricule":`${lesson.id}_${i}`, "version":lesson.versions[i%lesson.versions.length]}
+    extraStudents.push(student)
+  }
+
+  students = students.concat(extraStudents)
+
   var sources = [];
   var max = students.length
   let nbDone = 0
@@ -25,26 +35,12 @@ async function createInvoice(students, lesson, answers, fileVersions) {
       let doc = new PDFDocument();
       let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
-      generateHeader(doc); //Mise des carés et d'un titre
+      generateTemplate(doc); //Mise des carés et d'un titre
       generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
-      date = new Date();
-      doc.fontSize(10)
-      doc.text(`Nom et prénom: ${student.name}`, 140, 120);
-      doc.text(`Matricule: ${student.matricule}`, 140, 135);
-      doc.text(`Date: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`, 140, 150);
-      doc.text(`Cours: ${lesson.name}`, 140, 165);
-      doc.text(`Version: ${student.version}`, 140, 180);
-
+      generateHeader(doc, student, lesson, writeStream)
+    
       sources.push("pre_pdf/" + (student.matricule).toString() + ".pdf")
       const files = JSON.parse(fileVersions)
-
-      // QRCode generator
-      studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
-      QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
-        doc.image('pre_pdf/' + student.matricule + ".png", 50, 115, { scale: 0.45 });
-        doc.pipe(writeStream);
-        doc.end();
-      })
 
       writeStream.on('finish', async function () {
         nbDone++;
@@ -121,9 +117,9 @@ function removeUnnecessary() {
   });
 }
 
-function generateHeader(doc) {
+function generateTemplate(doc) {
   /**
-   * Fucntion that generate pdf header (top-left, top-right, bottom-left squares) for each student sheet
+   * Fucntion that generate pdf template (top-left, top-right, bottom-left squares) for each student sheet
    */
 
   doc.image("result_pdf/squares.PNG", 520, 20, { valign: "top" });
@@ -134,16 +130,38 @@ function generateHeader(doc) {
   doc.moveDown();
 }
 
+function generateHeader(doc, student, lesson, writeStream) {
+  /**
+   * Fucntion that generate pdf header (QRCoed, name, matricule, version...) for each student sheet
+   */
+
+   date = new Date();
+   doc.fontSize(10)
+   doc.text(`Nom et prénom: ${student.name}`, 140, 120);
+   doc.text(`Matricule: ${student.matricule}`, 140, 135);
+   doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 150);
+   doc.text(`Cours: ${lesson.name}`, 140, 165);
+   doc.text(`Version: ${student.version}`, 140, 180);
+
+   // QRCode generator
+   studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
+   QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
+     doc.image('pre_pdf/' + student.matricule + ".png", 50, 115, { scale: 0.40 });
+     doc.pipe(writeStream);
+     doc.end();
+   })
+}
+
 function generateTable(doc, answers) {
   /**
    * Function that generate table for the answers 
    */
 
   for (question = 0; question < answers.length; question++) {
-    doc.fontSize(14);
+    doc.fontSize(10);
     doc.text("Question " + (question + 1).toString() + " :", 125, 252 + (question * 25));
     for (answer = 0; answer < answers[question].length; answer++) {
-      doc.image("result_pdf/vide.PNG", 250 + (answer * 35), 245 + (question * 25));
+      doc.image("result_pdf/vide.PNG", 200 + (answer * 35), 245 + (question * 25));
     }
   }
 }

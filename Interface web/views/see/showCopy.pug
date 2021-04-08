@@ -5,9 +5,10 @@ include ../header.pug
 div(class="container page")
     div(class="card my-2")
         div(class="card-body")
-            h4(class="card-title") Copie d'examen (#[strong #{exam.name}]) - Version #[strong #{copy.version}]
+            
+            h4(class="card-title") Copie d'examen - #[strong #{copy.user.fullName}] - Version #[strong #{copy.version}]
 
-            p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
+            p(class="card-subtitle mb-2 text-muted")= `${exam.name} : ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
             
             - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
             - var questions = JSON.parse(copy.answers)
@@ -21,7 +22,18 @@ div(class="container page")
                     h4(class="text-success") Cote : #{point}/20
 
             div(class="photo my-3 row")
-                div(class="tab col-5 form-check p-0 m-auto")
+                div(class="tab col-10 col-sm-5 form-check p-0 m-auto")
+                    if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
+                        div
+                            form(class="form" method="POST" action="/see/updateUser/")
+                                input(type="hidden" name="matricule" value=copy.user.matricule)
+                                label(for="email" class="form-label") Adresse email ECAM
+                                input(type="email" class="form-control bouton" id="email" placeholder="17076@ecam.be")
+                                
+                                div(class="") 
+                                    button(id='submitButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
+
+
                     table(id='tableId' class="table table-sm tableClass mt-0 p-0")
                         if "error" in questions
                             each val in [...JSON.parse(exam.corrections)[copy.version].keys()]
@@ -30,8 +42,8 @@ div(class="container page")
                                         i Question #{val + 1}
                                     
                                     each response in [...JSON.parse(exam.corrections)[copy.version][val].keys()]
-                                        td
-                                            input(disabled=session.userObject.role == 0 class="" type="checkbox" name=response value="yes")
+                                        td(style="text-align:center")
+                                            input(disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes")
 
                         else
                             each val in [...questions.keys()]
@@ -40,15 +52,15 @@ div(class="container page")
                                         i Question #{val + 1}
                                     
                                     each response in [...questions[val].keys()]
-                                        td
-                                            input(checked=questions[val][response] disabled=session.userObject.role == 0 class="" type="checkbox" name=response value="yes" )
+                                        td(style="text-align:center")
+                                            input(checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
                     
                     if session.userObject.role == 0
                         a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
                     else 
-                        button(id='submitButton' class="btn btn-danger bouton float-end") Modifier la cotation
+                        button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Modifier la cotation
        
-                img(class="border rounded mx-auto d-block col-5" src=`/see/copy/${copy.id}/download` width="40%")
+                img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
             
             if messages.successEmail
                 div(class="alert alert-success" role="alert")= messages.successEmail

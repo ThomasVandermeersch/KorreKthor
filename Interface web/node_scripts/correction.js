@@ -104,20 +104,23 @@ async function correctAll(scanResultString){
 
     //Step 2 : CORRECT ALL COPIES
     scanResult.data.forEach(async (copy) =>{
-        correctionCopy(
-                corrections[copy.qrcode.version],
-                copy.answers,
-                questionStatus[copy.qrcode.version],
-                correctionCriterias
-        ).then(async result =>{
-            saveCopy(copy,result,exam.id)
-            //email.sendResult(copy,result)
-            console.log(result)
-        })
-        .catch(err=>{
-            console.log(err+copy.qrcode.matricule)
-            saveErrorCopy(copy, "correction copy error", exam.id)
-        })
+        console.log(copy)
+        if (copy.error == "None"){
+            correctionCopy(
+                    corrections[copy.qrcode.version],
+                    copy.answers,
+                    questionStatus[copy.qrcode.version],
+                    correctionCriterias
+            ).then(async result =>{
+                saveCopy(copy,result,exam.id)
+                //email.sendResult(copy,result)
+                console.log(result)
+            })
+            .catch(err=>{
+                console.log(err+copy.qrcode.matricule)
+                saveErrorCopy(copy, "correction copy error", exam.id)
+            })
+        }
     })    
 
     exam.status = 2

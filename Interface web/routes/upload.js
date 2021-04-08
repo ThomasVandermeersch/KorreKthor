@@ -20,7 +20,7 @@ var storage = multer.diskStorage(
 var upload = multer({ storage: storage})
 
 
-function callCorrection(filename){
+function callCorrection(filename, exam){
     const formData = {
 		my_field: "file",
 		my_file: fs.createReadStream(`uploads/${filename}`),
@@ -28,7 +28,8 @@ function callCorrection(filename){
     
     request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
         if (err){
-            res.status(500).send({"error":"something went wrong with the correction server.", "errorCode":1000})
+            exam.status = 3
+            exam.save()
         }
         else{
             zipFile = JSON.parse(body).zipFile
@@ -70,15 +71,17 @@ router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, r
 
     res.redirect("/see")
     
-    callCorrection(req.file.originalname)
+    callCorrection(req.file.originalname, exam)
 })
 
 router.post("/scans/robot", upload.single("file"), async (req, res) => {
+    // IMPORTANT GET THE EXAM //
+    var exam = null; 
 	if (req.params.token == "secretToken"){
-        callCorrection(req.file.originalname)
+        callCorrection(req.file.originalname, exam)
     }
     else{
-        res.end("Error, you're not allowed to do that, please check you token")
+        res.end("Error, you're not allowed to do that, please check your token")
     }
 })
 

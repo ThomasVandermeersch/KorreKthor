@@ -10,6 +10,8 @@ div(class="container page create")
                 h4(class="card-title") Exam #[strong #{exam.name}] - Créé
             else if exam.status == 1
                 h4(class="card-title text-warning") Exam #[strong #{exam.name}] - Correction en cours...
+            else if exam.status == 3
+                h4(class="card-title text-danger") Exam #[strong #{exam.name}] - Erreur, veuillez réessayer !
             else
                 h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
 
@@ -71,7 +73,7 @@ div(class="container page create")
 
             if exam.status == 2
                 a(href=`/see/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Afficher les copies des étudiants
-            else if exam.status == 0
+            else if exam.status == 0 || exam.status == 3
                 a(href=`/upload/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Uploader l'examen
 
 include ../footer.pug

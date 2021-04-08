@@ -21,6 +21,8 @@ div(class="container page")
                             td(class="text-secondary") Créé
                         else if exam.status == 1
                             td(class="text-warning") Correction en cours...
+                        else if exam.status == 3
+                            td(class="text-danger") Error, retry
                         else
                             td(class="text-success") Corrigé
                         td(class="versions")= exam.numberOfVersion
