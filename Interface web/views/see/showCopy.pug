@@ -27,8 +27,10 @@ div(class="container page")
                         div
                             form(class="form" method="POST" action="/see/updateUser/")
                                 input(type="hidden" name="matricule" value=copy.user.matricule)
+                                input(type="hidden" name="copyId" value=copy.id)
+
                                 label(for="email" class="form-label") Adresse email ECAM
-                                input(type="email" class="form-control bouton" id="email" placeholder="17076@ecam.be")
+                                input(type="email" class="form-control bouton" name="email" id="email" placeholder="17076@ecam.be")
                                 
                                 div(class="") 
                                     button(id='submitButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant

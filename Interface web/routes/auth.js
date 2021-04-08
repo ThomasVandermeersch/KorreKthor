@@ -70,6 +70,10 @@ router.get('/callback',
         req.session["userObject"] = user
       }
       else{
+        if(checkUser.fullName == 'Unknow-Name'){
+          checkUser.fullName = response.account.name
+          await checkUser.save()
+        }
         req.session["userObject"] = checkUser
       }
 

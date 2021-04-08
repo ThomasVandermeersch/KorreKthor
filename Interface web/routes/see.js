@@ -3,6 +3,7 @@ const acces = require('../node_scripts/hasAcces')
 const path = require("path")
 const { Exam, Copy, User } = require("../node_scripts/database/models");
 const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
+const matriculeConverter = require('../node_scripts/convertMatricule')
 
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -152,17 +153,34 @@ router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
 
 router.post("/updateUser/", acces.hasAcces, async (req, res) => {
     if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
-        User.findOne({where:{matricule:req.body.matricule}}).then((user) => {
-            user.fullName = "dddddd"
-            user.email = ""
-            user.matricule = req.body.matricule
-            user.save()
+        console.log('--- INFORMATIONS----')
+        console.log(req.body.matricule)
+        console.log(req.body.copyId)
+        console.log(req.body.email)
+        
+        User.findOne({where:{email:req.body.email}})
+            .then(async user=>{
+                if(!user){
+                    //Si pas de user, il faudra en créer un. Ce user devra être mis à jour à sa première connexion
+                    user = await User.create({
+                        "fullName": 'Unknow-Name', 
+                        "matricule": matriculeConverter.emailToMatricule(req.body.email), 
+                        "email": req.body.email, 
+                        "authorizations":3, 
+                        "role":0
+                    })
 
-            res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
-
-        }).catch((err) => {
-            res.render("index/error")
-        })
+                }
+                Copy.findOne({where:{id:req.body.copyId}})
+                    .then(copy=>{
+                        copy.userId = user.id
+                        copy.save()
+                        res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
+                    })
+                    .catch(err=> res.render("index/error"))
+            })
+            .catch(err=> res.render("index/error"))
+        
     }
     else{
         res.render("index/noAcces")
