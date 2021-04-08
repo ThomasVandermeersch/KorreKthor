@@ -6,23 +6,15 @@ const { Exam, Copy, User } = require("../node_scripts/database/models");
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
     var exams;
-    var examCopies;
 
     if (req.session.userObject.authorizations == 0){
         exams = await Exam.findAll({order:["createdAt"]})
-        examCopies = await Copy.findAll({order:["createdAt"], include:[{model:User, as:'user'}]})
     }
     else {
         exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
-        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}]})
     }   
     
-    const copies = []
-    for (copy of examCopies){
-        var exam = await copy.getExam()
-        copies.push({"copy":copy, "exam":exam})
-    };
-    res.render("see/showExams", {exams:exams, copies:copies})
+    res.render("see/showExams", {exams:exams})
 })
 
 router.get("/copies/:examid", acces.hasAcces, async (req, res) => {

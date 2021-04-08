@@ -28,34 +28,6 @@ div(class="container page")
                         td(class="versions")= exam.numberOfVersion
                         td(class="date")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
     
-    if copies.length
-        h1= "Copies"
-        table(class="table table-hover copiesTable")
-            thead(class="thear-dark")
-                tr
-                    th(scope="col")= "Examen"
-                    th(scope="col")= "Cote (pts)"
-                    th(scope="col" class="version")= "Version"
-                    th(scope="col" class="date")= "Date"
-            tbody
-                each pair, index in copies
-                    - var date = new Date(Date.parse(pair.copy.createdAt))
-                    - var point = Math.round(((pair.copy.result[0]/pair.copy.result[1])*20)*100)/100
-                    - var answers = JSON.parse(pair.copy.answers)
-                    
-                    tr(onClick=`getCopy("${ pair.copy.id }")` style="cursor: pointer;")
-                        if session.userObject.authorizations == 0
-                            th #{pair.exam.name} - #{pair.copy.user.matricule}
-                        else
-                            td= pair.exam.name
-                            
-                        if "error" in answers
-                            th 
-                                div(class="text-danger") Error
-                        else
-                            td #{point}/20
-                        td(class="version")= pair.copy.version
-                        td(class="date")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
 
 include ../footer.pug    
         

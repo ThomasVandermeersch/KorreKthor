@@ -71,9 +71,9 @@ div(class="container page create")
             
             a(href=`/correction/questionStatus/${exam.id}` class="bouton btn btn-warning mt-4") Changer le statut des questions
 
-            if exam.status == 2
-                a(href=`/see/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Afficher les copies des étudiants
-            else if exam.status == 0 || exam.status == 3
-                a(href=`/upload/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Uploader l'examen
+            //- if exam.status == 2
+            a(href=`/see/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Afficher les copies des étudiants
+            //- else if exam.status == 0 || exam.status == 3
+            a(href=`/upload/copies/${exam.id}` class="btn btn-success mt-4 float-end bouton") Uploader l'examen
 
 include ../footer.pug
