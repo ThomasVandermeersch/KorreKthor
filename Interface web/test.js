@@ -223,10 +223,29 @@ response4 = [[true, false, false],
 
 // corrector.correctAll(JSON.stringify(body))
 
+// User.create({"fullName":"LURKIN Quentin", "matricule": "lur", "email": "lur@ecam.be", "authorizations":3, "role":1})
+// User.create({"fullName":"MELOTTE Philippe", "matricule": "mlt", "email": "mlt@ecam.be", "authorizations":3, "role":1})
+// User.create({"fullName":"MARCHAND Cedric", "matricule": "mar", "email": "mar@ecam.be", "authorizations":3, "role":1})
+// User.create({"fullName":"BERGER Benjamin", "matricule": "brg", "email": "brg@ecam.be", "authorizations":3, "role":1})
 
-Copy.findAll({include:[{model:User, as:'user'}]}).then(resp => {
-  console.log(resp[0].user.fullName)
-})
+async function test() {
+  th = await User.findOne({where:{matricule:"17030"}})
+
+
+  console.log(th.id)
+
+  
+  Exam.findAll({include:[{model:User, as:'user'}]}).then(resp => {
+    resp.forEach(exam => {
+      // exam.user = 
+      // exam.save()
+      console.log(exam.user.fullName)
+    });
+  })
+}
+
+test()
+
 
 
 

@@ -8,15 +8,24 @@ const matriculeConverter = require('../node_scripts/convertMatricule')
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
     var exams;
+    var examCopies;
 
     if (req.session.userObject.authorizations == 0){
         exams = await Exam.findAll({order:["createdAt"]})
+        examCopies = []
     }
     else {
         exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
+        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}, {model:Exam, as:'exam'}]})
     }   
-    
-    res.render("see/showExams", {exams:exams})
+
+    // const copies = []
+    // for (copy of examCopies){
+    //     var exam = await copy.getExam()
+    //     copies.push({"copy":copy, "exam":exam})
+    // };
+
+    res.render("see/showExams", {exams:exams, copies:examCopies})
 })
 
 router.get("/copies/:examid", acces.hasAcces, async (req, res) => {

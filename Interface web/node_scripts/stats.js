@@ -20,7 +20,6 @@ function computeVariance(copies, mean)
 function computeZero(copies){
     var count = 0
     copies.forEach(copy => {
-        console.log(copy.result)
         if (copy.result[0] <= 0){
             count++
         }
