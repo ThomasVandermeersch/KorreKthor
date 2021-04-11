@@ -19,12 +19,6 @@ router.get("/", acces.hasAcces, async (req, res) => {
         examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}, {model:Exam, as:'exam'}]})
     }   
 
-    // const copies = []
-    // for (copy of examCopies){
-    //     var exam = await copy.getExam()
-    //     copies.push({"copy":copy, "exam":exam})
-    // };
-
     res.render("see/showExams", {exams:exams, copies:examCopies})
 })
 
@@ -165,16 +159,18 @@ router.post("/updateUser/", acces.hasAcces, async (req, res) => {
         console.log('--- INFORMATIONS----')
         console.log(req.body.matricule)
         console.log(req.body.copyId)
-        console.log(req.body.email)
+        console.log(req.body.matricule)
         
-        User.findOne({where:{email:req.body.email}})
+        var matricule = matriculeConverter.matriculeConverter(req.body.matricule)
+
+        User.findOne({where:{matricule:matricule}})
             .then(async user=>{
                 if(!user){
                     //Si pas de user, il faudra en créer un. Ce user devra être mis à jour à sa première connexion
                     user = await User.create({
                         "fullName": 'Unknow-Name', 
-                        "matricule": matriculeConverter.emailToMatricule(req.body.email), 
-                        "email": req.body.email, 
+                        "matricule": matricule, 
+                        "email": matriculeConverter.matriculeToEmail(matricule), 
                         "authorizations":3, 
                         "role":0
                     })

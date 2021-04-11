@@ -31,7 +31,7 @@ router.post('/modifyQuestionStatus/:examId',async(req,res)=>{
 
     var exam = await Exam.findOne({where:{id:req.params.examId}})
     exam.questionStatus = JSON.stringify(questionStatus)
-    exam.save()
+    await exam.save()
 
     corrector.reCorrect(req.params.examId).then(suc=>{
         res.redirect(`/see/exam/${req.params.examId}`)

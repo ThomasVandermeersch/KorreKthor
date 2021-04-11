@@ -74,6 +74,7 @@ async function reCorrect(examId){
             correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
             .then(async result=>{
                 console.log('OK')
+                console.log(result)
                 dbCopy = await Copy.findOne({where:{id:copy.id}})
                 dbCopy.result = result
                 await dbCopy.save()
