@@ -3,6 +3,15 @@ include ../header.pug
 - var date = new Date(Date.parse(copy.createdAt))
 
 div(class="container page")
+    if messages.successEmail
+        div(class="alert alert-success my-2" role="alert")= messages.successEmail
+    
+    if messages.successAnswerChange
+        div(class="alert alert-success my-2" role="alert")= messages.successAnswerChange
+    
+    if messages.errorAnswerChange
+        div(class="alert alert-danger my-2" role="alert")= messages.errorAnswerChange
+        
     div(class="card my-2")
         div(class="card-body")
             
@@ -29,8 +38,8 @@ div(class="container page")
                                 input(type="hidden" name="matricule" value=copy.user.matricule)
                                 input(type="hidden" name="copyId" value=copy.id)
 
-                                label(for="matricule" class="form-label") Matricule de l'étudiant
-                                input(type="input" class="form-control bouton" name="matricule" id="matricule" placeholder="17076")
+                                label(for="newMatricule" class="form-label") Matricule de l'étudiant
+                                input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="17076")
                                 
                                 div(class="") 
                                     button(id='submitButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
@@ -63,12 +72,6 @@ div(class="container page")
                         button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Modifier les réponses
        
                 img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
-            
-            if messages.successEmail
-                div(class="alert alert-success" role="alert")= messages.successEmail
-            
-            if messages.successAnswerChange
-                div(class="alert alert-success" role="alert")= messages.successAnswerChange
 
 input(id="copyId",type="hidden", value=copy.id)
 script(src='/javascript/correctImageProcess.js')

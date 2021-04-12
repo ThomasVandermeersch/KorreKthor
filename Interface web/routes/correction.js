@@ -89,11 +89,12 @@ router.post('/modifyImageTreatment/:copyId', acces.hasAcces, async (req,res)=>{
     .then(async (newResult) =>{
         copy.result = newResult      
         copy.save()
-        req.flash('successAnswerChange','Les réponses ont été correctement enregistrées');
-        res.redirect('/see/copy/'+req.params.copyId)
+        res.redirect('/see/copies/'+exam.id)
     })
     .catch(err=>{
         console.log(err + ' ---Not normal to have an error here because lists have to match')
+        req.flash('errorAnswerChange','Les listes ne correspondent pas, error : 1006');
+        res.redirect('/see/copy/'+copy.id)
     })
 })
 
