@@ -45,14 +45,16 @@ def compute(pdf):
                     else:
 
                         qrcode = process_img.decodeQRCode(img)
-                        if firstQRCode["lessonId"] != qrcode["lessonId"]:
-                            jsonToSend.append({"error" : f"{img} does not belong to the lesson : {firstQRCode}"})
 
                         if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
                             jsonToSend.append({"error" : f"{img} has no correct QR Code"})
                             
                         else:
-                            jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img.split("/")[-1], "error" : "None"})
+                            if firstQRCode["lessonId"] != qrcode["lessonId"]:
+                                jsonToSend.append({"error" : f"{img} does not belong to the lesson : {firstQRCode}"})
+                            
+                            else:
+                                jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img.split("/")[-1], "error" : "None"})
                         
 
     # Zip folder in order to send it
@@ -61,6 +63,7 @@ def compute(pdf):
         shutil.make_archive(zipPath, "zip", "From_PDF")
         response = {"zipFile":f"{firstQRCode['lessonId']}.zip", "data":jsonToSend}
         print(f"\nTransaction done, file in : {zipPath}.zip !\n")
+        print("response:", response)
     except:
         print(f"Error while zipping to {zipPath}")
         response = {"error":f"Zipping to {zipPath} failed"}

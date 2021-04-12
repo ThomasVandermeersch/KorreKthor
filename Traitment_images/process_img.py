@@ -46,7 +46,7 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    template = cv2.resize(template, (150, 150), interpolation=cv2.INTER_LINEAR)
+    template = cv2.resize(template, (140, 140), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", template)
     # cv2.waitKey(delay=5000)
@@ -76,6 +76,7 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     if(len(points) >= 3 ) :
         return points
 
+    print("Not a good page")
     return False
 
 def getGoodOrientation(img, squaresLocations, margin=0.8):
@@ -92,7 +93,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.8, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.85):
+def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.85):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -175,8 +176,6 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     if len(emptyListe) == 0 and len(fullListe) == 0:
         return None
 
-    print(emptyListe)
-    print(fullListe)
     
     xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else [(), ()]
     xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else [(), ()]
@@ -197,19 +196,15 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     y = 0
     c = 0
     for i in ySortedListe:
-        print("bool", boolArray)
-        print("i", i)
         if abs(y-i) > minDistance:
             y = i
             sub = []
             if c:
-                print("c", c)
                 for i in range(c):
                     sub.append(False)
                 boolArray.append(sub)
             c = 0
         c += 1
-        print("add 1 to C =" + str(c))
 
     sub = []
     for i in range(c):
@@ -237,7 +232,6 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     
 def decodeQRCode(imagePath):
     preQRCode = decode(cv2.imread(imagePath))
-
     if len(preQRCode) == 0:
         return None
     
