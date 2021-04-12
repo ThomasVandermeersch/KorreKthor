@@ -50,10 +50,10 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
 router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
     var exam;
     if (req.session.userObject.authorizations == 0){
-        var exam = await Exam.findOne({where:{id:req.params.examid}})
+        var exam = await Exam.findOne({where:{id:req.params.examid}, include:[{model:User, as:"user"}]})
     }
     else{
-        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
+        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id, }, include:[{model:User, as:"user"}]})
     }
 
     if (exam){
