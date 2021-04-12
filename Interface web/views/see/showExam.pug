@@ -36,9 +36,7 @@ div(class="container page create")
                                     tr
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
-                                div(class="float-end mt-1")
-                                    a(href=`/correction/questionStatus/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Annuler des questions
-                                    a(href=`/correction/modifyCriteria/${exam.id}` class="bouton btn btn-warning btn-sm") Changer le critère
+                                
                         else 
                             div(class="mx-2")
                                 table(class="table table-sm mb-1")
@@ -52,7 +50,9 @@ div(class="container page create")
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
                         
-                                a(href=`/correction/modifyCriteria/${exam.id}` class="btn btn-sm btn-warning float-end bouton mx-2") Changer le critère
+                        div(class="float-end mt-1")
+                            a(href=`/correction/questionStatus/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Annuler des questions
+                            a(href=`/correction/modifyCriteria/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Changer le critère
 
                 else 
                     h6(class="text-danger mx-2") Correction error
@@ -70,7 +70,7 @@ div(class="container page create")
                 div(class="float-end mt-3")
                     h6(class="text-danger") Fichiers introuvables
             
-            a(href=`/upload/copies/${exam.id}` class="btn btn-success col-5 mt-4 bouton") Uploader et corriger l'examen
+            a(href=`/upload/copies/${exam.id}` class="btn btn-success col-5 mt-4 bouton") Uploader et corriger des copies
             
             if exam.status == 2
                 a(href=`/see/copies/${exam.id}` class="btn col-5 btn-secondary mt-4 float-end bouton") Afficher les copies des étudiants

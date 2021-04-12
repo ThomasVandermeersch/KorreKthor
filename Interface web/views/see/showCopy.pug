@@ -72,6 +72,11 @@ div(class="container page")
                         button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Modifier les réponses
        
                 img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
+                
+            div(class="col-4 float-end")
+                div Légende : 
+                    li Cercle = reponse remplie détectée 
+                    li Carré = réponse vide détectée
 
 input(id="copyId",type="hidden", value=copy.id)
 script(src='/javascript/correctImageProcess.js')
