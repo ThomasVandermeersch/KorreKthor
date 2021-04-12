@@ -92,12 +92,11 @@ async function reCorrect(examId){
     })
 }
 
-async function correctAll(scanResultString){
+async function correctAll(exam, scanResultString){
     const scanResult = JSON.parse(scanResultString)
 
     // FIND THE EXAM RELATED TO THE EXAMID
     const id = scanResult.zipFile.split('.')[0]
-    var exam = await Exam.findOne({where:{id:id}})
     const examId = exam.id
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)

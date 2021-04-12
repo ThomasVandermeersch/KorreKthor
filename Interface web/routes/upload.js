@@ -43,8 +43,14 @@ function callCorrection(filename, exam){
             file.on("finish", function(){
                 fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' }));
             })
-            
-            correction.correctAll(body)
+
+            if (exam.id == zipFile.split('.')[0]){
+                correction.correctAll(exam, body)
+            }
+            else{
+                exam.status = 3
+                exam.save()
+            }
         }
     })
 }

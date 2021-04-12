@@ -174,8 +174,8 @@ router.post("/updateUser/", acces.hasAcces, async (req, res) => {
                         "authorizations":3, 
                         "role":0
                     })
-
                 }
+                
                 console.log("search copy")
                 Copy.findOne({where:{id:req.body.copyId}})
                     .then(copy=>{
