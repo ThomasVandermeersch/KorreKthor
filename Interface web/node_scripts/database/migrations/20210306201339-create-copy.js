@@ -15,7 +15,7 @@ module.exports = {
           type: DataTypes.STRING,
       },
       result:{
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        type: DataTypes.ARRAY(DataTypes.FLOAT),
       },
       answers:{
         type: DataTypes.STRING(2048),
