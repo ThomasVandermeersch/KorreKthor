@@ -27,7 +27,7 @@ div(class="row mt-3")
             div(class="form-group row")
                 div(class="form-group col-md-6")
                     label(for="inputEmail4") Une bonne réponse rapporte (pts)
-                    input(type="number",name="ptsRight" class="form-control", value= ptsRight, min=0, step=1)
+                    input(type="number",name="ptsRight" class="form-control", value= ptsRight, min=0, step=0.25)
 
                 div(class="form-group col-md-6")
                     label(for="inputPassword4") Une mauvaiseee réponse fait perdre (pts)
@@ -35,7 +35,7 @@ div(class="row mt-3")
                 
                 div(class="form-group col-md-6")
                     label(for="inputPassword4") Une abstention rapporte (pts)
-                    input(type="number",name="ptsAbs", class="form-control", value=ptsAbs, min=0, step=0.5)
+                    input(type="number",name="ptsAbs", class="form-control", value=ptsAbs, min=0, step=0.25)
 
 
         div(id='advanced',style=showAdvanced, class="mt-2")
@@ -43,7 +43,7 @@ div(class="row mt-3")
             div(class="form-group row")
                 div(class="form-group col-md-6")
                     label() Toutes les réponses sont correctes (pts)
-                    input(type="number",name="allGood" class="form-control", value=allGood, min=0, step=1)
+                    input(type="number",name="allGood" class="form-control", value=allGood, min=0, step=0.25)
 
                 div(class="form-group col-md-6")
                     label() Une des réponse est incorrecte (pts)
@@ -59,7 +59,7 @@ div(class="row mt-3")
 
                 div(class="form-group col-md-6")
                     label(f) Plus de trois réponses sont incorrectes (pts)
-                    input(type="number",name="threeMoreWrong" class="form-control", value=threeMoreWrong, step=0.5)
+                    input(type="number",name="threeMoreWrong" class="form-control", value=threeMoreWrong, step=0.25)
             
             br
             if isLastExclusive == 'on'

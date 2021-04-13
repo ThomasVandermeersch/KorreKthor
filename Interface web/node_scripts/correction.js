@@ -183,9 +183,9 @@ function correctionCopy(  correction /*list of list*/,
 
                 // --- > Normal correction
                 if(correctionCriterias.type == 'normal'){    
-                    const positif = parseInt(correctionCriterias.ptsRight,10)
-                    const negatif =  parseInt(correctionCriterias.ptsWrong,10)
-                    const abstention = parseInt(correctionCriterias.ptsAbs,10)
+                    const positif = parseFloat(correctionCriterias.ptsRight,10)
+                    const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
+                    const abstention = parseFloat(correctionCriterias.ptsAbs,10)
                     
                     
                     maxPoints += positif
@@ -219,14 +219,14 @@ function correctionAdvancedProp(correction,
     else lastExclusive = false
     console.log(correctionCriterias)
     
-    const eachGood = parseInt(correctionCriterias.allGood,10)
-    const onefalse = parseInt(correctionCriterias.oneWrong,10)
-    const twofalse = parseInt(correctionCriterias.twoWrong,10)
-    const threefalse = parseInt(correctionCriterias.threeWrong,10)
-    const morethanthree = parseInt(correctionCriterias.threeMoreWrong,10)
+    const eachGood = parseFloat(correctionCriterias.allGood,10)
+    const onefalse = parseFloat(correctionCriterias.oneWrong,10)
+    const twofalse = parseFloat(correctionCriterias.twoWrong,10)
+    const threefalse = parseFloat(correctionCriterias.threeWrong,10)
+    const morethanthree = parseFloat(correctionCriterias.threeMoreWrong,10)
     const lastProp = lastExclusive
-    const lastPropTrue = parseInt(correctionCriterias.lastExclusiveTrue,10)
-    const lastPropFalse = parseInt(correctionCriterias.lastExclusiveFalse,10)
+    const lastPropTrue = parseFloat(correctionCriterias.lastExclusiveTrue,10)
+    const lastPropFalse = parseFloat(correctionCriterias.lastExclusiveFalse,10)
 
     // Si dernière proposition EXCLUSIVE ET DEVAIT être cochée !
     if( lastProp && correction[correction.length - 1]){
