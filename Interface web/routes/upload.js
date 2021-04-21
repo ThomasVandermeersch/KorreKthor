@@ -6,6 +6,7 @@ const acces = require('../node_scripts/hasAcces')
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
 const { Exam } = require("../node_scripts/database/models");
+const path = require("path")
 
 var multer  = require('multer'); // Specific import for files 
 const exam = require('../node_scripts/database/models/exam');
@@ -42,8 +43,14 @@ function callCorrection(filename, exam){
             file.on("finish", function(){
                 fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' }));
             })
-            
-            correction.correctAll(body)
+
+            if (exam.id == zipFile.split('.')[0]){
+                correction.correctAll(exam, body)
+            }
+            else{
+                exam.status = 3
+                exam.save()
+            }
         }
     })
 }
@@ -63,15 +70,30 @@ router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, r
     }
 
     if (!exam){
-        res.status(500).render("error")
+        exam.status = 3
+        exam.save()
+        req.flash("errormsg", "Exam not found, error : 1007")
+        return res.status(500).render("error")
+    }
+    if (path.extname(req.file.originalname) != ".pdf"){
+        req.flash("errormsg", "Veuillez uploader un fichier pdf")
+        return res.render("upload/uploadScans", {exam:exam})
     }
 
     exam.status = 1
     exam.save()
 
+    req.flash("successmsg", "Début de la correction, ce processus peut prendre 5 minutes")
     res.redirect("/see")
-    
-    callCorrection(req.file.originalname, exam)
+
+    try{
+        callCorrection(req.file.originalname, exam)
+    }
+    catch(err){
+        console.log(err)
+        req.flash("errormsg", "Error while making the correction, error : 1007")
+        return res.status(500).render("error")
+    }
 })
 
 router.post("/scans/robot", upload.single("file"), async (req, res) => {

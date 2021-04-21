@@ -8,15 +8,18 @@ const matriculeConverter = require('../node_scripts/convertMatricule')
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
     var exams;
+    var examCopies;
 
     if (req.session.userObject.authorizations == 0){
         exams = await Exam.findAll({order:["createdAt"]})
+        examCopies = []
     }
     else {
         exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
+        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}, {model:Exam, as:'exam'}]})
     }   
-    
-    res.render("see/showExams", {exams:exams})
+
+    res.render("see/showExams", {exams:exams, copies:examCopies})
 })
 
 router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
@@ -47,10 +50,10 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
 router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
     var exam;
     if (req.session.userObject.authorizations == 0){
-        var exam = await Exam.findOne({where:{id:req.params.examid}})
+        var exam = await Exam.findOne({where:{id:req.params.examid}, include:[{model:User, as:"user"}]})
     }
     else{
-        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
+        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id, }, include:[{model:User, as:"user"}]})
     }
 
     if (exam){
@@ -156,31 +159,41 @@ router.post("/updateUser/", acces.hasAcces, async (req, res) => {
         console.log('--- INFORMATIONS----')
         console.log(req.body.matricule)
         console.log(req.body.copyId)
-        console.log(req.body.email)
+        console.log(req.body.newMatricule)
         
-        User.findOne({where:{email:req.body.email}})
+        var newMatricule = matriculeConverter.convertMatricule(req.body.newMatricule)
+
+        User.findOne({where:{matricule:newMatricule}})
             .then(async user=>{
                 if(!user){
                     //Si pas de user, il faudra en créer un. Ce user devra être mis à jour à sa première connexion
                     user = await User.create({
                         "fullName": 'Unknow-Name', 
-                        "matricule": matriculeConverter.emailToMatricule(req.body.email), 
-                        "email": req.body.email, 
+                        "matricule": newMatricule, 
+                        "email": matriculeConverter.matriculeToEmail(newMatricule), 
                         "authorizations":3, 
                         "role":0
                     })
-
                 }
+                
+                console.log("search copy")
                 Copy.findOne({where:{id:req.body.copyId}})
                     .then(copy=>{
+                        console.log("update userId")
                         copy.userId = user.id
                         copy.save()
                         res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
                     })
-                    .catch(err=> res.render("index/error"))
+                    .catch(err=> {
+                        req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
+                        res.render("index/error")
+                    })
             })
-            .catch(err=> res.render("index/error"))
-        
+            .catch(err=> {
+                console.log(err)
+                req.flash('errormsg', "Somthing went wrong while changing the user, error : 1005");
+                res.render("index/error")
+            })
     }
     else{
         res.render("index/noAcces")

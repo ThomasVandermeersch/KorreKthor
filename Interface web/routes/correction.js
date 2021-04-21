@@ -31,7 +31,7 @@ router.post('/modifyQuestionStatus/:examId',async(req,res)=>{
 
     var exam = await Exam.findOne({where:{id:req.params.examId}})
     exam.questionStatus = JSON.stringify(questionStatus)
-    exam.save()
+    await exam.save()
 
     corrector.reCorrect(req.params.examId).then(suc=>{
         res.redirect(`/see/exam/${req.params.examId}`)
@@ -89,11 +89,12 @@ router.post('/modifyImageTreatment/:copyId', acces.hasAcces, async (req,res)=>{
     .then(async (newResult) =>{
         copy.result = newResult      
         copy.save()
-        req.flash('successAnswerChange','Les réponses ont été correctement enregistrées');
-        res.redirect('/see/copy/'+req.params.copyId)
+        res.redirect('/see/copies/'+exam.id)
     })
     .catch(err=>{
         console.log(err + ' ---Not normal to have an error here because lists have to match')
+        req.flash('errorAnswerChange','Les listes ne correspondent pas, error : 1006');
+        res.redirect('/see/copy/'+copy.id)
     })
 })
 

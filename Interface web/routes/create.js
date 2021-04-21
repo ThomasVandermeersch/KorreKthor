@@ -142,6 +142,21 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
             // update model
             exam.examFile = ret.exam
             exam.correctionFile = ret.correction
+            exam.correctionCriterias = JSON.stringify({
+                type:'normal',
+                ptsRight:1,
+                ptsWrong:0,
+                ptsAbs:0,
+                allGood:1,
+                oneWrong:0.75,
+                twoWrong:0.50,
+                threeWrong:0.25,
+                threeMoreWrong:0.21,
+                isLastExclusive : 'on',
+                lastExclusiveTrue:1,
+                lastExclusiveFalse:0
+            })
+
             exam.save()
             req.session["examId"] = exam.id
             
@@ -215,25 +230,16 @@ router.post("/sendNormalCotationCriteria/:redirection", acces.hasAcces, async (r
 
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     exam.correctionCriterias = JSON.stringify(criteria)
-    exam.save()
+    await exam.save()
 
     corrector.reCorrect(req.session.examId).then(suc=>{
         if(req.params.redirection == 'create') res.redirect('/create/Step5')
         else res.redirect('/see/exam/' + req.session.examId)
     })
     .catch(err=>{
-            console.log(err)
-            res.end('Problem')
+        console.log(err)
+        res.end('Problem')
     })
-})
-
-router.post("/sendAdvancedCotationCriteria", acces.hasAcces, async (req,res)=>{
-    var criteria = req.body
-    criteria['type'] = 'advanced'
-    var exam = await Exam.findOne({where:{id:req.session.examId}})
-    exam.correctionCriterias = JSON.stringify(criteria)
-    exam.save()
-    res.redirect('/create/Step5')
 })
 
 module.exports = router;

@@ -13,5 +13,8 @@ div(class="container page create")
 
             div(class="col-5 col-md-3")
                 input(class="btn btn-warning float-end" type="submit", value="Envoyer")
+    
+    if messages.errormsg
+        div(class="alert alert-danger mt-2" role="alert")= messages.errormsg  
 
 include ../footer.pug

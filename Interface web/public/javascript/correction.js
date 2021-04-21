@@ -1,6 +1,3 @@
-
-console.log("coucou")
-
 const selectElement = document.getElementById('correctionType');
 
 selectElement.addEventListener('change', (event) => {

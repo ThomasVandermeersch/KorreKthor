@@ -18,7 +18,7 @@ div(class="container page")
                 //-     li Pire question :  Question n°#[strong #{stats.worstQuestionNum}] (Nombre de zero : #[strong #{stats.worstQuestionQtt}])
         
     
-    table(class="table table-sm table-hover")
+    table(class="table table-sm table-hover mt-2")
         thead
             tr
                 th Nom
@@ -31,13 +31,14 @@ div(class="container page")
 
                 tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
                     if copy.user.fullName == ""
-                        td(class="text-danger") Action requise
+                        td(class="text-danger") -- Spécifier l'étudiant --
+                        td(class="text-danger") -- Spécifier l'étudiant --
                     else
                         td= copy.user.fullName
-                    td= copy.user.matricule
+                        td= copy.user.matricule
                     if "error" in answers
                         th 
-                            div(class="text-danger") Error
+                            div(class="text-danger") -- Correction manuelle requise --  
                     else
                         td #{point}/20
 
