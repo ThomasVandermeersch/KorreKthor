@@ -1,6 +1,9 @@
 include ../header.pug
 
 div(class="container page")
+    if messages.successmsg
+        div(class="alert alert-success my-2" role="alert")= messages.successmsg
+        
     if exams.length
         h1= "Examens"
         table(class="table table-hover examsTable")
