@@ -229,22 +229,40 @@ response4 = [[true, false, false],
 // User.create({"fullName":"BERGER Benjamin", "matricule": "brg", "email": "brg@ecam.be", "authorizations":3, "role":1})
 
 async function test() {
-  th = await User.findOne({where:{matricule:"17030"}})
+  // th = await User.findOne({where:{matricule:"17030"}})
 
 
-  console.log(th.id)
+  // console.log(th.id)
 
+  await Exam.create({"userId":"41884d31-87af-4c68-a66e-bb410828095b", "numberOfVersion":4, "name":"bloblo", "excelFile":"ddd"})
   
-  Exam.findAll({include:[{model:User, as:'user'}]}).then(resp => {
+  Exam.findAll().then(resp => {
     resp.forEach(exam => {
-      // exam.user = 
+      // exam.excelFile = "jnzn"
       // exam.save()
-      console.log(exam.user.fullName)
+      console.log(exam.excelFile)
     });
   })
 }
 
-test()
+// test()
+
+
+const { exportStudents } = require("./node_scripts/functions");
+// edd7657b-0815-4688-915c-0de815d42c8d
+Exam.findOne({where:{id:"edd7657b-0815-4688-915c-0de815d42c8d"}, attributes:["id", "excelFile", "name"], include:[{model:Copy, as:"copies", attributes:["result"], include:[{model:User, as:"user", attributes:["matricule"]}]}]}).then(exam => {
+  // exportStudents(exam.excelFile, exam.copies)
+  console.log(exam.copies[0].user.matricule)
+
+  data = {}
+  exam.copies.forEach((copy) => {
+    data[copy.user.matricule] = copy.result
+  })
+
+  exportStudents({"name":exam.name, "excelFile":exam.excelFile, "id":exam.id}, data)
+})
+
+
 
 
 

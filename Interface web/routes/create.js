@@ -6,6 +6,7 @@ const acces = require('../node_scripts/hasAcces')
 const { Exam } = require("../node_scripts/database/models");
 const databaseTools = require("../node_scripts/databaseTools")
 const corrector = require('../node_scripts/correction')
+const { v4: uuidv4 } = require('uuid');
 
 var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(
@@ -16,7 +17,17 @@ var storage = multer.diskStorage(
         }
     }
 )
+var storagexls = multer.diskStorage(
+    {
+        destination: 'uploads/',
+        filename: function(req, file, cb){
+            uid = uuidv4()
+            cb(null, uid + path.extname(file.originalname))
+        }
+    }
+)
 var upload = multer({ storage: storage})
+var uploadxls = multer({ storage: storagexls})
 
 
 
@@ -96,11 +107,9 @@ router.get("/Step5",acces.hasAcces, function(req,res){
 
 // Route to send answers
 router.post("/quest", upload.single("studentList"), async (req, res) => {
-    const filename = req.body.filename
+    const excelFile = req.session.excelFile.filename
     const lessonName = req.session.excelFile.lesson
-    const students = await functions.importStudents("uploads/"+filename)
-
-    console.log(students)
+    const students = await functions.importStudents(excelFile)
 
     if (!students || students.length < 1){
         req.flash('errormsg', "Somthing went wrong with the student list");
@@ -122,8 +131,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const files = JSON.parse(req.body.files)
 
     studentObjects = await databaseTools.createStudents(students)
-
-    var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers),"questionStatus":JSON.stringify(questionStatus)})
+    var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers),"questionStatus":JSON.stringify(questionStatus), "excelFile":excelFile})
     
     var lesson = {
         name: lessonName,
@@ -172,8 +180,8 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
 })
 
 // Route to upload the student list file
-router.post("/sendList",acces.hasAcces, upload.single("studentList"), async function(req, res, next) {
-    const pathTofile = "uploads/"+req.file.originalname // file path
+router.post("/sendList",acces.hasAcces, uploadxls.single("studentList"), async function(req, res, next) {
+    const pathTofile = "./uploads/"+req.file.filename // file path
     var ext = path.extname(pathTofile); // file extension
 
     req.session["extraCopies"] = req.body.extraCopies
@@ -188,7 +196,7 @@ router.post("/sendList",acces.hasAcces, upload.single("studentList"), async func
         }
         else{ 
             excelFile = {
-                filename: req.file.originalname,
+                filename: pathTofile,
                 versions: JSON.stringify(versions[2]),
                 lesson: versions[3]
             }

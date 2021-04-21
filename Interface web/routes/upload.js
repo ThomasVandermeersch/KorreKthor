@@ -83,7 +83,7 @@ router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, r
     exam.status = 1
     exam.save()
 
-    req.flash("successmsg", "Début de la correction, ce processus peut prendre 5 minutes")
+    req.flash("successmsg", "Début de la correction, ce processus peut prendre jusqu'a 10 minutes. Actualisez pour voir l'état.")
     res.redirect("/see")
 
     try{

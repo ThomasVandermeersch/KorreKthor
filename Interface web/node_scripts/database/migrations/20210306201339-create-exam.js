@@ -48,7 +48,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
-      }
+      },
+      excelFile:{
+        type: DataTypes.STRING,
+        allowNull: false
+      },
     });
   },
   down: async (queryInterface, DataTypes) => {

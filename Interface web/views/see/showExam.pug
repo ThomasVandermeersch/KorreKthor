@@ -75,5 +75,7 @@ div(class="container page create")
             if exam.status == 2
                 a(href=`/see/copies/${exam.id}` class="btn col-5 btn-secondary mt-4 float-end bouton") Afficher les copies des étudiants
 
+            if exam.status == 2
+                a(href=`/correction/downloadExcel/${exam.id}` class="btn col-12 btn-success mt-4 bouton") Télécharger les résultats (fichier excel) 
 
 include ../footer.pug

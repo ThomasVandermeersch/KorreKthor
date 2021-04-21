@@ -57,7 +57,6 @@ async function getExcelInfo(path){
   try {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
-
     const worksheet = workbook.worksheets[0];
 
     var target = 10000
@@ -97,8 +96,62 @@ async function getExcelInfo(path){
   }
 }
 
+async function exportStudents(exam, data){
+  /**
+   * Function that fills the initial excel file with the student results
+   * Return true if something went wrong
+   */
+  try {
+    console.log(exam.excelFile);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(exam.excelFile);
+    const worksheet = workbook.worksheets[0];
+
+    var target = 100000
+    var matriculeInd = 0
+    var coteInd = 0
+
+    var errors = []
+
+    console.log("insert cotes")
+    worksheet.eachRow(function(row, rowNumber) {
+      var indexMatr = row.values.indexOf("matricule")
+      var indexCote = row.values.indexOf("cote")
+
+      if (indexMatr > 0 && indexCote > 0){
+        target = rowNumber
+        matriculeInd = indexMatr
+        coteInd = indexCote
+      }
+
+      if (target < rowNumber){
+        matricule = row.values[matriculeInd]
+
+        if (matricule in data){
+          row.getCell(coteInd).value = Math.round(((data[matricule][0]/data[matricule][1])*20)*100)/100
+        }
+        else{
+          errors.push(matricule)
+        }
+      }
+    })
+
+    if (errors.length > 0){
+      throw "One or more copy.user.matricule don't match the matricules in excel";
+    }
+
+    await workbook.xlsx.writeFile(exam.excelFile)
+
+  }
+  catch(e){
+    console.log(e);
+    return e
+  }
+}
+
 exports.importStudents = importStudents
 exports.getExcelInfo = getExcelInfo
+exports.exportStudents = exportStudents
 
 //table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
 //versions = getExcelInfo("./exemple_liste.xlsx").then(versions => { console.log(versions)})

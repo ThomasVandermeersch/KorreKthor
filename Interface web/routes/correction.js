@@ -1,8 +1,10 @@
 const router = require('express-promise-router')();
 const acces = require('../node_scripts/hasAcces')
-const { Exam, Copy } = require("../node_scripts/database/models");
+const { Exam, Copy, User } = require("../node_scripts/database/models");
 const corrector = require('../node_scripts/correction')
 const sendEmail = require('../node_scripts/sendEmail');
+const path = require("path")
+const functions = require("../node_scripts/functions")
 
 router.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
     var exam = await Exam.findOne({where:{id:req.params.examId}})
@@ -13,7 +15,7 @@ router.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
     res.render('correction/modifyCriteria.pug', correctionCriterias)
 })
 
-router.get("/questionStatus/:examId",async (req,res)=>{
+router.get("/questionStatus/:examId", acces.hasAcces, async (req,res)=>{
     const exam = await Exam.findOne({where:{id:req.params.examId}})
     const questionStatus = JSON.parse(exam.questionStatus)
     res.render('correction/questionStatus',{questionStatus:questionStatus, exam:exam})
@@ -110,5 +112,30 @@ router.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
         res.redirect('/correction/sendEmail/'+ req.body.copyId)
     })
 })
+
+router.get("/downloadExcel/:examId", acces.hasAcces, async (req,res)=>{
+    const exam = await Exam.findOne({where:{id:req.params.examId}, attributes:["excelFile"], include:[{model:Copy, as:"copies", attributes:["result"], include:[{model:User, as:"user", attributes:["matricule"]}]}]})
+    const excelFilePath =  exam.excelFile
+
+    data = {}
+    exam.copies.forEach((copy) => {
+        data[copy.user.matricule] = copy.result
+    })
+    
+    err = await functions.exportStudents({"name":exam.name, "excelFile":exam.excelFile, "id":exam.id}, data)
+
+    if (err){
+        req.flash("errormsg", err)
+        return res.status(500).render("index/error")
+    }
+
+    res.download(
+        path.resolve(excelFilePath),
+        (err) => {
+            if (err) res.status(404).send("<h1>File Not found: 404</h1>");
+        }
+    );
+})
+
 
 module.exports = router
