@@ -38,6 +38,7 @@
     "get-stream": "^6.0.0",
     "graph-service": "^2.1.3",
     "http-errors": "^1.8.0",
+    "isomorphic-fetch": "^3.0.0",
     "jszip": "^3.5.0",
     "multer": "^1.4.2",
     "nodejs-nodemailer-outlook": "^1.2.3",

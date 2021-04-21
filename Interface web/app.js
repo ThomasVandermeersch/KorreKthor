@@ -33,7 +33,7 @@ const msalConfig = {
     system: {
       loggerOptions: {
         loggerCallback(loglevel, message, containsPii) {
-          console.log(message);
+          //console.log(message); //Message des requêtes de l'API Graph et MSal
         },
         piiLoggingEnabled: false,
         logLevel: msal.LogLevel.Verbose,
