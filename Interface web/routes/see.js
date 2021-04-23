@@ -4,6 +4,7 @@ const path = require("path")
 const { Exam, Copy, User } = require("../node_scripts/database/models");
 const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
 const matriculeConverter = require('../node_scripts/convertMatricule')
+const getUser = require('../node_scripts/getUser')
 
 router.get("/", acces.hasAcces, async (req, res) => {
     userid = req.session.userObject.id
@@ -156,40 +157,24 @@ router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
 
 router.post("/updateUser/", acces.hasAcces, async (req, res) => {
     if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
-        console.log('--- INFORMATIONS----')
-        console.log(req.body.matricule)
-        console.log(req.body.copyId)
-        console.log(req.body.newMatricule)
-        
-        var newMatricule = matriculeConverter.convertMatricule(req.body.newMatricule)
 
-        User.findOne({where:{matricule:newMatricule}})
-            .then(async user=>{
-                if(!user){
-                    //Si pas de user, il faudra en créer un. Ce user devra être mis à jour à sa première connexion
-                    user = await User.create({
-                        "fullName": 'Unknow-Name', 
-                        "matricule": newMatricule, 
-                        "email": matriculeConverter.matriculeToEmail(newMatricule), 
-                        "authorizations":3, 
-                        "role":0
-                    })
-                }
-                
-                console.log("search copy")
+
+        const userEmail = matriculeConverter.matriculeToEmail(req.body.newMatricule)
+        getUser.getUser(userEmail,req)
+            .then(user=>{
                 Copy.findOne({where:{id:req.body.copyId}})
-                    .then(copy=>{
-                        console.log("update userId")
-                        copy.userId = user.id
-                        copy.save()
-                        res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
-                    })
-                    .catch(err=> {
-                        req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
-                        res.render("index/error")
-                    })
+                .then(copy=>{
+                    console.log("update userId")
+                    copy.userId = user.id
+                    copy.save()
+                    res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
+                })
+                .catch(err=> {
+                    req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
+                    res.render("index/error")
+                })
             })
-            .catch(err=> {
+            .catch(err=>{
                 console.log(err)
                 req.flash('errormsg', "Somthing went wrong while changing the user, error : 1005");
                 res.render("index/error")
@@ -198,6 +183,6 @@ router.post("/updateUser/", acces.hasAcces, async (req, res) => {
     else{
         res.render("index/noAcces")
     }
-});
+})
 
 module.exports = router;
