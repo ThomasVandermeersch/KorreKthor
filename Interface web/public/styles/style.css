@@ -28,6 +28,9 @@
     bottom: auto;
 }
 
+body {
+    padding-bottom: 55px;
+    }
 
 @media screen and (max-width:991px){
     .create{

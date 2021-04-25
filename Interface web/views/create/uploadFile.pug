@@ -10,15 +10,23 @@ div(class="container page create")
         div(class="row mt-3")
             div(class="col-12")
                 label(for="fileForm" class="form-label") Veuillez entrer le fichier Excel avec la liste d'élèves.
+
             div(class="col-12")
                 input(class="form-control" id="fileForm" type="file" name="studentList" required)
         
         div(class="row mt-3")
             div(class="col-12 col-md-8")
-                label(for="fileForm" class="form-label") Veuillez entrer un nombre de copies supplémentaires pour l'examen.
+                    label(for="fileForm" class="form-label") Veuillez entrer un nombre de copies supplémentaires pour l'examen.
+                        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nombre de copies supplémentaires vous permet de créer des copies non nominatives. Cette option est utile lorsque votre liste d'étudiants est encore incomplète complète. Les étudiants recevant ce type de copies devront eux-même indiquer leurs informations personnelles (Nom, Prénom, Matricule).") &#10068;
+
+
+        
+
             div(class="col-12 col-md-4")
                 input(class="form-control" id="extraCopies" type="number" name="extraCopies" min=0 value=10)
-                
+        
+ 
+        
         div(class="my-3 float-end")
             input(class="btn btn-warning" type="submit", value="Soumettre et continuer")
 

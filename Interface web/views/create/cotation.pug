@@ -4,8 +4,9 @@ div(class="container page create")
     div(class="progress mt-3 mb-2")
         <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
 
-    h2 Etape 4 : Entrer les critères de correction 
-    
+    h2 Etape 4 : Entrer les critères de correction
+        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Vous aurez encore l'occasion de modifier ces critères par la suite")
+            i(class="fa fa-question-circle" style="font-size:24px;")    
     include ../cotationTable.pug
 
 

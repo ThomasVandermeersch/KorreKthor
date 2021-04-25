@@ -1,0 +1,34 @@
+include ../header.pug
+
+div(class="container page create")
+
+    h2 Avant de commencer 
+
+    ol
+        li Préparer le fichier Excel.
+            ul
+                li Le fichier Excel doit être au format ci-dessous (.xlsx).
+                    img(src="/img/excelExample.jpg" height="150")
+                li ATTENTION, celui-ci doit contenir une colonne "version"
+                li Dans la colonne version, indiquer la version que vous voulez donner à l'étudiant.
+                li Les questionnaires de chaque étudians apparaîtront dans l'ordre des lignes du fichier Excel.
+        br
+        li Préparer les questionnaires PDF 
+            ul
+                li Le fichier PDF contient les intitulés des questions et les intitulés des propositions avec une mise en page de votre choix.
+                li Ce pdf ne doit <b> PAS </b> contenir de grille de réponse. Cette grille sera automatiquement générée par notre application.
+                li Il faut autant de fichiers PDF qu'il y a de version. (Korrekthor ne mélange <b> PAS </b> les questions)
+
+        br
+        li Préparer le correctif des différentes versions.
+            ul
+                li Korrekthor ne peut deviner les réponses aux différentes questions. Préparer donc les réponses sur un support de votre choix afin de les entrer dans le système lorsque ce sera demandé.
+                li Pour chaque version, il faudra entrer manuellement la grille des réponses.
+
+    p Vous êtes maintenant prêt à suivre les différentes étapes pour Créer Votre QCM.
+    p A la fin des différentes étapes de création, vous obtiendrez <b> UN </b> fichier PDF contenant pour chauque étudiant le questionnaire étudiant suivi d'une grille de réponses.  
+    a(href="/create/Step1")
+        button(type="button" class="btn btn-secondary") Commencer à créer mon questionnaire
+
+include ../footer.pug
+

@@ -32,13 +32,19 @@ div(class="container page")
                 tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
                     if copy.user.fullName == ""
                         td(class="text-danger") -- Spécifier l'étudiant --
+                            button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
+                                i(class="fa fa-question-circle" style="font-size:24px;color:red")
                         td(class="text-danger") -- Spécifier l'étudiant --
+                            button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
+                                i(class="fa fa-question-circle" style="font-size:24px;color:red")
                     else
                         td= copy.user.fullName
                         td= copy.user.matricule
                     if "error" in answers
                         th 
-                            div(class="text-danger") -- Correction manuelle requise --  
+                            div(class="text-danger") -- Correction manuelle requise -- 
+                                button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Il y a eu un problème lors de la détection des réponses sur cette copie.\n Il faut rentrer les réponses manuellement")
+                                    i(class="fa fa-question-circle" style="font-size:24px;color:red") 
                     else
                         td #{point}/20
 

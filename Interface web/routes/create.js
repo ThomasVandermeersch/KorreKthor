@@ -31,7 +31,14 @@ var uploadxls = multer({ storage: storagexls})
 
 
 
-// Download final pdf route 
+// Download final pdf route
+
+
+router.get("/Step0",acces.hasAcces,(req,res)=>{
+    res.render('create/introduction')
+})
+
+
 router.get("/downloadresult", acces.hasAcces, async (req, res) => {
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     res.download(

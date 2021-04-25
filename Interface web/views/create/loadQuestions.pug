@@ -4,7 +4,10 @@ div(class="container page create")
     div(class="progress mt-3 mb-2")
         <div class="progress-bar" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">40%</div>
 
-    h2 Etape 2 : Importer les versions des questionnaires
+    h2 Etape 2 : Importer les différents questionnaires
+        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Importez simplement les différents fichiers PDF contenant vos questionnaires. Un fichier PDF par version.\nCes fichiers PDF seront automatiquement joint à la feuille de réponse respective.")
+            i(class="fa fa-question-circle" style="font-size:24px;")
+
 
     form(action="/create/sendQuestions" method="POST" enctype="multipart/form-data")
     
@@ -16,7 +19,9 @@ div(class="container page create")
                     b= uploadedFilename
             
             div(class="row row-cols-auto my-2") 
-                div(class="col") Nom du cours : 
+                div(class="col") Nom du cours :
+                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="C'est sous ce nom qu'apparaîtra votre examen sur la plateforme et sur les copies des étudiants")
+                        i(class="fa fa-question-circle" style="font-size:20px;color:grey")
 
                 div(class="col p-0" id="lesson")
                     input(type="text", name="lesson", value=lesson)
