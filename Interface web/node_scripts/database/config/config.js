@@ -7,7 +7,11 @@ module.exports = {
         "database": process.env.POSTGRES_DATABASE,
         "host": process.env.POSTGRES_HOST,
         "port": process.env.POSTGRES_PORT,
-        "dialect": "postgres"
+        "dialect": "postgres",
+        dialectOptions:{
+            statement_timeout: 1000,
+            idle_in_transaction_session_timeout: 5000
+        }
     },
     "test": {
         "username": "root",

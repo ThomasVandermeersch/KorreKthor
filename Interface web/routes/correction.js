@@ -1,12 +1,12 @@
 const router = require('express-promise-router')();
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 const { Exam, Copy, User } = require("../node_scripts/database/models");
 const corrector = require('../node_scripts/correction')
 const sendEmail = require('../node_scripts/sendEmail');
 const path = require("path")
 const functions = require("../node_scripts/functions")
 
-router.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
+router.get("/modifyCriteria/:examId", access.hasAccess, async (req,res)=>{
     var exam = await Exam.findOne({where:{id:req.params.examId}})
 
     var correctionCriterias = JSON.parse(exam.correctionCriterias)
@@ -15,7 +15,7 @@ router.get("/modifyCriteria/:examId", acces.hasAcces, async (req,res)=>{
     res.render('correction/modifyCriteria.pug', correctionCriterias)
 })
 
-router.get("/questionStatus/:examId", acces.hasAcces, async (req,res)=>{
+router.get("/questionStatus/:examId", access.hasAccess, async (req,res)=>{
     const exam = await Exam.findOne({where:{id:req.params.examId}})
     const questionStatus = JSON.parse(exam.questionStatus)
     res.render('correction/questionStatus',{questionStatus:questionStatus, exam:exam})
@@ -44,7 +44,7 @@ router.post('/modifyQuestionStatus/:examId',async(req,res)=>{
     })
 })
 
-router.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
+router.get('/sendEmail/:copyid',access.hasAccess, async(req,res)=>{
     var copy;
     if (req.session.userObject.authorizations == 0){
         copy = await Copy.findOne({where:{id:req.params.copyid}})
@@ -73,7 +73,7 @@ router.get('/sendEmail/:copyid',acces.hasAcces, async(req,res)=>{
     }
 })
 
-router.post('/modifyImageTreatment/:copyId', acces.hasAcces, async (req,res)=>{
+router.post('/modifyImageTreatment/:copyId', access.hasAccess, async (req,res)=>{
     console.log(req.body)
     var copy = await Copy.findOne({where:{id:req.params.copyId}})
     const exam = await Exam.findOne({where:{id:copy.examId}})
@@ -101,7 +101,7 @@ router.post('/modifyImageTreatment/:copyId', acces.hasAcces, async (req,res)=>{
     })
 })
 
-router.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
+router.post('/sendComplainEmail',access.hasAccess,(req,res)=>{
     sendEmail.sendEmail(req.body.email,req.session.userObject.email,req.body.object,req.body.message)
     .then(response=>{
         req.flash('successEmail','Email envoyé');
@@ -114,7 +114,7 @@ router.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
     })
 })
 
-router.get("/downloadExcel/:examId", acces.hasAcces, async (req,res)=>{
+router.get("/downloadExcel/:examId", access.hasAccess, async (req,res)=>{
     const exam = await Exam.findOne({where:{id:req.params.examId}, attributes:["excelFile"], include:[{model:Copy, as:"copies", attributes:["result", "version"], include:[{model:User, as:"user", attributes:["matricule", "fullName", "role"]}]}]})
     const excelFilePath =  exam.excelFile
 

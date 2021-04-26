@@ -1,20 +1,22 @@
 const router = require('express-promise-router')();
 const { User } = require("../node_scripts/database/models");
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 
-router.get('/', acces.hasAcces, (req,res)=>{
-    User.findAll({order:[['matricule', 'ASC']]})
-        .then(users =>res.render('admin/adminUsers',{users:users}))
+router.get('/', access.hasAccess, (req,res)=>{
+    User.findAll({where:{role:[0,1]},order:[['matricule', 'ASC']]})
+        .then(users => res.render('admin/adminUsers',{users:users}))
         .catch(err =>{
             console.log(" --- DATABASE ERROR -- ADMIN/ ---\n " + err)
-            res.send('Database error !')
+            req.flash('errormsg','Database error, error : 1007')
+            res.render('index/error')
         })
 })
 
-router.get('/:matricule', acces.hasAcces, (req,res)=>{
+router.get('/:matricule', access.hasAccess, (req,res)=>{
     User.findOne({where:{matricule:req.params.matricule}})
         .then(user =>{
-            if (user.id != req.session.userObject.id && (user.authorizations == 0 || user.authorizations == 2)){
+            // An Admin User, other than me cannot be modified.
+            if (user.id != req.session.userObject.id && user.authorizations == 0){
                 res.render('index/noAcces')
             }
             else{
@@ -23,25 +25,33 @@ router.get('/:matricule', acces.hasAcces, (req,res)=>{
         })
         .catch(err => {
             console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
-            res.end('Database error')
+            req.flash('errormsg','Database error, error : 1008')
+            res.render('index/error')        
         })
 })
 
-router.post('/modifyUser', acces.hasAcces, async(req,res)=>{
-    var auth;
-
-    if(req.body.createQCM && req.body.makeAdmin) auth=0
+router.post('/modifyUser', access.hasAccess, (req,res)=>{
+    if(req.body.makeAdmin) auth=0
     else if(req.body.createQCM) auth=1
-    else if (req.body.makeAdmin) auth=2
     else auth= 3
 
-    //Vérifier qu'on ne modifie pas un admin
-    var user = await User.findOne({where:{matricule:req.body.matricule}})
-    if ((user.authorizations != 0 && user.authorizations != 2) || user.email == req.session.userObject.email) {
-        user.authorizations = auth
-        await user.save()
-    }
-    res.redirect("/admin")
+    User.findOne({where:{matricule:req.body.matricule}}).then(user=>{
+        if ( user.authorizations != 0 || user.email == req.session.userObject.email) {
+            user.authorizations = auth
+            user.save()
+            .then(()=>{
+                res.redirect("/admin")
+            }
+            ).catch(err=>{
+                req.flash('errormsg','Database error, error : 1009')
+                res.render('index/error')  
+            })
+        }
+        else res.redirect('/noAccess')
+    }).catch(err=>{
+        req.flash('errormsg','Database error, error : 1010')
+        res.render('index/error')  
+    })
 })
 
 module.exports = router;

@@ -25,11 +25,10 @@ div(class="container page")
         tr
             td Privilège 
             if session.userObject.authorizations == 0
-                td Admin + Create
+                td Admin
             else if  session.userObject.authorizations == 1
                 td Create
-            else if session.userObject.authorizations == 2
-                td Admin
+
             else 
                 td Aucun
 

@@ -17,29 +17,24 @@ div(class="container page")
                     b Role 
                 td(class="authorizations") 
                     b Privilèges             
-                //- td 
-                //-     b Actions 
+
 
         tbdoy
             for user in users
-                if (user.authorizations != 0 && user.authorizations != 2) || user.email == session.userObject.email
+                if (user.authorizations != 0  || user.email == session.userObject.email)
                     tr(onClick=`getUser("${ user.matricule}")` style="cursor: pointer;" )
                         td= user.matricule
                         td= user.fullName 
                         td(class="email")= user.email 
                         if user.role == 1
                             td Enseingnant 
-                        else 
+                        else
                             td Etudiant
                         
                         if user.authorizations == 0
-                            td(class="authorizations") Create + Admin
+                            td(class="authorizations") Admin
                         else if user.authorizations == 1
-                            td(class="authorizations") Create
-                        
-                        else if user.authorizations == 2
-                            td(class="authorizations")  Admin
-                        
+                            td(class="authorizations") Create                        
                         else 
                             td(class="authorizations")  Aucun
                 
@@ -54,13 +49,9 @@ div(class="container page")
                             td Etudiant
                         
                         if user.authorizations == 0
-                            td(class="authorizations") Create + Admin
+                            td(class="authorizations") Admin
                         else if user.authorizations == 1
-                            td(class="authorizations") Create
-                        
-                        else if user.authorizations == 2
-                            td(class="authorizations")  Admin
-                        
+                            td(class="authorizations") Create                        
                         else 
                             td(class="authorizations")  Aucun
 

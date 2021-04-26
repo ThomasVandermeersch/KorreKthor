@@ -1,7 +1,7 @@
 
 //This function is only used by the developpers
 
-const { User, Exam, Copy } = require("./node_scripts/database/models");
+const { User, Exam, Copy } = require("./models");
 
 async function seeUsers(){
     var users = await Exam.findAll()
@@ -9,12 +9,11 @@ async function seeUsers(){
     console.log(users)
 }
 
-seeUsers()
+//seeUsers()
 
 
-//0 ==> admin + create
+//0 ==> admin
 //1 ==> create
-//2 ==> admin
 //3 ==> rien
 async function changeAuth(mat,auth){
     var user = await User.findOne({where:{matricule:mat}})
@@ -29,7 +28,7 @@ async function deleteUsers(){
     })
 }
 
-deleteUsers()
+//deleteUsers()
 
 //seeUsers()
 changeAuth('17030',0)

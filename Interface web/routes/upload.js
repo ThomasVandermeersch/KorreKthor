@@ -2,14 +2,13 @@ const router = require('express-promise-router')();
 const request = require('request');
 const unzipper = require("unzipper")
 const http = require('http');
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
 const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
 
 var multer  = require('multer'); // Specific import for files 
-const exam = require('../node_scripts/database/models/exam');
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
@@ -55,12 +54,12 @@ function callCorrection(filename, exam){
     })
 }
 
-router.get("/copies/:examid", acces.hasAcces, async(req, res) => {
+router.get("/copies/:examid", access.hasAccess, async(req, res) => {
     var exam = await Exam.findOne({where:{id:req.params.examid}})
     res.render("upload/uploadScans", {exam:exam})
 })
 
-router.post("/scans/manual", acces.hasAcces, upload.single("file"), async(req, res) => {
+router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req, res) => {
     var exam;
     if (req.session.userObject.authorizations == 0){
         exam = await Exam.findOne({where:{id:req.body.examid}})

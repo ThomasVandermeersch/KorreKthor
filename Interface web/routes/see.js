@@ -1,12 +1,12 @@
 const router = require('express-promise-router')();
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 const path = require("path")
 const { Exam, Copy, User } = require("../node_scripts/database/models");
 const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
 const matriculeConverter = require('../node_scripts/convertMatricule')
 const getUser = require('../node_scripts/getUser')
 
-router.get("/", acces.hasAcces, async (req, res) => {
+router.get("/", access.hasAccess, async (req, res) => {
     userid = req.session.userObject.id
     var exams;
     var examCopies;
@@ -23,7 +23,7 @@ router.get("/", acces.hasAcces, async (req, res) => {
     res.render("see/showExams", {exams:exams, copies:examCopies})
 })
 
-router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
+router.get("/copies/:examid", access.hasAccess, async (req, res) => {
     var exam;
     var examCopies;
 
@@ -48,7 +48,7 @@ router.get("/copies/:examid", acces.hasAcces, async (req, res) => {
     res.render("see/showCopies", {exam:exam, copies:copies, stats:stats})
 })
 
-router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
+router.get("/exam/:examid", access.hasAccess, async (req, res) => {
     var exam;
     if (req.session.userObject.authorizations == 0){
         var exam = await Exam.findOne({where:{id:req.params.examid}, include:[{model:User, as:"user"}]})
@@ -65,7 +65,7 @@ router.get("/exam/:examid", acces.hasAcces, async (req, res) => {
     }
 })
 
-router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
+router.get("/copy/:copyid", access.hasAccess, async (req, res) => {
     var exam;
     var copy;
 
@@ -86,7 +86,7 @@ router.get("/copy/:copyid", acces.hasAcces, async (req, res) => {
     }
 })
 
-router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
+router.get("/exam/:examid/downloadresult", access.hasAccess, async (req, res) => {
     var exam;
 
     if (req.session.userObject.authorizations == 0){
@@ -109,7 +109,7 @@ router.get("/exam/:examid/downloadresult", acces.hasAcces, async (req, res) => {
     }
 });
 
-router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) => {
+router.get("/exam/:examid/downloadcorrection", access.hasAccess, async (req, res) => {
     var exam;
     
     if (req.session.userObject.authorizations == 0){
@@ -132,7 +132,7 @@ router.get("/exam/:examid/downloadcorrection", acces.hasAcces, async (req, res) 
     }
 });
 
-router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
+router.get("/copy/:copyid/download", access.hasAccess, async (req, res) => {
     var copy;
     
     if (req.session.userObject.authorizations == 0 || req.session.userObject.role == 1){
@@ -155,7 +155,7 @@ router.get("/copy/:copyid/download", acces.hasAcces, async (req, res) => {
     }
 });
 
-router.post("/updateUser/", acces.hasAcces, async (req, res) => {
+router.post("/updateUser/", access.hasAccess, async (req, res) => {
     if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
 
 

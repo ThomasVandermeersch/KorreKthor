@@ -1,10 +1,9 @@
 const { User } = require("../node_scripts/database/models");
 const convertMatricule = require('./../node_scripts/convertMatricule')
-/* GET auth callback. */
 const router = require('express-promise-router')();
+const getUser = require('../node_scripts/getUser')
 
 router.get("/login",function(req,res){
-    //On est pas supposé se connecter si on l'est déjà
     if(!req.session.userId) res.render("auth/login")
     else res.redirect('/')
 })
@@ -32,7 +31,6 @@ router.get('/signin',
   }
 );
 
-// <CallbackSnippet>
 router.get('/callback',
   async function(req, res) {
     const tokenRequest = {
@@ -48,35 +46,13 @@ router.get('/callback',
       // Save the user's homeAccountId in their session
       req.session.userId = response.account.homeAccountId;
 
-      // Get the matricule and the role 
-      var checkUser = await User.findOne({where:{email:response.account.username}})
-      if (checkUser === null){
-        var role;
-        
-        var matricule = convertMatricule.emailToMatricule(response.account.username)
-        let re = /^\d/
-        
-        if (re.test(matricule)) role = 0
-        else role = 1
-        
-        var user = await User.create({
-          "fullName":response.account.name, 
-          "email":response.account.username, 
-          "matricule":matricule, 
-          "role":role, 
-          "authorizations":3
-        })
-
+      getUser.getUser(response.account.username,req).then(user=>{ 
         req.session["userObject"] = user
-      }
-      else{
-        if(checkUser.fullName == 'Unknow-Name'){
-          checkUser.fullName = response.account.name
-          await checkUser.save()
-        }
-        req.session["userObject"] = checkUser
-      }
-
+        
+        //REDIRECTION
+        if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])
+        else res.redirect('/');
+      })
     } catch(error) {
       console.log(error)
       req.flash('error_msg', {
@@ -84,10 +60,6 @@ router.get('/callback',
         debug: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
     }
-    
-    //REDIRECTION
-    if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])
-    else res.redirect('/');
   }
 );
 

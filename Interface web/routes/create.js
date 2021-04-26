@@ -2,7 +2,7 @@ const router = require('express-promise-router')();
 const path = require("path")
 const functions = require("../node_scripts/functions")
 const QCM_automatisation = require("../node_scripts/QCM_automatisation")
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 const { Exam } = require("../node_scripts/database/models");
 const databaseTools = require("../node_scripts/databaseTools")
 const corrector = require('../node_scripts/correction')
@@ -34,12 +34,12 @@ var uploadxls = multer({ storage: storagexls})
 // Download final pdf route
 
 
-router.get("/Step0",acces.hasAcces,(req,res)=>{
+router.get("/Step0",access.hasAccess,(req,res)=>{
     res.render('create/introduction')
 })
 
 
-router.get("/downloadresult", acces.hasAcces, async (req, res) => {
+router.get("/downloadresult", access.hasAccess, async (req, res) => {
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     res.download(
         path.resolve(exam.examFile),
@@ -50,7 +50,7 @@ router.get("/downloadresult", acces.hasAcces, async (req, res) => {
 });
 
 
-router.get("/downloadcorrection", acces.hasAcces, async (req, res) => {
+router.get("/downloadcorrection", access.hasAccess, async (req, res) => {
     var exam = await Exam.findOne({where:{id:req.session.examId}})
     res.download(
         path.resolve(exam.correctionFile),
@@ -61,13 +61,13 @@ router.get("/downloadcorrection", acces.hasAcces, async (req, res) => {
 })
 
 // Route to upload file
-router.get("/Step1",acces.hasAcces, function(req,res){
+router.get("/Step1",access.hasAccess, function(req,res){
     res.render('create/uploadFile', {title:"QCM CREATOR"})
 
 })
 
 // Route to upload questions
-router.get("/Step2", acces.hasAcces, function(req,res){
+router.get("/Step2", access.hasAccess, function(req,res){
     res.render('create/loadQuestions', 
             {title:"QCM CREATOR", 
                 uploadedFilename :req.session.excelFile.filename, 
@@ -77,7 +77,7 @@ router.get("/Step2", acces.hasAcces, function(req,res){
 })
 
 // Route to load the answers
-router.get("/Step3",acces.hasAcces, function(req, res){
+router.get("/Step3",access.hasAccess, function(req, res){
     res.render('create/loadAnswers', 
                 {title:"QCM CREATOR", 
                 uploadedFilename: req.session.excelFile.filename,
@@ -90,7 +90,7 @@ router.get("/Step3",acces.hasAcces, function(req, res){
 
 
 //Route de cotation
-router.get("/Step4",acces.hasAcces,function(req,res){
+router.get("/Step4",access.hasAccess,function(req,res){
     res.render('create/cotation.pug',
         {   type:'normal',
             ptsRight:1,
@@ -108,7 +108,7 @@ router.get("/Step4",acces.hasAcces,function(req,res){
 })
 
 // Route to the download page
-router.get("/Step5",acces.hasAcces, function(req,res){
+router.get("/Step5",access.hasAccess, function(req,res){
     res.render('create/downloadPDF')
 })
 
@@ -187,7 +187,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
 })
 
 // Route to upload the student list file
-router.post("/sendList",acces.hasAcces, uploadxls.single("studentList"), async function(req, res, next) {
+router.post("/sendList",access.hasAccess, uploadxls.single("studentList"), async function(req, res, next) {
     const pathTofile = "./uploads/"+req.file.filename // file path
     var ext = path.extname(pathTofile); // file extension
 
@@ -219,7 +219,7 @@ router.post("/sendList",acces.hasAcces, uploadxls.single("studentList"), async f
 })
 
 // Route to upload the question files
-router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (req, res)=>{
+router.post("/sendQuestions",access.hasAccess, upload.array("question"), async (req, res)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
     req.session.excelFile["lesson"] = req.body.lesson
@@ -240,7 +240,7 @@ router.post("/sendQuestions",acces.hasAcces, upload.array("question"), async (re
 })
 
 
-router.post("/sendNormalCotationCriteria/:redirection", acces.hasAcces, async (req,res)=>{
+router.post("/sendNormalCotationCriteria/:redirection", access.hasAccess, async (req,res)=>{
     var criteria = req.body
 
     var exam = await Exam.findOne({where:{id:req.session.examId}})
