@@ -5,26 +5,19 @@ div(class="container page create")
         <div class="progress-bar" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">40%</div>
 
     h2 Etape 2 : Importer les différents questionnaires
-        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Importez simplement les différents fichiers PDF contenant vos questionnaires. Un fichier PDF par version.\nCes fichiers PDF seront automatiquement joint à la feuille de réponse respective.")
+        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Importez simplement les différents fichiers PDF contenant vos questionnaires. Un fichier PDF par version.\nCes fichiers PDF seront automatiquement joint à la feuille de réponse pour chaque étudiant.")
             i(class="fa fa-question-circle" style="font-size:24px;")
-
 
     form(action="/create/sendQuestions" method="POST" enctype="multipart/form-data")
     
         div(class="container border border-1 rounded mt-3")
             div(class="row row-cols-auto my-2") 
-                div(class="col") Liste des etudiants : 
-
-                div(class="col p-0" id="filename")
-                    b= uploadedFilename
-            
-            div(class="row row-cols-auto my-2") 
                 div(class="col") Nom du cours :
-                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="C'est sous ce nom qu'apparaîtra votre examen sur la plateforme et sur les copies des étudiants")
+                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="C'est sous ce nom qu'apparaîtra votre examen sur la plateforme et sur les copies des étudiants.")
                         i(class="fa fa-question-circle" style="font-size:20px;color:grey")
 
                 div(class="col p-0" id="lesson")
-                    input(type="text", name="lesson", value=lesson)
+                    input(class="form-control" type="text", name="lesson", value=lesson)
 
         
         each questID in versions 

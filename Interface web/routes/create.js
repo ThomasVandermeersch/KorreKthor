@@ -7,6 +7,7 @@ const { Exam } = require("../node_scripts/database/models");
 const databaseTools = require("../node_scripts/databaseTools")
 const corrector = require('../node_scripts/correction')
 const { v4: uuidv4 } = require('uuid');
+const getUser = require("../node_scripts/getUser")
 
 var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(
@@ -26,12 +27,9 @@ var storagexls = multer.diskStorage(
         }
     }
 )
+
 var upload = multer({ storage: storage})
 var uploadxls = multer({ storage: storagexls})
-
-
-
-// Download final pdf route
 
 
 router.get("/Step0",access.hasAccess,(req,res)=>{
@@ -40,89 +38,91 @@ router.get("/Step0",access.hasAccess,(req,res)=>{
 
 
 router.get("/downloadresult", access.hasAccess, async (req, res) => {
-    var exam = await Exam.findOne({where:{id:req.session.examId}})
-    res.download(
-        path.resolve(exam.examFile),
-        (err) => {
-            if (err) res.status(404).send("<h1>File Not found: 404</h1>");
-        }
+    Exam.findOne({where:{id:req.session.examId}}).then(exam=> {
+        res.download(
+            path.resolve(exam.examFile),
+            (err) => {
+                if (err) res.redirect("/error")
+            }
         );
+    }).catch(err=> {
+        console.log(" --- DATABASE ERROR -- CREATE/download ---\n " + err)
+        req.flash('errormsg','Database error, error : 1011')
+        res.redirect('/error')
+    })
 });
 
 
 router.get("/downloadcorrection", access.hasAccess, async (req, res) => {
-    var exam = await Exam.findOne({where:{id:req.session.examId}})
-    res.download(
-        path.resolve(exam.correctionFile),
-        (err) => {
-            if (err) res.status(404).send("<h1>File Not found: 404</h1>");
-        }
-    );
+    Exam.findOne({where:{id:req.session.examId}}).then(exam=> {
+        res.download(
+            path.resolve(exam.correctionFile),
+            (err) => {
+                if (err) res.redirect("error")
+            }
+        ); 
+    }).catch(err=> {
+        console.log(" --- DATABASE ERROR -- CREATE/download ---\n " + err)
+        req.flash('errormsg','Database error, error : 1012')
+        res.redirect('/error')
+    })
 })
 
 // Route to upload file
 router.get("/Step1",access.hasAccess, function(req,res){
-    res.render('create/uploadFile', {title:"QCM CREATOR"})
-
+    res.render('create/uploadFile')
 })
 
 // Route to upload questions
 router.get("/Step2", access.hasAccess, function(req,res){
-    res.render('create/loadQuestions', 
-            {title:"QCM CREATOR", 
-                uploadedFilename :req.session.excelFile.filename, 
-                versions: JSON.parse(req.session.excelFile.versions),
-                lesson : req.session.excelFile.lesson
-            })
+    res.render('create/loadQuestions', {
+            uploadedFilename :req.session.excelFile.filename, 
+            versions: JSON.parse(req.session.excelFile.versions),
+            lesson : req.session.excelFile.lesson
+        })
 })
 
 // Route to load the answers
 router.get("/Step3",access.hasAccess, function(req, res){
-    res.render('create/loadAnswers', 
-                {title:"QCM CREATOR", 
-                uploadedFilename: req.session.excelFile.filename,
-                versions :JSON.parse(req.session.excelFile.versions), 
-                files :JSON.parse(req.session.pdffiles),
-                lesson : req.session.excelFile.lesson
-    })
-    
+    res.render('create/loadAnswers', {
+            versions :JSON.parse(req.session.excelFile.versions), 
+            files :JSON.parse(req.session.pdffiles),
+            lesson : req.session.excelFile.lesson
+        })
 })
 
 
 //Route de cotation
-router.get("/Step4",access.hasAccess,function(req,res){
-    res.render('create/cotation.pug',
-        {   type:'normal',
-            ptsRight:1,
-            ptsWrong:0,
-            ptsAbs:0,
-            allGood:1,
-            oneWrong:0.75,
-            twoWrong:0.50,
-            threeWrong:0.25,
-            threeMoreWrong:0.21,
-            isLastExclusive : 'on',
-            lastExclusiveTrue:1,
-            lastExclusiveFalse:0,
-            redirection:'create'})
+router.get("/Step4", access.hasAccess, function(req,res){
+    Exam.findOne({where:{id:req.session.examId}}).then(exam=>{
+        var correctionCriterias = JSON.parse(exam.correctionCriterias)
+        correctionCriterias['redirection'] = 'create'
+        
+        res.render('create/cotation.pug', correctionCriterias)
+    }).catch(err=> {
+        console.log(" --- DATABASE ERROR -- CREATE/download ---\n " + err)
+        req.flash('errormsg','Database error, error : 1013')
+        res.redirect('/error')
+    })
 })
 
 // Route to the download page
-router.get("/Step5",access.hasAccess, function(req,res){
+router.get("/Step5", access.hasAccess, function(req,res){
     res.render('create/downloadPDF')
 })
 
-// Route to send answers
+// Route to send answers and create Exam
 router.post("/quest", upload.single("studentList"), async (req, res) => {
     const excelFile = req.session.excelFile.filename
     const lessonName = req.session.excelFile.lesson
     const students = await functions.importStudents(excelFile)
 
     if (!students || students.length < 1){
-        req.flash('errormsg', "Somthing went wrong with the student list");
+        req.flash('errormsg', "Somthing went wrong with the student list, error 1014");
         res.redirect("/create/Step1")
     }
 
+    // Create an array with all question status to normal
     const answers = JSON.parse(req.body.liste)
     var questionStatus = {}
 
@@ -132,62 +132,72 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
             array.push('normal')   
         }
         questionStatus[key] = array
-
     });
     
     const files = JSON.parse(req.body.files)
 
-    studentObjects = await databaseTools.createStudents(students)
-    var exam = await Exam.create({"userId":req.session.userObject.id, "name":lessonName, "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, "versionsFiles":req.session.excelFile.versions, "corrections":JSON.stringify(answers),"questionStatus":JSON.stringify(questionStatus), "excelFile":excelFile})
-    
-    var lesson = {
-        name: lessonName,
-        id: exam.id,
-        versions: JSON.parse(req.session.excelFile.versions)
-    }
+    Exam.create({
+        "userId":req.session.userObject.id, 
+        "name":lessonName, 
+        "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, 
+        "versionsFiles":req.session.excelFile.versions, 
+        "corrections":JSON.stringify(answers),
+        "questionStatus":JSON.stringify(questionStatus), 
+        "excelFile":excelFile
+    }).then(exam => {
+        var lesson = {
+            name: lessonName,
+            id: exam.id,
+            versions: JSON.parse(req.session.excelFile.versions)
+        }
 
-    QCM_automatisation.createInvoice(students, lesson, answers, files, req.session.extraCopies)
-        .then((ret) => {
-            // handle errors
-            if (ret.error){
-                exam.destroy()
-                res.send({"error":"somthing went wrong while creating exam.", "code":1001})
-            }
-            
-            // update model
-            exam.examFile = ret.exam
-            exam.correctionFile = ret.correction
-            exam.correctionCriterias = JSON.stringify({
-                type:'normal',
-                ptsRight:1,
-                ptsWrong:0,
-                ptsAbs:0,
-                allGood:1,
-                oneWrong:0.75,
-                twoWrong:0.50,
-                threeWrong:0.25,
-                threeMoreWrong:0.21,
-                isLastExclusive : 'on',
-                lastExclusiveTrue:1,
-                lastExclusiveFalse:0
+        QCM_automatisation.createInvoice(students, lesson, answers, files, req.session.extraCopies)
+            .then((ret) => {
+                // handle errors
+                if (ret.error){
+                    exam.destroy()
+                    res.send({"error":"somthing went wrong while creating exam.", "code":1001})
+                }
+                
+                // update model
+                exam.examFile = ret.exam
+                exam.correctionFile = ret.correction
+                exam.correctionCriterias = JSON.stringify({
+                    type:'normal',
+                    ptsRight:1,
+                    ptsWrong:0,
+                    ptsAbs:0,
+                    allGood:1,
+                    oneWrong:0.75,
+                    twoWrong:0.50,
+                    threeWrong:0.25,
+                    threeMoreWrong:0,
+                    isLastExclusive : 'on',
+                    lastExclusiveTrue:1,
+                    lastExclusiveFalse:0
+                })
+
+                exam.save()
+                req.session["examId"] = exam.id
+                
+                //redirect
+                res.redirect("/create/Step4")
             })
-
-            exam.save()
-            req.session["examId"] = exam.id
-            
-            //redirect
-            res.redirect("/create/Step4")
+            .catch((ret) => {
+                exam.destroy()
+                console.log(ret)
+                req.flash('errormsg', ret.error);
+                res.redirect("/create/Step2")
+            })
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- CREATE/quest ---\n " + err)
+            req.flash('errormsg', 'Database error, error : 1014')
+            res.redirect('/error')
         })
-        .catch((ret) => {
-            exam.destroy()
-            console.log(ret)
-            req.flash('errormsg', ret.error);
-            res.redirect("/create/Step2")
-        })
-})
+    })
 
 // Route to upload the student list file
-router.post("/sendList",access.hasAccess, uploadxls.single("studentList"), async function(req, res, next) {
+router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), async function(req, res, next) {
     const pathTofile = "./uploads/"+req.file.filename // file path
     var ext = path.extname(pathTofile); // file extension
 
@@ -219,7 +229,7 @@ router.post("/sendList",access.hasAccess, uploadxls.single("studentList"), async
 })
 
 // Route to upload the question files
-router.post("/sendQuestions",access.hasAccess, upload.array("question"), async (req, res)=>{
+router.post("/sendQuestions", access.hasAccess, upload.array("question"), (req, res)=>{
     var files = {}
     var liste = JSON.parse(req.body.versions)
     req.session.excelFile["lesson"] = req.body.lesson
@@ -228,8 +238,7 @@ router.post("/sendQuestions",access.hasAccess, upload.array("question"), async (
         var fileName = req.files[i].filename
         if(path.extname(fileName) != '.pdf'){
             req.flash('errormsg', 'You can only send PDF files');
-            res.redirect('/create/Step2')
-           return 0
+            return res.redirect('/create/Step2')
         }
         else{
             files[liste[i]] = fileName
@@ -240,20 +249,31 @@ router.post("/sendQuestions",access.hasAccess, upload.array("question"), async (
 })
 
 
-router.post("/sendNormalCotationCriteria/:redirection", access.hasAccess, async (req,res)=>{
+router.post("/sendCotationCriteria/:redirection", access.hasAccess, async (req, res)=>{
     var criteria = req.body
 
-    var exam = await Exam.findOne({where:{id:req.session.examId}})
-    exam.correctionCriterias = JSON.stringify(criteria)
-    await exam.save()
-
-    corrector.reCorrect(req.session.examId).then(suc=>{
-        if(req.params.redirection == 'create') res.redirect('/create/Step5')
-        else res.redirect('/see/exam/' + req.session.examId)
-    })
-    .catch(err=>{
-        console.log(err)
-        res.end('Problem')
+    Exam.findOne({where:{id:req.session.examId}}).then(async exam=>{
+        if (exam){
+            exam.correctionCriterias = JSON.stringify(criteria)
+            await exam.save()
+            
+            if(req.params.redirection == 'create') return res.redirect('/create/Step5')
+            else corrector.reCorrect(req.session.examId).then(suc=>{
+                return res.redirect('/see/exam/' + req.session.examId)
+            }).catch(err=>{
+                console.log(err)
+                req.flash("errormsg", "Error while recorrecting the exam")
+                return res.redirect("/error")
+            })
+        }
+        else {
+            req.flash("errormsg", "No exam found")
+            return res.redirect("/error")
+        }
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- CREATE/sendCotationCriteria ---\n " + err)
+        req.flash('errormsg', 'Database error, error : 1015')
+        res.redirect('/error')
     })
 })
 
