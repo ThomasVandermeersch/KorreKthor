@@ -10,7 +10,7 @@ function getUser( email , req, createIfNotExist = true){
         .then(user=>{
             if(user) resolve(user)
             
-            if(createIfNotExist){
+            else if(createIfNotExist){
                 //Call Graph API to find users displayName
                 graph.getName(email,req.app.locals.msalClient,req.session.userId)
                     .then(graphUser=>{

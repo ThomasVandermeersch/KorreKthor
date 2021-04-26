@@ -91,6 +91,7 @@ router.post('/modifyImageTreatment/:copyId', acces.hasAcces, async (req,res)=>{
     .then(async (newResult) =>{
         copy.result = newResult      
         copy.save()
+        req.flash('successCotationChange',"La note de l'étudiant a été modifiée correctement ! ");
         res.redirect('/see/copies/'+exam.id)
     })
     .catch(err=>{

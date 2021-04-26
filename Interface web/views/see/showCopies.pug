@@ -17,6 +17,10 @@ div(class="container page")
                 //-     li Meilleur question : Question n°#[strong #{stats.bestQuestionNum}] (Nombre de correct : #[strong #{stats.bestQuestionQtt}])
                 //-     li Pire question :  Question n°#[strong #{stats.worstQuestionNum}] (Nombre de zero : #[strong #{stats.worstQuestionQtt}])
         
+    if messages.successNameChange
+        div(class="alert alert-success my-2" role="alert")= messages.successNameChange
+    if messages.successCotationChange 
+        div(class="alert alert-success my-2" role="alert")= messages.successCotationChange
     
     table(class="table table-sm table-hover mt-2")
         thead

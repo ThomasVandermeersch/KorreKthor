@@ -24,9 +24,12 @@ async function changeAuth(mat,auth){
 
 async function deleteUsers(){
     await User.destroy({
-        truncate:true
+        truncate:true,
+        where:{examId:'f0b29f64-3133-4a76-ac62-0149d9b69725'}
     })
 }
+
+deleteUsers()
 
 //seeUsers()
 changeAuth('17030',0)

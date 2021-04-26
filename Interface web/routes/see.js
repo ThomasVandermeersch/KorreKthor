@@ -167,9 +167,12 @@ router.post("/updateUser/", acces.hasAcces, async (req, res) => {
                     console.log("update userId")
                     copy.userId = user.id
                     copy.save()
+                    console.log(user)
+                    req.flash('successNameChange',"L'étudiant " + user.fullName  + " a été assigné.")
                     res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
                 })
                 .catch(err=> {
+                    console.log(err)
                     req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
                     res.render("index/error")
                 })
