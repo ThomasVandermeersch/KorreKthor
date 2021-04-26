@@ -115,12 +115,12 @@ router.post('/sendComplainEmail',acces.hasAcces,(req,res)=>{
 })
 
 router.get("/downloadExcel/:examId", acces.hasAcces, async (req,res)=>{
-    const exam = await Exam.findOne({where:{id:req.params.examId}, attributes:["excelFile"], include:[{model:Copy, as:"copies", attributes:["result"], include:[{model:User, as:"user", attributes:["matricule"]}]}]})
+    const exam = await Exam.findOne({where:{id:req.params.examId}, attributes:["excelFile"], include:[{model:Copy, as:"copies", attributes:["result", "version"], include:[{model:User, as:"user", attributes:["matricule", "fullName", "role"]}]}]})
     const excelFilePath =  exam.excelFile
 
     data = {}
     exam.copies.forEach((copy) => {
-        data[copy.user.matricule] = copy.result
+        data[copy.user.matricule] = copy
     })
     
     err = await functions.exportStudents({"name":exam.name, "excelFile":exam.excelFile, "id":exam.id}, data)

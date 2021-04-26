@@ -110,31 +110,47 @@ async function exportStudents(exam, data){
     var target = 100000
     var matriculeInd = 0
     var coteInd = 0
+    var versionInd = 0
 
     var errors = []
+    var maxRows = 0
 
-    console.log("insert cotes")
     worksheet.eachRow(function(row, rowNumber) {
+      console.log("in row:", rowNumber)
       var indexMatr = row.values.indexOf("matricule")
       var indexCote = row.values.indexOf("cote")
+      var indexName = row.values.indexOf("etudiant")
+      var indexVersion = row.values.indexOf("version")
+      maxRows += 1
 
       if (indexMatr > 0 && indexCote > 0){
         target = rowNumber
         matriculeInd = indexMatr
         coteInd = indexCote
+        nameInd = indexName
+        versionInd = indexVersion
       }
 
       if (target < rowNumber){
         matricule = row.values[matriculeInd]
 
         if (matricule in data){
-          row.getCell(coteInd).value = Math.round(((data[matricule][0]/data[matricule][1])*20)*100)/100
-        }
-        else{
-          errors.push(matricule)
+          row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
+          delete data[matricule]
         }
       }
     })
+
+    var i = 0
+    for ([matricule, error] of Object.entries(data)){
+      if (error.user.role != 2){
+        i += 1
+        worksheet.getRow(maxRows+i).getCell(matriculeInd).value = parseInt(error.user.matricule)
+        worksheet.getRow(maxRows+i).getCell(coteInd).value = Math.round(((error.result[0]/error.result[1])*20)*100)/100
+        worksheet.getRow(maxRows+i).getCell(nameInd).value = error.user.fullName
+        worksheet.getRow(maxRows+i).getCell(versionInd).value = error.version
+      }
+    }
 
     if (errors.length > 0){
       throw "One or more copy.user.matricule don't match the matricules in excel";
