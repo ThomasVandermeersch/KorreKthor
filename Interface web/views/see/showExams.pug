@@ -47,10 +47,7 @@ div(class="container page")
                     - var answers = JSON.parse(copy.answers)
 
                     tr(onClick=`getCopy("${ copy.id }")` style="cursor: pointer;")
-                        if session.userObject.authorizations == 0
-                            th #{copy.exam.name} - #{copy.user.matricule}
-                        else
-                            td= copy.exam.name
+                        td= copy.exam.name
 
                         if "error" in answers
                             th 

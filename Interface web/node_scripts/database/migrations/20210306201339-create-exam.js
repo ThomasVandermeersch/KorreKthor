@@ -37,9 +37,9 @@ module.exports = {
       examFile:{
           type: DataTypes.STRING,
       },
-      userId:{
-        type: DataTypes.UUID,
-        allowNull: false
+      userMatricule:{
+        type: DataTypes.STRING,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

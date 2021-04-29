@@ -20,9 +20,9 @@ module.exports = {
       answers:{
         type: DataTypes.STRING(2048),
       },
-      userId: {
-        type: DataTypes.UUID,
-        allowNull: false
+      userMatricule: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
       examId: {
         type: DataTypes.UUID,

@@ -3,6 +3,8 @@ const { sendEmail } = require("nodejs-nodemailer-outlook");
 const { resolve } = require("path");
 const { User, Exam, Copy } = require("./database/models");
 const exam = require("./database/models/exam");
+const getUser = require("./getUser")
+const convertMatricule = require("./convertMatricule")
 
 const email = require('./sendEmail')
 
@@ -10,51 +12,58 @@ const email = require('./sendEmail')
 //copiesObject = {"zipFile": "78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip", "data": [{"qrcode": {"matricule": 17076, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, true], [true, true], [true, false, false], [true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_17076.png", "error": "None"}, {"qrcode": {"matricule": 14136, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false, false], [false, false, false], [false, true, false, false], [true, false, false, false], [false, false, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_14136.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_15154.png", "error": "None"}, {"qrcode": {"matricule": 17030, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, true, false], [false, true, true], [false, true, false], [false, true, true], [false, false, true], [false, true, false, false, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17036.png", "error": "None"}, {"qrcode": {"matricule": 17338, "version": "C", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [true, false, false, false], [false, true, false, false], [false, true, true, false], [false, true, true, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_17338.png", "error": "None"}, {"qrcode": {"matricule": 17325, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false], [false, true, false], [true, false, false], [false, true, false], [false, false, true], [true, false, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_17325.png", "error": "None"}, {"qrcode": {"matricule": 16027, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, false, false], [false, true], [false, false, true], [false, true, false, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_16027.png", "error": "None"}, {"qrcode": {"matricule": 19371, "version": "A", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[true, false, true], [false, false, true], [false, true, false], [false, true, true, false], [false, true, false], [false, false, true, true]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_A_19371.png", "error": "None"}, {"qrcode": {"matricule": 19286, "version": "B", "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"}, "answers": [[false, true, false], [false, true], [false, false, true], [false, true, false], [true, false, false]], "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_19286.png", "error": "None"}]}
 //correctAll(JSON.stringify(copiesObject))
 
-async function saveErrorCopy(copy, error, examId){
-    var user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
-    dbCopy = await Copy.findOne({where:{"examId":examId,"userId": user.id}})
+async function saveErrorCopy(copy, error, examId, req){
+    getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
+        dbCopy = await Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}})
 
-    if(dbCopy){
-        dbCopy.version = copy.qrcode.version, 
-        dbCopy.result = [0, 0], 
-        dbCopy.file = copy.file,
-        dbCopy.answers = JSON.stringify({"error":error})
-        dbCopy.save()
-        console.log('Resave copy')
-    }
-    else{
-        Copy.create({"userId": user.id, 
-                    "examId": examId, 
-                    "version": copy.qrcode.version, 
-                    "result": [0, 0], 
-                    "file": copy.file,
-                    "answers": JSON.stringify({"error":error})
-                })
-    }
+        if(dbCopy){
+            dbCopy.version = copy.qrcode.version, 
+            dbCopy.result = [0, 0], 
+            dbCopy.file = copy.file,
+            dbCopy.answers = JSON.stringify({"error":error})
+            dbCopy.save()
+            console.log('Resave copy')
+        }
+        else{
+            Copy.create({"userMatricule": user.matricule, 
+                        "examId": examId, 
+                        "version": copy.qrcode.version, 
+                        "result": [0, 0], 
+                        "file": copy.file,
+                        "answers": JSON.stringify({"error":error})
+                    })
+        }
+    }).catch(err=>{
+        console.log(err)
+    })
+    
 }
 
 
-async function saveCopy(copy,result,examId){
-    var user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})
-    dbCopy = await Copy.findOne({where:{"examId":examId,"userId": user.id}})
+async function saveCopy(copy,result,examId, req){
+    getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
+        dbCopy = await Copy.findOne({where:{"examId":examId, "userMatricule": user.matricule}})
 
-    if(dbCopy){
-        dbCopy.version = copy.qrcode.version, 
-        dbCopy.result =result, 
-        dbCopy.file = copy.file,
-        dbCopy.answers = JSON.stringify(copy.answers)
-        dbCopy.save()
-        console.log('Resave copy')
-    }
-    else{
-        Copy.create({"userId": user.id, 
-                    "examId":examId, 
-                    "version":copy.qrcode.version, 
-                    "result": result, 
-                    "file": copy.file,
-                    "answers": JSON.stringify(copy.answers)
-                })
-    }
+        if(dbCopy){
+            dbCopy.version = copy.qrcode.version, 
+            dbCopy.result =result, 
+            dbCopy.file = copy.file,
+            dbCopy.answers = JSON.stringify(copy.answers)
+            dbCopy.save()
+            console.log('Resave copy')
+        }
+        else{
+            Copy.create({"userMatricule": user.matricule, 
+                        "examId":examId, 
+                        "version":copy.qrcode.version, 
+                        "result": result, 
+                        "file": copy.file,
+                        "answers": JSON.stringify(copy.answers)
+                    })
+        }
+    }).catch(err=>{
+        console.log(err);
+    })
 }
 
 
@@ -92,7 +101,7 @@ async function reCorrect(examId){
     })
 }
 
-async function correctAll(exam, scanResultString){
+async function correctAll(exam, scanResultString, req){
     const scanResult = JSON.parse(scanResultString)
 
     // FIND THE EXAM RELATED TO THE EXAMID
@@ -112,13 +121,13 @@ async function correctAll(exam, scanResultString){
                     questionStatus[copy.qrcode.version],
                     correctionCriterias
             ).then(async result =>{
-                saveCopy(copy,result,exam.id)
+                saveCopy(copy,result,exam.id, req)
                 //email.sendResult(copy,result)
                 console.log(result)
             })
             .catch(err=>{
                 console.log(err+copy.qrcode.matricule)
-                saveErrorCopy(copy, "correction copy error", exam.id)
+                saveErrorCopy(copy, "correction copy error", exam.id, req)
             })
         }
     })    

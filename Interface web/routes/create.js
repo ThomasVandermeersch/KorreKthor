@@ -137,7 +137,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const files = JSON.parse(req.body.files)
 
     Exam.create({
-        "userId":req.session.userObject.id, 
+        "userMatricule":req.session.userObject.matricule, 
         "name":lessonName, 
         "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, 
         "versionsFiles":req.session.excelFile.versions, 
@@ -152,7 +152,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         }
 
         QCM_automatisation.createInvoice(students, lesson, answers, files, req.session.extraCopies)
-            .then((ret) => {
+            .then(async(ret) => {
                 // handle errors
                 if (ret.error){
                     exam.destroy()
@@ -177,7 +177,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
                     lastExclusiveFalse:0
                 })
 
-                exam.save()
+                await exam.save()
                 req.session["examId"] = exam.id
                 
                 //redirect

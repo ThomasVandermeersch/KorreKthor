@@ -7,20 +7,26 @@ const matriculeConverter = require('../node_scripts/convertMatricule')
 const getUser = require('../node_scripts/getUser')
 
 router.get("/", access.hasAccess, async (req, res) => {
-    userid = req.session.userObject.id
-    var exams;
-    var examCopies;
+    const userMatricule = req.session.userObject.matricule
 
-    if (req.session.userObject.authorizations == 0){
-        exams = await Exam.findAll({order:["createdAt"]})
-        examCopies = []
-    }
-    else {
-        exams = await Exam.findAll({where:{userId:userid}, order:["createdAt"]})
-        examCopies = await Copy.findAll({where:{userId:userid}, order:["createdAt"], include:[{model:User, as:'user'}, {model:Exam, as:'exam'}]})
-    }   
+    if (req.session.userObject.authorizations == 0) query = {order:[["createdAt", "DESC"]]}
+    else query = {where:{userMatricule:userMatricule}, order:[["createdAt", "DESC"]]}
+    
+    Exam.findAll(query).then(exams=>{
+        console.log(exams)
+        if (req.session.userObject.authorizations != 0) {
+            query.include = [{model:Exam, as:'exam', attributes:["name"]}]
+            Copy.findAll(query).then(copies=>{
+                return res.render("see/showExams", {exams:exams, copies:copies})
+            })
+        }
+        else return res.render("see/showExams", {exams:exams, copies:[]})
 
-    res.render("see/showExams", {exams:exams, copies:examCopies})
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- SEE/ ---\n " + err)
+        req.flash('errormsg', 'Database error error, error : 1017')
+        res.redirect('/error')
+    })
 })
 
 router.get("/copies/:examid", access.hasAccess, async (req, res) => {
@@ -32,7 +38,7 @@ router.get("/copies/:examid", access.hasAccess, async (req, res) => {
         examCopies = await exam.getCopies()
     }
     else {
-        exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id}})
+        exam = await Exam.findOne({where:{id:req.params.examid, userMatricule:req.session.userObject.matricule}})
         examCopies = await exam.getCopies()
     } 
 
@@ -51,10 +57,10 @@ router.get("/copies/:examid", access.hasAccess, async (req, res) => {
 router.get("/exam/:examid", access.hasAccess, async (req, res) => {
     var exam;
     if (req.session.userObject.authorizations == 0){
-        var exam = await Exam.findOne({where:{id:req.params.examid}, include:[{model:User, as:"user"}]})
+        var exam = await Exam.findOne({where:{id:req.params.examid}, })
     }
     else{
-        var exam = await Exam.findOne({where:{id:req.params.examid, userId:req.session.userObject.id, }, include:[{model:User, as:"user"}]})
+        var exam = await Exam.findOne({where:{id:req.params.examid, userMatricule:req.session.userObject.matricule, include:{model:User, as:"user"}}, include:[{model:User, as:"user"}]})
     }
 
     if (exam){
