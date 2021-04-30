@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import math
 from pyzbar.pyzbar import decode
 import json
-
+import os
 
 def process(imgPath):
     """
@@ -14,7 +14,8 @@ def process(imgPath):
     """
     img_rgb = cv2.imread(imgPath)
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-    # img = cv2.resize(img, (710, 1024), interpolation=cv2.INTER_LINEAR)
+    ratio  = img.shape[1]/1191
+    img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
 
     # img[img>190] = 255
     # cv2.imshow("img", img)
@@ -22,16 +23,18 @@ def process(imgPath):
     # cv2.destroyAllWindows()
 
     goodPage = isGoodPage(img)
-
+    print(f" {imgPath}")
     if goodPage:
         if not getGoodOrientation(img, goodPage):
             print("Make a rotation of 180 degrees...")
             img = cv2.rotate(img, cv2.ROTATE_180)
-    
-        return getImageResponses(img)
 
-    else: 
-        return None
+        resp = getImageResponses(img)
+        if resp:
+            cv2.imwrite(imgPath, img)
+            return resp
+
+    return None
 
 
 def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8):
@@ -43,9 +46,12 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    template = cv2.resize(template, (150, 150), interpolation=cv2.INTER_LINEAR)
+    template = cv2.resize(template, (140, 140), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", template)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
+    # cv2.imshow("img", img)
     # cv2.waitKey(delay=5000)
     # cv2.destroyAllWindows()
 
@@ -59,16 +65,18 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     points = []
     prev = (0,0)
     for pt in zip(*loc[::-1]):
+        # cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,0), 5)
         distance = math.sqrt(((pt[0]-prev[0])**2)+((pt[1]-prev[1])**2))
-
+        
         if distance > minDistance : 
             points.append(pt)
 
         prev = pt
-    
+
     if(len(points) >= 3 ) :
         return points
 
+    print("Not a good page")
     return False
 
 def getGoodOrientation(img, squaresLocations, margin=0.8):
@@ -85,7 +93,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.8, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.8):
+def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.85):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -95,23 +103,34 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     - The emptyThreshold param is the resemblance ratio between the empty template and a block in the image
     """
     emptyTemplate = cv2.imread(emptyTemplatePath, 0)
-    emptyTemplate = cv2.resize(emptyTemplate, (100,100), interpolation=cv2.INTER_LINEAR)
+    emptyTemplate = cv2.resize(emptyTemplate, (45, 45), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", emptyTemplate)
     # cv2.waitKey(delay=5000)
     # cv2.destroyAllWindows()
+    # cv2.imshow("img", img)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
 
     fullTemplate = cv2.imread(fullTemplatePath, 0)
-    fullTemplate = cv2.resize(fullTemplate, (150,150), interpolation=cv2.INTER_LINEAR)
+    fullTemplate = cv2.resize(fullTemplate, (60, 60), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", fullTemplate)
     # cv2.waitKey(delay=5000)
     # cv2.destroyAllWindows()
 
-    emptyListe = getPatternList(img, emptyTemplate, emptyThreshold, 50)
-    fullListe = getPatternList(img, fullTemplate, fullThreshold, 70)
+    emptyListe = getPatternList(img, emptyTemplate, emptyThreshold, 25)
+    fullListe = getPatternList(img, fullTemplate, fullThreshold, 35)
 
-    boolArray = getBoolArray(emptyListe, fullListe, 50)
+    w, h = fullTemplate.shape[::-1]
+
+    for i in fullListe:
+        cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
+
+    for i in emptyListe:
+        cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
+
+    boolArray = getBoolArray(emptyListe, fullListe, 25)
     return boolArray
 
 def getPatternList(img, template, threshold, minDistance):
@@ -157,8 +176,9 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     if len(emptyListe) == 0 and len(fullListe) == 0:
         return None
 
-    xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else []
-    xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else []
+    
+    xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else [(), ()]
+    xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else [(), ()]
 
     xMin = min(xEmptyListe + xFullListe)
     xMax = max(xEmptyListe + xFullListe)
@@ -189,25 +209,29 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     sub = []
     for i in range(c):
         sub.append(False)
-    boolArray.append(sub)     
+    boolArray.append(sub)  
+
+    print("bool end", boolArray)   
 
     # get the size of the biggest liste in the boolArray
     maxVal = len(max(boolArray, key = lambda i: len(i)))
 
     for i in sortedListe:
         # x is interpolated between xMin and xMax -> estimation where the point i[0] is on the question line
-        x = round(np.interp(i[0], [xMin, xMax], [1, maxVal])) - 1
+        vx = np.interp(i[0], [xMin, xMax], [1, maxVal])
+        x = round(vx) - 1
         # y is interpolated between yMin and yMax -> estimation where the question line is
-        y = round(np.interp(i[1], [yMin, yMax], [1, len(boolArray)])) - 1
+        vy = np.interp(i[1], [yMin, yMax], [1, len(boolArray)])
+        y = round(vy) - 1 
 
         if i in fullListe:
+            x = len(boolArray[y]) - 1 if x >= len(boolArray[y]) - 1 else x
             boolArray[y][x] = True
             
     return boolArray
     
 def decodeQRCode(imagePath):
     preQRCode = decode(cv2.imread(imagePath))
-
     if len(preQRCode) == 0:
         return None
     

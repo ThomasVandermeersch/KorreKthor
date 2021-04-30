@@ -6,3 +6,4 @@ PyMuPDF
 PyPDF2
 pyzbar
 bottle
+bottle-fdsend

@@ -13,6 +13,10 @@
       - [With migrations](#with-migrations)
   - [How to use the app](#how-to-use-the-app)
   - [Student list format](#student-list-format)
+- [Python image processing](#python-image-processing)
+  - [Setup](#setup)
+  - [Run the pdf processing method](#run-the-pdf-processing-method)
+  - [Accessing the zip file](#accessing-the-zip-file)
 - [Code structure](#code-structure)
 
 
@@ -191,11 +195,62 @@ The student list must contain at least 3 columns :
 - *version*
 
 
-Here is an example of stuent list :
+Here is an example of student list :
 
 ![Student list exemple](Images/StudentList.png)
 
 
+## Python image processing
+
+### Setup
+To setup the python server you need to be in the **Traitement_images/** folder and then run:
+```cmd
+$ pip install -r requirements.txt
+```
+> Note : Using a virtual environement is a good practice.
+
+Finally, run :
+```cmd
+$ python server.py
+```
+
+### Run the pdf processing method
+
+You need to make a *POST* request to the python server running on `0.0.0.0:8080/run`. With form-data as follows:
+```json
+{
+  "my_file":UPLOAD_YOUR_FILE
+}
+```
+
+The response is the form :
+```json
+{
+    "zipFile": "78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip",
+    "data": [
+        {
+            "qrcode": {
+                "matricule": 17076,
+                "version": "B",
+                "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"
+            },
+            "answers": [...],
+            "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_17076.png",
+            "error": "None"
+        },
+        {
+          "error" : "No answers scanned in From_PDF/78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_14136.png"
+        },
+        {
+          ...
+        },
+    ]
+}
+```
+
+### Accessing the zip file 
+
+The zip file is available on `http://0.0.0.0:8080/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
 ## Code structure
 The main file to run is in "Interface Web"/
 

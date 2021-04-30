@@ -1,4 +1,9 @@
 virtualenv/
 
 __pycache__/
-*.py[cod]
+*.pyc
+*.cpython-39.pyc
+
+saves/
+From_PDF/
+zips/
