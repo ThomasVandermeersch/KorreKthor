@@ -36,15 +36,15 @@ def compute(pdf):
                     else :
                         qrcode = process_img.decodeQRCode(img)
 
-                        if qrcode == None:
-                            jsonToSend.append({"error" : f"{img} has no Enable QR Code"})
+                        if qrcode and "version" in qrcode and "matricule" in qrcode and "lessonId" in qrcode:
+                            jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img, "error" : "None"})
+                        else:
+                            jsonToSend.append({"error" : f"{img} has no correct QR Code"})
                         
-                        jsonToSend.append({"student":qrcode, "answers":answers, "file":img, "error" : "None"})
 
 
     print(json.dumps(jsonToSend))
     print("\nTranslation done!\n")
     return json.dumps(jsonToSend)
 
-
-compute("SAVE.pdf")
+compute("scan_result.pdf")
