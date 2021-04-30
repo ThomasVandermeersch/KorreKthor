@@ -23,10 +23,11 @@ div(class="container page create")
             div(class="col-12 col-md-4")
                 input(class="form-control" id="extraCopies" type="number" name="extraCopies" min=0 value=10)
         
+        if messages.errormsg
+            div(class="alert alert-danger mt-2" role="alert")= messages.errormsg
+
         div(class="my-3 float-end")
             input(class="btn btn-warning" type="submit", value="Soumettre et continuer")
 
-    if messages.errormsg
-        div(class="alert alert-danger mt-2" role="alert")= messages.errormsg
 
 include ../footer.pug

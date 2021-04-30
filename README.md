@@ -1,6 +1,12 @@
 # KorreKthor <!-- omit in TOC -->
 
-- [](#)
+- [Run for production](#run-for-production)
+  - [Setting up](#setting-up)
+    - [Dotenv file](#dotenv-file)
+    - [SSL certificates](#ssl-certificates)
+  - [Deployment](#deployment)
+  - [Images](#images)
+  - [Data](#data)
 - [Database](#database)
   - [Set-up the database](#set-up-the-database)
   - [Access the database](#access-the-database)
@@ -19,11 +25,11 @@
   - [Accessing the zip file](#accessing-the-zip-file)
 - [Code structure](#code-structure)
 
-
 ## Run for production
 
 ### Setting up
 
+First thing first, clone this github repo in `/` (for example).
 #### Dotenv file
 
 Please consider creating a `.env` file in `/Interface web/` folder with the database informations. The `.env` file must contains :
@@ -42,6 +48,8 @@ Please consider creating a `.env` file in `/Interface web/` folder with the data
 - POSTGRES_DATABASE_dev (for development only)
 - POSTGRES_HOST_dev (for development only)
 - POSTGRES_PORT_dev (for development only)
+- PYTHON_SERVER_HOST
+- PYTHON_SERVER_PORT
   
 #### SSL certificates
 
@@ -55,7 +63,7 @@ Place the key.perm and the cert.pem in a new folder located in `/Interface web/c
 
 ### Deployment
 
-First thing first, you need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
+You need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
 
 Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/`):
 ```
@@ -86,6 +94,9 @@ The KorreKthor app runs on multiple docker images :
 - korrekthor_backend
 - korrekthor_img_processing
 
+### Data
+
+You can access the docker data in the `/data` folder. The `db/` folder saves the database files and the `files/` folder saves the image processing files.
 
 ## Database
 ### Set-up the database

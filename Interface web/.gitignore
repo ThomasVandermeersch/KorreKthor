@@ -8,5 +8,5 @@ certificates/
 downloads/
 zips/*
 copies/*
-uploads/
+uploads/*
 test*.js

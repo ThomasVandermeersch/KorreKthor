@@ -2,7 +2,7 @@ var nodeoutlook = require('nodejs-nodemailer-outlook')
 const { User, Exam, Copy } = require("./database/models");
 
 
-console.log(process.env.EMAIL_ADDRESS)
+// console.log(process.env.EMAIL_ADDRESS)
 
 async function sendResult(copy,result){
     user = await User.findOne({where:{"matricule":String(copy.qrcode.matricule)}})

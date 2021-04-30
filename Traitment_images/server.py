@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from fdsend import send_file
 import io
+import sys
 
 @get("/")
 def resp():
@@ -26,5 +27,5 @@ def index():
 def send_static(filename):
     return static_file(filename, root='./zips')
 
-run(host='0.0.0.0', port=8080)
+run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
 

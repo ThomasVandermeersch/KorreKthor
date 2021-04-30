@@ -35,22 +35,22 @@ const msalConfig = {
     }
   };
   
-  app = express()
+app = express()
 
-  // Create msal application object
-  app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
+// Create msal application object
+app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
 
-  app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    unset: 'destroy',
-    cookie: {
-      expires: 1000 * 60 * 45 //La sesssion expire après 45 minutes d'inactivité
-    }
-  }));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  unset: 'destroy',
+  cookie: {
+    expires: 1000 * 60 * 45 //La sesssion expire après 45 minutes d'inactivité
+  }
+}));
 
-  app.use(flash());
+app.use(flash());
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -86,11 +86,15 @@ app.get("*", access.hasAccess, function (req, res) {
 });
 
 
-
 // Application https port 9898
 const httpsServer = https.createServer(credentials, app)
 
 httpsServer.listen(9898)
-console.log("Running KorrKthor on: " + env)
-console.log("Listening on: https://localhost:9898/")
-console.log("PostgrSQL host: " + config.host + ":" + config.port )
+
+console.log("-------------------------------------")
+console.log("| RUNNING KorrKthor on: " + env + " |")
+console.log("-------------------------------------")
+console.log(" [Listening] https://localhost:9898/")
+console.log(" [PostgrSQL]    " + config.host + ":" + config.port +"/")
+console.log(" [Python]     http://" + process.env.PYTHON_SERVER_HOST + ":" + process.env.PYTHON_SERVER_PORT + "/" )
+console.log("-------------------------------------")

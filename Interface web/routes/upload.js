@@ -20,6 +20,8 @@ var storage = multer.diskStorage(
 )
 var upload = multer({ storage: storage})
 
+const url = `http://${process.env.PYTHON_SERVER_HOST}:${process.env.PYTHON_SERVER_PORT}`
+
 // Call the python server (for correction)
 function callCorrection(filename, exam, req){
     const formData = {
@@ -27,7 +29,7 @@ function callCorrection(filename, exam, req){
 		my_file: fs.createReadStream(`uploads/${filename}`),
 	}
     
-    request.post({url:'http://localhost:8080/run', formData:formData}, function (err, httpResponse, body) {
+    request.post({url:`${url}/run`, formData:formData}, function (err, httpResponse, body) {
         if (err){
             exam.status = 3 // 3 = correction error
             exam.save()
@@ -36,7 +38,7 @@ function callCorrection(filename, exam, req){
             zipFile = JSON.parse(body).zipFile
             const file = fs.createWriteStream(`zips/${zipFile}`);
             
-            http.get(`http://localhost:8080/static/${zipFile}`, function(response) {
+            http.get(`${url}/static/${zipFile}`, function(response) {
                 response.pipe(file);
             });
             
