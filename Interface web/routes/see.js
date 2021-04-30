@@ -11,7 +11,7 @@ router.get("/", access.hasAccess, async (req, res) => {
 
     if (req.session.userObject.authorizations == 0) query = {order:[["createdAt", "DESC"]]}
     else query = {where:{userMatricule:userMatricule}, order:[["createdAt", "DESC"]]}
-    
+
     Exam.findAll(query).then(exams=>{
         console.log(exams)
         if (req.session.userObject.authorizations != 0) {

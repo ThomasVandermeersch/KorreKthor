@@ -4,9 +4,9 @@ version: '3.1'
 services:
   db:
     image: postgres
-    restart: always
+    # restart: always
     ports:
-      - 5433:5432
+      - 5433:5432 # External access to db on 5433, local access on 5432
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -15,6 +15,23 @@ services:
 
   adminer:
     image: adminer
-    restart: always
+    # restart: always
     ports:
       - 1880:8080
+
+  backend:
+    build: ./Interface web/
+    # restart: always
+    ports: 
+      - 9898:9898
+
+    depends_on:
+      - db
+  
+  processing:
+    build: ./Traitement_images/
+    # restart: always
+    ports: 
+      - 8081:8081
+
+      

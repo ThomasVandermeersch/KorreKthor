@@ -15,4 +15,9 @@ router.get("/noAccess", access.hasAccess, function(req,res){
         res.render('index/noAccess')    
 });
 
+router.get("/unloggederror", function(req,res){
+        res.status(403)    
+        res.render('index/error')    
+});
+
 module.exports = router

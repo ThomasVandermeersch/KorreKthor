@@ -42,7 +42,6 @@ function getUser( email , req, createIfNotExist = true){
             }
         })
         .catch(err=>{
-            console.log('Database problem')
             reject(err)
         })
     })    

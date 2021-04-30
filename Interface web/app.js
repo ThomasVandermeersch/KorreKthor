@@ -8,6 +8,8 @@ const https = require('https');
 const fs = require("fs");
 const access = require('./node_scripts/hasAccess')
 require('dotenv').config();
+const env = process.env.NODE_ENV || 'development';
+const config = require('./node_scripts/database/config/config')[env]
 
 var credentials = {
   key: fs.readFileSync("certificates/key.pem"),
@@ -89,5 +91,6 @@ app.get("*", access.hasAccess, function (req, res) {
 const httpsServer = https.createServer(credentials, app)
 
 httpsServer.listen(9898)
-console.log("Listening on : https://localhost:9898/")
-console.log("PostgrSQL host : " + process.env.POSTGRES_HOST )
+console.log("Running KorrKthor on: " + env)
+console.log("Listening on: https://localhost:9898/")
+console.log("PostgrSQL host: " + config.host + ":" + config.port )

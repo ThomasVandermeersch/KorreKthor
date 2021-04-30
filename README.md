@@ -1,5 +1,6 @@
 # KorreKthor <!-- omit in TOC -->
 
+- [](#)
 - [Database](#database)
   - [Set-up the database](#set-up-the-database)
   - [Access the database](#access-the-database)
@@ -14,29 +15,78 @@
   - [Student list format](#student-list-format)
 - [Code structure](#code-structure)
 
-## Database
-### Set-up the database
-The KorreKthor app runs on a docker PostgreSQL database. 
 
-So, first thing first, you need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
+## Run for production
+
+### Setting up
+
+#### Dotenv file
+
+Please consider creating a `.env` file in `/Interface web/` folder with the database informations. The `.env` file must contains :
+- NODE_ENV (equal to development or production)
+- OAUTH_APP_ID
+- OAUTH_APP_SECRET
+- OAUTH_REDIRECT_URI
+- OAUTH_SCOPES
+- OAUTH_AUTHORITY
+- SESSION_SECRET
+- POSTGRES_PASSWORD
+- POSTGRES_USER
+- POSTGRES_DATABASE_prod (for production only)
+- POSTGRES_HOST_prod (for production only)
+- POSTGRES_PORT_prod (for production only)
+- POSTGRES_DATABASE_dev (for development only)
+- POSTGRES_HOST_dev (for development only)
+- POSTGRES_PORT_dev (for development only)
+  
+#### SSL certificates
+
+If you don't have any certificates provided by a CA you can generate them yourself with openssl as follow :
+
+```
+$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
+
+Place the key.perm and the cert.pem in a new folder located in `/Interface web/certificates/`
+
+### Deployment
+
+First thing first, you need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
 
 Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/`):
 ```
-docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
+$ docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
 ```
-> Note: Please consider creating a `.env` file in `/Interface web/` folder with the database informations. The `.env` file must contains :
-POSTGRES_PASSWORD, 
-POSTGRES_USER,
-POSTGRES_DATABASE,
-POSTGRES_HOST,
-POSTGRES_PORT values.
->
-> Note 2: The database files are stored in `/db/data/`.
 
-To stop the database don't forget to run:
+> Note: The database files are stored in `/db/data/`.
+
+To stop the app don't forget to run:
 ```
 $ docker-compose -f docker-compose.yml down
 ```
+
+If you want to update some docker container after updating the code, run:
+```
+$ docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up --build
+```
+
+You're now able use the KorreKthor app. Open your favourite web browser and access https://localhost:9898  
+
+### Images
+
+The KorreKthor app runs on multiple docker images :
+
+- postgres
+- adminer
+- node
+- korrekthor_backend
+- korrekthor_img_processing
+
+
+## Database
+### Set-up the database
+
+You can set up your own database without docker. To do so, you just need to install PostgreSQL and update the `.env` file with your database informations.
 ### Access the database
 To access the database it's recommended to install [pgAdmin4](https://www.pgadmin.org/) (a browser for PostgreSQL database). 
 But, if you don't have any database browser you can use the docker PostgreSQL built-in browser named [adminer](https://www.adminer.org/) and listening on port **1880**. 
@@ -44,6 +94,8 @@ But, if you don't have any database browser you can use the docker PostgreSQL bu
 The PostgreSQL server listen on the port you specified in the `.env` file with the user and password also specified. 
 
 ## Web interface
+
+If you want to run the Web interface by your own (without docker) you can follow these steps in the `/Interface web/` folder. 
 ### Install dependencies
 ````
 $ npm install
@@ -54,7 +106,7 @@ Only if you're building the whole project, you need to apply the migations (crea
 $ sequelize db:create
 $ sequelize db:migrate
 ```
-> Note: if an error occurred try `export NODE_ENV=developement` before running the above commands.
+> Note: if an error occurred try `export NODE_ENV=development` before running the above commands.
 
 Run :
 ````cmd
@@ -115,7 +167,7 @@ Then, run:
 $ sequelize db:migrate:undo // To undo the migration
 $ sequelize db:migrate // To apply the new migration
 ```
-> Note: if an error occurred try `export NODE_ENV=developement` before running the migation(s)
+> Note: if an error occurred try `export NODE_ENV=development` before running the migation(s)
 
 ### How to use the app
 First, open your favorit browser and enter this url : http://localhost:8000/.

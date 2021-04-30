@@ -3,8 +3,10 @@ package-lock.json
 .pdf
 pre_pdf/
 .env
+.env.prod
 certificates/
 downloads/
 zips/*
 copies/*
 uploads/
+test*.js

@@ -52,6 +52,11 @@ router.get('/callback',
         //REDIRECTION
         if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])
         else res.redirect('/');
+
+      }).catch(err=>{
+        console.log(" --- INTERNAL ERROR -- auth/callback ---\n " + err)
+        req.flash('errormsg', 'Internal error while logging in, error : 1018')
+        return res.redirect('/unloggederror')
       })
     } catch(error) {
       console.log(error)
