@@ -29,10 +29,10 @@
 
 ### Setting up
 
-First thing first, clone this github repo in `/` (for example).
+First thing first, clone this github repo in `/` (for example). Then you have the code in `/KorreKthor/`
 #### Dotenv file
 
-Please consider creating a `.env` file in `/Interface web/` folder with the database informations. The `.env` file must contains :
+Please consider creating a `.env` file in `/KorreKthor/Interface web/` folder with the database informations. The `.env` file must contains :
 - NODE_ENV (equal to development or production)
 - OAUTH_APP_ID
 - OAUTH_APP_SECRET
@@ -43,12 +43,12 @@ Please consider creating a `.env` file in `/Interface web/` folder with the data
 - POSTGRES_PASSWORD
 - POSTGRES_USER
 - POSTGRES_DATABASE_prod (for production only)
-- POSTGRES_HOST_prod (for production only)
+- POSTGRES_HOST_prod (for production only, equal to db or localhost or remote postgres address)
 - POSTGRES_PORT_prod (for production only)
 - POSTGRES_DATABASE_dev (for development only)
 - POSTGRES_HOST_dev (for development only)
 - POSTGRES_PORT_dev (for development only)
-- PYTHON_SERVER_HOST
+- PYTHON_SERVER_HOST (equal to processing or localhost)
 - PYTHON_SERVER_PORT
   
 #### SSL certificates
@@ -59,18 +59,18 @@ If you don't have any certificates provided by a CA you can generate them yourse
 $ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 ```
 
-Place the key.perm and the cert.pem in a new folder located in `/Interface web/certificates/`
+Place the key.perm and the cert.pem in a new folder located in `/KorreKthor/Interface web/certificates/`
 
 ### Deployment
 
 You need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
 
-Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/`):
+Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/KorreKthor/`):
 ```
 $ docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
 ```
 
-> Note: The database files are stored in `/db/data/`.
+> Note: The database files are stored in `/data/db/data/`.
 
 To stop the app don't forget to run:
 ```
@@ -110,7 +110,7 @@ The PostgreSQL server listen on the port you specified in the `.env` file with t
 
 ## Web interface
 
-If you want to run the Web interface by your own (without docker) you can follow these steps in the `/Interface web/` folder. 
+If you want to run the Web interface by your own (without docker) you can follow these steps in the `/KorreKthor/Interface web/` folder. 
 ### Install dependencies
 ````
 $ npm install
@@ -214,7 +214,7 @@ Here is an example of student list :
 ## Python image processing
 
 ### Setup
-To setup the python server you need to be in the **Traitement_images/** folder and then run:
+To setup the python server you need to be in the `/KorreKthor/Traitement_images/` folder and then run:
 ```cmd
 $ pip install -r requirements.txt
 ```
@@ -227,7 +227,7 @@ $ python server.py
 
 ### Run the pdf processing method
 
-You need to make a *POST* request to the python server running on `0.0.0.0:8080/run`. With form-data as follows:
+You need to make a *POST* request to the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/run`. With form-data as follows:
 ```json
 {
   "my_file":UPLOAD_YOUR_FILE
@@ -261,7 +261,7 @@ The response is the form :
 
 ### Accessing the zip file 
 
-The zip file is available on `http://0.0.0.0:8080/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
+The zip file is available on the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
 ## Code structure
 The main file to run is in "Interface Web"/
 
