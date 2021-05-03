@@ -29,11 +29,11 @@ div(class="container page")
                 th Matricule
                 th Cote (pts)
         tbody
-            each copy in copies 
-                - var point = Math.round(((copy.copy.result[0]/copy.copy.result[1])*20)*100)/100
-                - var answers = JSON.parse(copy.copy.answers)
+            each copy in exam.copies 
+                - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
+                - var answers = JSON.parse(copy.answers)
 
-                tr(onClick=`getCopyPreview("${ copy.copy.id }")` style="cursor: pointer;")
+                tr(onClick=`getCopyPreview("${ copy.id }")` style="cursor: pointer;")
                     if copy.user.fullName == ""
                         td(class="text-danger") -- Spécifier l'étudiant --
                             button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
