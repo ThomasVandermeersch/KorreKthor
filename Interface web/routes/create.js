@@ -4,10 +4,8 @@ const functions = require("../node_scripts/functions")
 const QCM_automatisation = require("../node_scripts/QCM_automatisation")
 const access = require('../node_scripts/hasAccess')
 const { Exam } = require("../node_scripts/database/models");
-const databaseTools = require("../node_scripts/databaseTools")
 const corrector = require('../node_scripts/correction')
 const { v4: uuidv4 } = require('uuid');
-const getUser = require("../node_scripts/getUser")
 
 var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(

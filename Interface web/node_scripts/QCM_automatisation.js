@@ -199,11 +199,4 @@ function generateCorection(answers) {
   });
 }
 
-// async function call(){
-//   const answers = JSON.parse('{"A": [[true, false, false], [false, false, true, false], [false, false, true, true]], "B": [[true, false,true, false], [false, true, false], [false, false, true]]}');
-//   const students = await functions.importStudents("./uploads/exemple_liste.xlsx")
-
-//   createInvoice(students, 'Math', answers);
-// }
-
 exports.createInvoice = createInvoice
