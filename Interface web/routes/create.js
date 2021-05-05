@@ -113,10 +113,16 @@ router.get("/Step5", access.hasAccess, function(req,res){
 router.post("/quest", upload.single("studentList"), async (req, res) => {
     const excelFile = req.session.excelFile.filename
     const lessonName = req.session.excelFile.lesson
+
+    if (!excelFile && !lessonName) {
+        req.flash('errormsg', "Somthing went wrong please retry, error 1014b");
+        res.redirect("/create/Step1")
+    }
+
     const students = await functions.importStudents(excelFile)
 
     if (!students || students.length < 1){
-        req.flash('errormsg', "Somthing went wrong with the student list, error 1014");
+        req.flash('errormsg', "Somthing went wrong with the student list, error 1014a");
         res.redirect("/create/Step1")
     }
 

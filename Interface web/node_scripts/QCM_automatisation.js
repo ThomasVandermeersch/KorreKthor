@@ -32,7 +32,7 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
 
   return new Promise((resolve, reject) => {
     students.forEach(async (student) => {
-      let doc = new PDFDocument();
+      let doc = new PDFDocument({size: 'A4'});
       let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
       generateTemplate(doc); //Mise des carés et d'un titre
@@ -121,12 +121,11 @@ function generateTemplate(doc) {
   /**
    * Fucntion that generate pdf template (top-left, top-right, bottom-left squares) for each student sheet
    */
-
-  doc.image("result_pdf/squares.PNG", 520, 20, { valign: "top" });
-  doc.image("result_pdf/squares.PNG", 20, 20, { valign: "top" });
-  doc.image("result_pdf/squares.PNG", 20, 700, { valign: "top" });
+  doc.image("result_pdf/squares.PNG", 530, 10, { valign: "top" });
+  doc.image("result_pdf/squares.PNG", 10, 10, { valign: "top" });
+  doc.image("result_pdf/squares.PNG", 10, 765, { valign: "top" });
   doc.fontSize(20);
-  doc.text("Feuilles de réponses", 110, 57, { align: "center" });
+  doc.text("Feuilles de réponses", 105, 47, { align: "center" });
   doc.moveDown();
 }
 
@@ -137,16 +136,16 @@ function generateHeader(doc, student, lesson, writeStream) {
 
    date = new Date();
    doc.fontSize(10)
-   doc.text(`Nom et prénom: ${student.name}`, 140, 120);
-   doc.text(`Matricule: ${student.matricule}`, 140, 135);
-   doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 150);
-   doc.text(`Cours: ${lesson.name}`, 140, 165);
-   doc.text(`Version: ${student.version}`, 140, 180);
+   doc.text(`Nom et prénom: ${student.name}`, 140, 75);
+   doc.text(`Matricule: ${student.matricule}`, 140, 90);
+   doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
+   doc.text(`Cours: ${lesson.name}`, 140, 120);
+   doc.text(`Version: ${student.version}`, 140, 135);
 
    // QRCode generator
    studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
    QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
-     doc.image('pre_pdf/' + student.matricule + ".png", 50, 115, { scale: 0.40 });
+     doc.image('pre_pdf/' + student.matricule + ".png", 55, 70, { scale: 0.40 });
      doc.pipe(writeStream);
      doc.end();
    })
@@ -157,12 +156,22 @@ function generateTable(doc, answers) {
    * Function that generate table for the answers 
    */
 
+  const alph = "ABCDEFGHIJ" 
+  var max = 0
+  doc.fontSize(10);
+
   for (question = 0; question < answers.length; question++) {
-    doc.fontSize(10);
-    doc.text("Question " + (question + 1).toString() + " :", 125, 252 + (question * 25));
+    if (max < answers[question].length) max = answers[question].length
+
+    doc.text("Question " + (question + 1).toString() + " :", 60, 174 + (question * 20));
     for (answer = 0; answer < answers[question].length; answer++) {
-      doc.image("result_pdf/vide.PNG", 200 + (answer * 35), 245 + (question * 25));
+      doc.image("result_pdf/vide.PNG", 135 + (answer * 35), 170 + (question * 20), {scale: 0.15});
     }
+  }
+
+  doc.fontSize(13);
+  for (letter = 0; letter < max; letter++) {
+    doc.text(alph[letter], 138 + (letter * 35), 155);
   }
 }
 
@@ -175,18 +184,18 @@ function generateCorection(answers) {
   version.forEach((letter) => {
     let correction = new PDFDocument();
 
-    correction.fontSize(14);
-    correction.text("Correctif version : " + letter, 110, 57, { align: "center" });
+    correction.fontSize(10);
+    correction.text("Correctif version " + letter, 110, 57, { align: "center" });
     Qindex = 0;
     answers[letter].forEach((questions) => {
       Aindex = 0;
-      correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString(), 125, 252 + Qindex * 25);
+      correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString() + " :", 50, 105 + Qindex * 20);
       questions.forEach((answer) => {
         if (answer == true) {
-          correction.image("result_pdf/rempli.PNG", 250 + (Aindex * 35), 245 + (Qindex * 25))
+          correction.image("result_pdf/rempli.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
         }
         else {
-          correction.image("result_pdf/vide.PNG", 250 + (Aindex * 35), 245 + (Qindex * 25))
+          correction.image("result_pdf/vide.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
         }
         Aindex++;
       });

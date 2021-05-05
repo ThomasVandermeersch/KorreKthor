@@ -51,7 +51,7 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
         var table = item.parentNode.parentNode.childNodes[1]
         var nbRows = table.rows.length
 
-        if (nbRows < 20){
+        if (nbRows < 30){
             var row = table.insertRow()
             row.insertCell(0).innerHTML = "Question " + (nbRows + 1)
 

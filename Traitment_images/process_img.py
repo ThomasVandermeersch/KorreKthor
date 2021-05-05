@@ -17,11 +17,6 @@ def process(imgPath):
     ratio  = img.shape[1]/1191
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
 
-    # img[img>190] = 255
-    # cv2.imshow("img", img)
-    # cv2.waitKey(delay=5000)
-    # cv2.destroyAllWindows()
-
     goodPage = isGoodPage(img)
     print(f" {imgPath}")
     if goodPage:
@@ -30,6 +25,11 @@ def process(imgPath):
             img = cv2.rotate(img, cv2.ROTATE_180)
 
         resp = getImageResponses(img)
+
+        # cv2.imshow("img", img)
+        # cv2.waitKey(delay=5000)
+        # cv2.destroyAllWindows()
+
         if resp:
             cv2.imwrite(imgPath, img)
             return resp
@@ -46,7 +46,7 @@ def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8)
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    template = cv2.resize(template, (140, 140), interpolation=cv2.INTER_LINEAR)
+    # template = cv2.resize(template, (140, 140), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", template)
     # cv2.waitKey(delay=5000)
@@ -103,7 +103,8 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     - The emptyThreshold param is the resemblance ratio between the empty template and a block in the image
     """
     emptyTemplate = cv2.imread(emptyTemplatePath, 0)
-    emptyTemplate = cv2.resize(emptyTemplate, (45, 45), interpolation=cv2.INTER_LINEAR)
+    emptyTemplate = cv2.resize(emptyTemplate, (30, 30), interpolation=cv2.INTER_LINEAR)
+
 
     # cv2.imshow("img", emptyTemplate)
     # cv2.waitKey(delay=5000)
@@ -113,7 +114,7 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     # cv2.destroyAllWindows()
 
     fullTemplate = cv2.imread(fullTemplatePath, 0)
-    fullTemplate = cv2.resize(fullTemplate, (60, 60), interpolation=cv2.INTER_LINEAR)
+    fullTemplate = cv2.resize(fullTemplate, (30, 30), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", fullTemplate)
     # cv2.waitKey(delay=5000)
@@ -124,6 +125,8 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
 
     w, h = fullTemplate.shape[::-1]
 
+    print(fullListe)
+    print(emptyListe)
     for i in fullListe:
         cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
 

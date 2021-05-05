@@ -27,5 +27,7 @@ def index():
 def send_static(filename):
     return static_file(filename, root='./zips')
 
-run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
+
+main.compute("./saves/Exam_67dcfcd8-2141-4dc2-b0d2-9fd275102774.pdf")
+# run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
 
