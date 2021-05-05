@@ -2,167 +2,202 @@ const { User, Exam, Copy } = require("./database/models");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
-async function saveErrorCopy(copy, error, examId, req){
-    getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
-        dbCopy = await Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}})
-
-        if(dbCopy){
-            dbCopy.version = copy.qrcode.version, 
-            dbCopy.result = [0, 0], 
-            dbCopy.file = copy.file,
-            dbCopy.answers = JSON.stringify({"error":error})
-            dbCopy.save()
-            console.log('Resave copy')
-        }
-        else{
-            Copy.create({"userMatricule": user.matricule, 
-                        "examId": examId, 
-                        "version": copy.qrcode.version, 
-                        "result": [0, 0], 
-                        "file": copy.file,
-                        "answers": JSON.stringify({"error":error})
-                    })
-        }
-    }).catch(err=>{
-        console.log(err)
-    })
-    
-}
-
-async function saveCopy(copy, result, examId, req){
-    getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
-        dbCopy = await Copy.findOne({where:{"examId":examId, "userMatricule": user.matricule}})
-
-        if(dbCopy){
-            dbCopy.version = copy.qrcode.version, 
-            dbCopy.result =result, 
-            dbCopy.file = copy.file,
-            dbCopy.answers = JSON.stringify(copy.answers)
-            dbCopy.save()
-            console.log('Resave copy')
-        }
-        else{
-            Copy.create({"userMatricule": user.matricule, 
-                        "examId":examId, 
-                        "version":copy.qrcode.version, 
-                        "result": result, 
-                        "file": copy.file,
-                        "answers": JSON.stringify(copy.answers)
-                    })
-        }
-    }).catch(err=>{
-        console.log(err);
-    })
-}
-
-//called to recorrect after criteria changes
-async function reCorrect(examId){
-    return new Promise(async(resolve,reject)=>{
-        const exam = await Exam.findOne({where:{id:examId}})
-        const copies = await Copy.findAll({where:{examId:examId}})
-        const corrections = JSON.parse(exam.corrections)
-        const questionStatus = JSON.parse(exam.questionStatus)
-        const correctionCriterias = JSON.parse(exam.correctionCriterias)
-        
-        copies.forEach((copy)=>{
-            
-            console.log(corrections[copy.version])
-            console.log(copy.answers)
-            correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
-            .then(async result=>{
-                console.log('OK')
-                console.log(result)
-                dbCopy = await Copy.findOne({where:{id:copy.id}})
-                dbCopy.result = result
-                await dbCopy.save()
-            })
-            .catch(async err=>{
-                console.log('KO')
-                dbCopy = await Copy.findOne({where:{id:copy.id}})
-                dbCopy.result = [0, 0]
-                dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
-                reject(err)
-            })
+function saveCopy(copy, result, examId, req, error=null){
+    getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(user=>{
+        Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}}).then(dbCopy=>{
+            var answers
+            if(error) answers = JSON.stringify({"error":error})
+            else answers = JSON.stringify(copy.answers)
+            if(dbCopy){
+                dbCopy.version = copy.qrcode.version, 
+                dbCopy.result = result, 
+                dbCopy.file = copy.file,
+                dbCopy.answers = answers
+                dbCopy.save().catch(err=>{
+                    console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
+                })
+            }
+            else{
+                Copy.create({"userMatricule": user.matricule, 
+                            "examId": examId, 
+                            "version": copy.qrcode.version, 
+                            "result": result, 
+                            "file": copy.file,
+                            "answers": answers
+                        }).catch(err=>{
+                            console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
+                        })
+            }
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
         })
-        resolve('Done')
+    }).catch(err=>{
+        console.log(" --- GRAPH ERROR -- Function correction/saveCopy --\n " + err)
+    })
+}
+
+// async function saveCopy(copy, result, examId, req){
+//     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
+//         dbCopy = await Copy.findOne({where:{"examId":examId, "userMatricule": user.matricule}})
+
+//         if(dbCopy){
+//             dbCopy.version = copy.qrcode.version, 
+//             dbCopy.result =result, 
+//             dbCopy.file = copy.file,
+//             dbCopy.answers = JSON.stringify(copy.answers)
+//             dbCopy.save()
+//             console.log('Resave copy')
+//         }
+//         else{
+//             Copy.create({"userMatricule": user.matricule, 
+//                         "examId":examId, 
+//                         "version":copy.qrcode.version, 
+//                         "result": result, 
+//                         "file": copy.file,
+//                         "answers": JSON.stringify(copy.answers)
+//                     })
+//         }
+//     }).catch(err=>{
+//         console.log(err);
+//     })
+// }
+
+// This function is called when correction criterias or question status are changed
+function reCorrect(examId){
+    return new Promise((resolve,reject)=>{
+        const query = {where:{id:examId}, include:[{model:Copy, as:"copies"}]}
+        Exam.findOne(query).then(exam=>{
+            const corrections = JSON.parse(exam.corrections)
+            const questionStatus = JSON.parse(exam.questionStatus)
+            const correctionCriterias = JSON.parse(exam.correctionCriterias)
+
+            exam.copies.forEach((copy)=>{
+ 
+                correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
+                .then(result=>{
+
+                    // dbCopy = await Copy.findOne({where:{id:copy.id}})
+                    // dbCopy.result = result
+                    copy.result = result
+                    copy.save().catch(err=>{
+                        console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
+                    })
+                    //await dbCopy.save()
+                })
+                .catch(err=>{
+                    // dbCopy = await Copy.findOne({where:{id:copy.id}})
+                    // dbCopy.result = [0, 0]
+                    // dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
+                    copy.result = [0, 0]
+                    copy.answers = JSON.stringify({"error": "error while re correcting"})
+                    copy.save().catch(err=>{
+                        console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
+                    })
+                    //reject(err)
+                })
+            })
+            resolve('Done')
+
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
+            reject(err)
+        })
+
+        // const exam = await Exam.findOne({where:{id:examId}})
+        // const copies = await Copy.findAll({where:{examId:examId}})
+        // const corrections = JSON.parse(exam.corrections)
+        // const questionStatus = JSON.parse(exam.questionStatus)
+        // const correctionCriterias = JSON.parse(exam.correctionCriterias)
+        
+        // copies.forEach((copy)=>{
+            
+        //     console.log(corrections[copy.version])
+        //     console.log(copy.answers)
+        //     correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
+        //     .then(async result=>{
+        //         console.log('OK')
+        //         console.log(result)
+        //         dbCopy = await Copy.findOne({where:{id:copy.id}})
+        //         dbCopy.result = result
+        //         await dbCopy.save()
+        //     })
+        //     .catch(async err=>{
+        //         console.log('KO')
+        //         dbCopy = await Copy.findOne({where:{id:copy.id}})
+        //         dbCopy.result = [0, 0]
+        //         dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
+        //         reject(err)
+        //     })
+        // })
+        // resolve('Done')
 
     })
 }
 
-async function correctAll(exam, scanResultString, req){
+function correctAll(exam, scanResultString, req){
     const scanResult = JSON.parse(scanResultString)
-
-    // FIND THE EXAM RELATED TO THE EXAMID
-    const id = scanResult.zipFile.split('.')[0]
-    const examId = exam.id
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
     const questionStatus = JSON.parse(exam.dataValues.questionStatus)
 
-    //Step 2 : CORRECT ALL COPIES
-    scanResult.data.forEach(async (copy) =>{
-        console.log(copy)
+    // Correct all copies
+    scanResult.data.forEach( copy =>{
         if (copy.error == "None"){
-            correctionCopy(
+            correctionCopy( 
                     corrections[copy.qrcode.version],
                     copy.answers,
                     questionStatus[copy.qrcode.version],
                     correctionCriterias
-            ).then(async result =>{
+            ).then( result =>{
                 saveCopy(copy,result,exam.id, req)
-                //email.sendResult(copy,result)
-                console.log(result)
             })
             .catch(err=>{
-                console.log(err+copy.qrcode.matricule)
-                saveErrorCopy(copy, "correction copy error", exam.id, req)
+                saveCopy(copy,[0,0],exam.id,req,err)
             })
         }
-    })    
-
+    })
+    
+    // Modify exam status
     exam.status = 2
-    exam.save()
+    exam.save().then(exam=>{
+        // nothing to do
+    }).catch( err=>{
+        console.log(" --- DATABASE ERROR -- Function correction/correctAll \n " + err)
+    })
 }
 
 //Correction file
-function correctionCopy(  correction /*list of list*/,
-                            response /*list of list*/,
-                            questionStatus, /*list */
-                            correctionCriterias,
-                            ){
-
+function correctionCopy( correction, response, questionStatus, correctionCriterias){
     return new Promise((resolve, reject) => {                                  
-        if (correction.length != response.length){
-            reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
-        }
+        if (correction.length != response.length) reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
+        
 
         totalPoints = 0
         maxPoints = 0
-        const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b);
+        
+        const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b); // Comparaison de deux listes
         
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
             if(questionStatus[questionIndex] == 'normal'){
-                //Vérifier que le nombre de propositions de la correction correspond au nombre
-                //de proposition de la copie
-                if(response[questionIndex].length != correction[questionIndex].length){
-                    reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
-                }
+                // Copy proposition length == Correction proposition length
+                if(response[questionIndex].length != correction[questionIndex].length) reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+                
 
-                // --- > Normal correction
+                // Normal correction
                 if(correctionCriterias.type == 'normal'){    
                     const positif = parseFloat(correctionCriterias.ptsRight,10)
                     const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
                     const abstention = parseFloat(correctionCriterias.ptsAbs,10)
-                    
-                    
                     maxPoints += positif
-                    // NO ABSTENTION:
+
+                    // Check if any proposition is checked to detect absentention
                     if(response[questionIndex].some(elem => elem == true)){            
                         if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
                         else totalPoints -= negatif
                     }
                     else totalPoints += abstention
                 }
+                // Advanced correction
                 else{
                     correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],correctionCriterias)
                     totalPoints += correctProp[0]
@@ -174,18 +209,15 @@ function correctionCopy(  correction /*list of list*/,
     });
 }
 
-
-function correctionAdvancedProp(correction,
-                                response,
-                                correctionCriterias
-                                ){
+// This function computes the result of an advanced
+function correctionAdvancedProp(correction, response, correctionCriterias){
     
-    
-    var lastExclusive = null;
+    // Check if last proposition is exclusive
+    var lastExclusive;
     if(correctionCriterias.isLastExclusive) lastExclusive = true
     else lastExclusive = false
-    console.log(correctionCriterias)
-    
+
+    //Set up correction criterias
     const eachGood = parseFloat(correctionCriterias.allGood,10)
     const onefalse = parseFloat(correctionCriterias.oneWrong,10)
     const twofalse = parseFloat(correctionCriterias.twoWrong,10)
@@ -195,43 +227,36 @@ function correctionAdvancedProp(correction,
     const lastPropTrue = parseFloat(correctionCriterias.lastExclusiveTrue,10)
     const lastPropFalse = parseFloat(correctionCriterias.lastExclusiveFalse,10)
 
-    // Si dernière proposition EXCLUSIVE ET DEVAIT être cochée !
+    // "Case 1" : If last propositon is exclusive AND MUST BE checked
     if( lastProp && correction[correction.length - 1]){
-        // Si la réponse a été cochée :
+        // DOES student check the question ?
         if(response[response.length - 1]){
-            //Vérifier que rien d'autre n'a été coché
-            for(var propIndex = 0; propIndex< response.length -1; propIndex++)
-            {
-                if(response[propIndex]) return [lastPropFalse, lastPropTrue ] //Point obtenu, point max
-            }
-            
-            return [lastPropTrue, lastPropTrue] //point Obtenue , point max
+            // If checked, verify if no other questions are checked.
+            for(var propIndex = 0; propIndex< response.length -1; propIndex++) if(response[propIndex]) return [lastPropFalse, lastPropTrue ] //Point obtenu, point max
+            return [lastPropTrue, lastPropTrue] // [getPoint, maxPoint]
         }
-        else return [lastPropFalse, lastPropTrue ] //point Obtenue , point max
+        else return [lastPropFalse, lastPropTrue ] // [getPoint, maxPoint]
     }
 
-    //Dernière propostion exclusive MAIS ne devait pas être cochée
-    else if(lastProp && response[response.length -1]){
-        return [lastPropFalse, eachGood ] //point Obtenue , point max
-    }
-
+    // "Case 2" : If last propositon is exclusive AND MUST NOT BE checked
+    //Check if the student don't check the proposition
+    else if(lastProp && response[response.length -1]) return [lastPropFalse, eachGood ] // [getPoint, maxPoint]
+    
     else{
         nbError = 0
         for(var propIndex = 0; propIndex < response.length; propIndex++){
-            if(response[propIndex] != correction[propIndex]){
-                nbError++
-            }
+            if(response[propIndex] != correction[propIndex]) nbError++
         }
 
         if(nbError == 0) return [eachGood, eachGood ]
         if(nbError == 1) return [onefalse, eachGood ]
         if(nbError == 2) return [twofalse, eachGood ]
         if(nbError == 3) return [threefalse, eachGood ]
-        if(nbError >  3) return [morethanthree, eachGood ]
+        if(nbError >  3) return [morethanthree, eachGood]
     }
 }
 
-exports.saveErrorCopy = saveErrorCopy
+//J'ai supprimé la fonction error copy, il faut voir qu'elle se trouve nulle part ailleurs mais je ne pense pas
 exports.saveCopy = saveCopy
 exports.correctAll = correctAll
 exports.correctionCopy = correctionCopy
