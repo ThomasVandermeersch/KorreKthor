@@ -212,7 +212,7 @@ router.post('/modifyImageTreatment/:copyid', access.hasAccess, (req,res)=>{
 })
 
 router.post('/sendComplainEmail', access.hasAccess,(req,res)=>{
-    sendEmail.sendEmail(req.body.email,req.session.userObject.email, req.body.object,req.body.message)
+    sendEmail.sendEmail(req.body.email, req.session.userObject.email, req.body.object, req.body.message)
     .then(response=>{
         req.flash('successEmail','Email envoyé');
         res.redirect('/see/copy/' + req.body.copyId)

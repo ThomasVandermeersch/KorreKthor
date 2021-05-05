@@ -170,6 +170,3 @@ async function exportStudents(exam, data){
 exports.importStudents = importStudents
 exports.getExcelInfo = getExcelInfo
 exports.exportStudents = exportStudents
-
-//table = importStudents("./uploads/exemple_liste.xlsx").then(table => { console.log(table)})
-//versions = getExcelInfo("./exemple_liste.xlsx").then(versions => { console.log(versions)})

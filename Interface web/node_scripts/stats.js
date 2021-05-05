@@ -39,14 +39,6 @@ function computeWorstQuestion(copies){
     return copies.length
 }
 
-// Exam.findOne({where:{name:"Stabilité"}, include:[{model:Copy, as:'copies'}]}).then(async(exam) => {
-//     console.log(computeVariance(exam.copies, computeMean(exam.copies)))
-//     console.log(computeZero(exam.copies))
-//     console.log(computeParticipants(exam.copies))
-//     console.log(computeBestQuestion(exam.copies))
-//     console.log(computeWorstQuestion(exam.copies))
-// })
-
 exports.computeMean = computeMean
 exports.computeVariance = computeVariance
 exports.computeZero = computeZero

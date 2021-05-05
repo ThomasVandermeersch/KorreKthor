@@ -1,13 +1,10 @@
-
-//This function recieves user matricule and returns a Promise containing his full Name
-
 require('isomorphic-fetch');
 var graph = require('@microsoft/microsoft-graph-client');
 const converter = require('./convertMatricule')
 
-function getName(email,msalClient,userId){
-    return new Promise(async(resolve,reject)=>{
-        
+//This function recieves user email and returns a Promise containing his full Name
+function getName(email, msalClient, userId){
+    return new Promise(async(resolve, reject)=>{
         getAccessToken(userId, msalClient)
             .then(accessToken=>{
                 const client = getAuthenticatedClient(accessToken);
@@ -31,13 +28,14 @@ function getName(email,msalClient,userId){
     })
 }
 
-
 async function getAccessToken(userId, msalClient) {
-    // Look up the user's account in the cache
+  return new Promise(async(resolve, reject) =>{
     try {
       const accounts = await msalClient
         .getTokenCache()
         .getAllAccounts();
+
+      if (!accounts) return reject("Account not found, error 665")
   
       const userAccount = accounts.find(a => a.homeAccountId === userId);
   
@@ -48,16 +46,15 @@ async function getAccessToken(userId, msalClient) {
         account: userAccount
       });
   
-      return response.accessToken;
+      if (reponse) return resolve(response.accessToken);
+      else return reject("Response empty, error 666")
+
     } catch (err) {
+      reject(err)
       console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    }
+    }    
+  })
 }
-
-
-
-
-
 
 function getAuthenticatedClient(accessToken) {
     // Initialize Graph client
