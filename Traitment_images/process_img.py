@@ -124,8 +124,6 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
 
     w, h = fullTemplate.shape[::-1]
 
-    print(fullListe)
-    print(emptyListe)
     for i in fullListe:
         cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
 
@@ -212,8 +210,6 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     for i in range(c):
         sub.append(False)
     boolArray.append(sub)  
-
-    print("bool end", boolArray)   
 
     # get the size of the biggest liste in the boolArray
     maxVal = len(max(boolArray, key = lambda i: len(i)))
