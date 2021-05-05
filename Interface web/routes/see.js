@@ -3,9 +3,7 @@ const access = require('../node_scripts/hasAccess')
 const path = require("path")
 const { Exam, Copy, User } = require("../node_scripts/database/models");
 const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
-const matriculeConverter = require('../node_scripts/convertMatricule')
-const getUser = require('../node_scripts/getUser');
-const { query } = require('express');
+
 
 router.get("/", access.hasAccess, async (req, res) => {
     const userMatricule = req.session.userObject.matricule
@@ -14,7 +12,6 @@ router.get("/", access.hasAccess, async (req, res) => {
     else query = {where:{userMatricule:userMatricule}, order:[["createdAt", "DESC"]]}
 
     Exam.findAll(query).then(exams=>{
-        console.log(exams)
         if (req.session.userObject.authorizations != 0) {
             query.include = [{model:Exam, as:'exam', attributes:["name"]}]
             Copy.findAll(query).then(copies=>{

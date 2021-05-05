@@ -37,7 +37,7 @@ def process(imgPath):
     return None
 
 
-def isGoodPage(img, squaresTemplatePath="result_pdf/squares.PNG", threshold=0.8):
+def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8):
     """
     This function checks is the povided image can be analysed (this means it has 3 templates: TL, TR, BL). 
     If yes returns the squares points list else None. 
@@ -93,7 +93,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.75):
+def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.75):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -104,7 +104,6 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     """
     emptyTemplate = cv2.imread(emptyTemplatePath, 0)
     emptyTemplate = cv2.resize(emptyTemplate, (30, 30), interpolation=cv2.INTER_LINEAR)
-
 
     # cv2.imshow("img", emptyTemplate)
     # cv2.waitKey(delay=5000)

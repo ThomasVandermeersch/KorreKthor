@@ -9,7 +9,6 @@ function convertMatricule (matricule){
 
 function emailToMatricule(email){
     var matricule = email.split('@')[0]
-    console.log(matricule)
     return convertMatricule(matricule)
 }
 

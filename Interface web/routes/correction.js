@@ -200,7 +200,7 @@ router.post('/modifyImageTreatment/:copyid', access.hasAccess, (req,res)=>{
             })
         })
         .catch(err=>{
-            console.log(err + ' ---Not normal to have an error here because lists have to match')
+            console.log(' ---Not normal to have an error here because lists have to match ---\n '+ err)
             req.flash('errorAnswerChange','Les listes ne correspondent pas, error : 1006');
             res.redirect('/see/copy/'+copy.id)
         })

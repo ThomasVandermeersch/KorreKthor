@@ -19,8 +19,7 @@ const checkBoxProposition = document.getElementById('checkBoxProposition');
 
 checkBoxProposition.addEventListener('change',(event)=>{
   var lastPropostionDiv = document.getElementById("lastPropostion")
-  console.log(event)
-  console.log(event.target.value)
+
   if(lastPropostionDiv.style.display == 'none'){
       lastPropostionDiv.style.display = "block";
   }

@@ -49,8 +49,8 @@ async function getAccessToken(userId, msalClient) {
       else return reject("Response empty, error 666")
 
     } catch (err) {
-      reject(err)
       console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+      reject(err)
     }    
   })
 }

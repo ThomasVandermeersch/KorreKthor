@@ -8,14 +8,9 @@ function post(path, params, method='post') {
     const form = document.createElement('form');
     form.method = method;
     form.action = path;
-    //form.enctype = "multipart/form-data"
   
     for (const key in params) {
-        console.log("oui oui")
-        console.log(key)
-        console.log(params[key])
       if (params.hasOwnProperty(key)) {
-        console.log('oui oui oui oui oui')
         const hiddenField = document.createElement('input');
         hiddenField.type = 'hidden';
         hiddenField.name = key;
@@ -24,7 +19,6 @@ function post(path, params, method='post') {
       }
     }
     document.body.appendChild(form);
-    console.log('oui')
     form.submit();
   }
 
@@ -40,7 +34,6 @@ document.getElementById('submitButton').addEventListener("click",function(){
         }
         responseList.push(propList)
     }
-    console.log(JSON.stringify(responseList))
-    console.log(document.getElementById('copyId').value)
-    post("/correction/modifyImageTreatment/"+document.getElementById('copyId').value,{"hello": "bonjour les amis","response":JSON.stringify(responseList)})
+
+    post("/correction/modifyImageTreatment/"+document.getElementById('copyId').value,{"response":JSON.stringify(responseList)})
 })

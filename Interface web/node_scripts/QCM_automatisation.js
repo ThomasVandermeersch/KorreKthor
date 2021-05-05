@@ -10,7 +10,7 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
    * Function that create a printable pdf for teachers
    * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
    * The output file is located in ./downloads 
-   * Temps files are located in ./pre_pdf, ./result_pdf
+   * Temps files are located in ./pre_pdf, ./source_pdf
    */
 
   setUp()
@@ -80,7 +80,6 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
             error: null
           };
 
-          console.log("Generation completed !");
           resolve(ret)
         }
       })
@@ -112,8 +111,6 @@ function removeUnnecessary() {
     if (err) {
       throw err;
     }
-
-    console.log('pre_pdf/ is deleted');
   });
 }
 
@@ -121,9 +118,9 @@ function generateTemplate(doc) {
   /**
    * Fucntion that generate pdf template (top-left, top-right, bottom-left squares) for each student sheet
    */
-  doc.image("result_pdf/squares.PNG", 530, 10, { valign: "top" });
-  doc.image("result_pdf/squares.PNG", 10, 10, { valign: "top" });
-  doc.image("result_pdf/squares.PNG", 10, 765, { valign: "top" });
+  doc.image("source_pdf/squares.PNG", 530, 10, { valign: "top" });
+  doc.image("source_pdf/squares.PNG", 10, 10, { valign: "top" });
+  doc.image("source_pdf/squares.PNG", 10, 765, { valign: "top" });
   doc.fontSize(20);
   doc.text("Feuilles de réponses", 105, 47, { align: "center" });
   doc.moveDown();
@@ -165,7 +162,7 @@ function generateTable(doc, answers) {
 
     doc.text("Question " + (question + 1).toString() + " :", 60, 174 + (question * 20));
     for (answer = 0; answer < answers[question].length; answer++) {
-      doc.image("result_pdf/vide.PNG", 135 + (answer * 35), 170 + (question * 20), {scale: 0.15});
+      doc.image("source_pdf/vide.PNG", 135 + (answer * 35), 170 + (question * 20), {scale: 0.15});
     }
   }
 
@@ -192,10 +189,10 @@ function generateCorection(answers) {
       correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString() + " :", 50, 105 + Qindex * 20);
       questions.forEach((answer) => {
         if (answer == true) {
-          correction.image("result_pdf/rempli.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
+          correction.image("source_pdf/rempli.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
         }
         else {
-          correction.image("result_pdf/vide.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
+          correction.image("source_pdf/vide.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
         }
         Aindex++;
       });

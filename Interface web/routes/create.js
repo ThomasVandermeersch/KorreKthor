@@ -30,11 +30,6 @@ var upload = multer({ storage: storage})
 var uploadxls = multer({ storage: storagexls})
 
 
-router.get("/Step0",access.hasAccess,(req,res)=>{
-    res.render('create/introduction')
-})
-
-
 router.get("/downloadresult", access.hasAccess, async (req, res) => {
     Exam.findOne({where:{id:req.session.examId}}).then(exam=> {
         res.download(
@@ -49,7 +44,6 @@ router.get("/downloadresult", access.hasAccess, async (req, res) => {
         res.redirect('/error')
     })
 });
-
 
 router.get("/downloadcorrection", access.hasAccess, async (req, res) => {
     Exam.findOne({where:{id:req.session.examId}}).then(exam=> {
@@ -66,6 +60,10 @@ router.get("/downloadcorrection", access.hasAccess, async (req, res) => {
     })
 })
 
+router.get("/Step0",access.hasAccess,(req,res)=>{
+    res.render('create/introduction')
+})
+
 // Route to upload file
 router.get("/Step1",access.hasAccess, function(req,res){
     res.render('create/uploadFile')
@@ -73,7 +71,11 @@ router.get("/Step1",access.hasAccess, function(req,res){
 
 // Route to upload questions
 router.get("/Step2", access.hasAccess, function(req,res){
-    res.render('create/loadQuestions', {
+    if (!req.session.excelFile){
+        req.flash('errormsg', "You cannot go directly to step 2, error 1014a");
+        return res.redirect("/create/Step1")
+    }
+    return res.render('create/loadQuestions', {
             uploadedFilename :req.session.excelFile.filename, 
             versions: JSON.parse(req.session.excelFile.versions),
             lesson : req.session.excelFile.lesson
@@ -82,30 +84,41 @@ router.get("/Step2", access.hasAccess, function(req,res){
 
 // Route to load the answers
 router.get("/Step3",access.hasAccess, function(req, res){
-    res.render('create/loadAnswers', {
+    if (!req.session.excelFile || !req.session.pdffiles){
+        req.flash('errormsg', "You cannot go directly to step 3, error 1014b");
+        return res.redirect("/create/Step1")
+    }
+    return res.render('create/loadAnswers', {
             versions :JSON.parse(req.session.excelFile.versions), 
             files :JSON.parse(req.session.pdffiles),
             lesson : req.session.excelFile.lesson
         })
 })
 
-
 //Route de cotation
 router.get("/Step4", access.hasAccess, function(req,res){
+    if (!req.session.examId){
+        req.flash('errormsg', "You cannot go directly to step 4, error 1014c");
+        return res.redirect("/create/Step1")
+    }
     Exam.findOne({where:{id:req.session.examId}}).then(exam=>{
         var correctionCriterias = JSON.parse(exam.correctionCriterias)
         correctionCriterias['redirection'] = 'create'
         
-        res.render('create/cotation.pug', correctionCriterias)
+        return res.render('create/cotation.pug', correctionCriterias)
     }).catch(err=> {
         console.log(" --- DATABASE ERROR -- CREATE/download ---\n " + err)
         req.flash('errormsg','Database error, error : 1013')
-        res.redirect('/error')
+        return res.redirect('/error')
     })
 })
 
 // Route to the download page
 router.get("/Step5", access.hasAccess, function(req,res){
+    if (!req.session.examId){
+        req.flash('errormsg', "You cannot go directly to step 5, error 1014d");
+        return res.redirect("/create/Step1")
+    }
     res.render('create/downloadPDF')
 })
 
@@ -115,14 +128,14 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     const lessonName = req.session.excelFile.lesson
 
     if (!excelFile && !lessonName) {
-        req.flash('errormsg', "Somthing went wrong please retry, error 1014b");
+        req.flash('errormsg', "Somthing went wrong please retry, error 1015b");
         res.redirect("/create/Step1")
     }
 
     const students = await functions.importStudents(excelFile)
 
     if (!students || students.length < 1){
-        req.flash('errormsg', "Somthing went wrong with the student list, error 1014a");
+        req.flash('errormsg', "Somthing went wrong with the student list, error 1015a");
         res.redirect("/create/Step1")
     }
 
@@ -181,11 +194,11 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
                     lastExclusiveFalse:0
                 })
 
-                await exam.save()
-                req.session["examId"] = exam.id
-                
-                //redirect
-                res.redirect("/create/Step4")
+                exam.save().then(exam=>{
+                    req.session["examId"] = exam.id
+                    //redirect
+                    res.redirect("/create/Step4")
+                })
             })
             .catch((ret) => {
                 exam.destroy()
@@ -212,7 +225,7 @@ router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), asyn
         
         if(versions[0]){
             req.flash('errormsg', versions[0]);
-            console.log(versions[1] ) //log de l'erreur détaillée
+            console.log(versions[1]) //log de l'erreur détaillée
             res.redirect("/create/Step1")
         }
         else{ 

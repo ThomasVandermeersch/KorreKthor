@@ -72,7 +72,6 @@ async function getExcelInfo(path){
 
       if (target < rowNumber){
         if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
-          console.log(row.values[version])
           versions.push(row.values[version])
         }
       }
@@ -104,7 +103,6 @@ async function exportStudents(exam, data){
 
   return new Promise(async(resolve, reject)=>{
     try {
-      console.log(exam.excelFile);
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.readFile(exam.excelFile);
       const worksheet = workbook.worksheets[0];

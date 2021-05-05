@@ -1,5 +1,3 @@
-const { User } = require("../node_scripts/database/models");
-const convertMatricule = require('./../node_scripts/convertMatricule')
 const router = require('express-promise-router')();
 const getUser = require('../node_scripts/getUser')
 
