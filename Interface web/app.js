@@ -1,27 +1,21 @@
 const express = require("express")
 const path = require("path")
 const bodyParser = require('body-parser');
-const createError = require('http-errors');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('express-flash');
 const msal = require('@azure/msal-node');
 const https = require('https');
 const fs = require("fs");
-const acces = require('./node_scripts/hasAcces')
-const Sequelize = require('sequelize');
-const { User, Exam, Copy } = require("./node_scripts/database/models");
-
+const access = require('./node_scripts/hasAccess')
 require('dotenv').config();
-
+const env = process.env.NODE_ENV || 'development';
+const config = require('./node_scripts/database/config/config')[env]
 
 var credentials = {
   key: fs.readFileSync("certificates/key.pem"),
   cert: fs.readFileSync("certificates/cert.pem")
 }
 
-app = express()
-app.locals.users = {};   //base de données NULLE A CHIER des users
 
 //Configuration de msal
 const msalConfig = {
@@ -33,7 +27,7 @@ const msalConfig = {
     system: {
       loggerOptions: {
         loggerCallback(loglevel, message, containsPii) {
-          console.log(message);
+          //console.log(message); //Message des requêtes de l'API Graph et MSal
         },
         piiLoggingEnabled: false,
         logLevel: msal.LogLevel.Verbose,
@@ -41,66 +35,66 @@ const msalConfig = {
     }
   };
   
-  // Create msal application object
-  app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
-  // </MsalInitSnippet>
-  
-  // <SessionSnippet>
-  // Session middleware
-  // NOTE: Uses default in-memory session store, which is not
-  // suitable for production
-  app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    unset: 'destroy'
-  }));
+app = express()
 
-  app.use(flash());
+// Create msal application object
+app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
 
-// Initializing the app
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  unset: 'destroy',
+  cookie: {
+    expires: 1000 * 60 * 45 //La sesssion expire après 45 minutes d'inactivité
+  }
+}));
+
+app.use(flash());
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(express.static('public')); //Load files from 'public' -> (CSS, image, JS...)
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(function(req,res,next){
+  res.locals.session = req.session;
+  next();
+});
 
-var createRouter = require('./routes/create');
-var indexRouter = require("./routes/index")
-var authRouter = require("./routes/auth")
+// Import routes
+const createRouter = require("./routes/create");
+const indexRouter = require("./routes/index")
+const authRouter = require("./routes/auth")
+const uploadRouter = require("./routes/upload")
+const adminRouter = require("./routes/admin")
+const seeRouter = require("./routes/see")
+const correctionRouter = require("./routes/correction")
+
 app.use('/create', createRouter);
 app.use('',indexRouter)
 app.use('/auth',authRouter)
+app.use('/upload', uploadRouter)
+app.use('/admin',adminRouter)
+app.use('/see',seeRouter)
+app.use('/correction',correctionRouter)
 
 //Si aucune route n'est trouvée
-app.get("*", function (req, res) {
+app.get("*", access.hasAccess, function (req, res) {
   res.status("404")
-  res.render("error");   
+  res.render("index/error");   
 });
 
-// Application http port 9898
-// app.listen(9898)
 
 // Application https port 9898
-var httpsServer = https.createServer(credentials, app)
+const httpsServer = https.createServer(credentials, app)
+
 httpsServer.listen(9898)
 
-
-// (async function () {
-  // var user = await User.create({"fullName":"Tom"})
-  // var exam = await Exam.create({"name":"Exam 1", "numberOfVersion":4, "userId":user.id})
-  // var copyA = await Copy.create({"version":"A", "userId":user.id, "examId":exam.id})
-  // var copyB = await Copy.create({"version":"B", "userId":user.id, "examId":exam.id})
-  
-  // var examS = (await Exam.findAll())[0]
-  // console.log(await examS.getUser())
-  // console.log(await examS.getCopies())
-
-  // var userS = (await User.findAll())[0]
-  // console.log(await userS.getExams())
-  // console.log(await userS.getCopies())
-
-  // var copyS = (await Copy.findAll())[0]
-  // console.log(await copyS.getUser())
-  // console.log(await copyS.getExam())
-// })()
+console.log("-------------------------------------")
+console.log("| RUNNING KorrKthor on: " + env + " |")
+console.log("-------------------------------------")
+console.log(" [Listening] https://" + process.env.ENDPOINT + "/")
+console.log(" [PostgrSQL]    " + config.host + ":" + config.port +"/")
+console.log(" [Python]     http://" + process.env.PYTHON_SERVER_HOST + ":" + process.env.PYTHON_SERVER_PORT + "/" )
+console.log("-------------------------------------")

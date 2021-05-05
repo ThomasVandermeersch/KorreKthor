@@ -1,0 +1,66 @@
+include ../header.pug
+
+div(class="container page create")
+    div(class="progress mt-3 mb-2")
+        <div class="progress-bar" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
+
+    h2 Etape 3 : Remplissez les reponses de vos questionnaires
+        button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="- Pour chacunes de vos versions, il faudra créer la grille de réponse correspondant au nombre de questions et de propositions de votre questionnaire. Cette grille vierge s'imprimera sur les questionnaires étudiants.\n- Ensuite, il faudra cocher les réponses aux questions en vue de la correction automatique.\n- Quand tout est terminé, n'oubliez pas de cliquer sur 'Confirmer les réponses en bas de la page'")
+            i(class="fa fa-question-circle" style="font-size:24px;")
+
+    div(class="container border border-1 rounded mt-3")
+        div(class="row row-cols-auto my-2") 
+            div(class="col") Nom du cours : 
+
+            div(class="col p-0" id="lesson")
+                b= lesson
+
+        div() Liste des énoncés :
+        div(class="create mb-2" id="files")
+            ul(class="list-group")
+                each elem, i in files
+                    li(class="list-group-item me-5") 
+                        b !{i} : !{elem}
+            input(id="filesList" type="hidden" name="files" value=files)
+
+    div(class="mt-3 row" id="questions")
+        each questID in versions
+            div(class="" id=questID)
+                div(class="h4")
+                    label(for="table" class="form-label")
+                        b= "Questionnaire " + questID
+
+                table(id=questID class="table tableClass mt-0 p-0")
+                    each val in [1,2,3,4,5]
+                        tr
+                            td
+                                i= "Question " + val
+                            
+                            each response in [1,2,3]
+                                td
+                                    input(
+                                        class="form-check-input checkboxClass"
+                                        type="checkbox" 
+                                        id="question"
+                                        name= response -1 
+                                        value="yes"
+                                        )
+
+                            td(class="px-0 mx-0")
+                                button(class="btn btn-secondary btn-sm removeChoice" type="button") -
+                            td(class="px-0 mx-0")
+                                button(class="btn btn-secondary btn-sm addChoice" type="button") +
+
+                div(class="btn-group mb-5" role="group")
+                    button(id="addQuestion" + questID type="button" class="btn btn-secondary addQuestion") <b>+</b> Question
+                    button(id="removeLast" +questID type="button" class="btn btn-danger removeQuestion") <b>-</b> Question
+
+    div(class="row mb-4")
+            div(class="col-12")
+                button(id="send" type="button" class="btn btn-warning float-end") Confirmer les réponses
+
+include ../footer.pug
+
+script(src='/javascript/loadAnswers.js')
+
+

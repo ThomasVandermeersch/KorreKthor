@@ -1,5 +1,12 @@
 # KorreKthor <!-- omit in TOC -->
 
+- [Run for production](#run-for-production)
+  - [Setting up](#setting-up)
+    - [Dotenv file](#dotenv-file)
+    - [SSL certificates](#ssl-certificates)
+  - [Deployment](#deployment)
+  - [Images](#images)
+  - [Data](#data)
 - [Database](#database)
   - [Set-up the database](#set-up-the-database)
   - [Access the database](#access-the-database)
@@ -12,31 +19,89 @@
       - [With migrations](#with-migrations)
   - [How to use the app](#how-to-use-the-app)
   - [Student list format](#student-list-format)
+- [Python image processing](#python-image-processing)
+  - [Setup](#setup)
+  - [Run the pdf processing method](#run-the-pdf-processing-method)
+  - [Accessing the zip file](#accessing-the-zip-file)
 - [Code structure](#code-structure)
 
-## Database
-### Set-up the database
-The KorreKthor app runs on a docker PostgreSQL database. 
+## Run for production
 
-So, first thing first, you need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
+### Setting up
 
-Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/`):
+First thing first, clone this github repo in `/` (for example). Then you have the code in `/KorreKthor/`
+#### Dotenv file
+
+Please consider creating a `.env` file in `/KorreKthor/Interface web/` folder with the database informations. The `.env` file must contains :
+- NODE_ENV (equal to development or production)
+- OAUTH_APP_ID
+- OAUTH_APP_SECRET
+- OAUTH_REDIRECT_URI
+- OAUTH_SCOPES
+- OAUTH_AUTHORITY
+- SESSION_SECRET
+- POSTGRES_PASSWORD
+- POSTGRES_USER
+- POSTGRES_DATABASE_prod (for production only)
+- POSTGRES_HOST_prod (for production only, equal to db or localhost or remote postgres address)
+- POSTGRES_PORT_prod (for production only)
+- POSTGRES_DATABASE_dev (for development only)
+- POSTGRES_HOST_dev (for development only)
+- POSTGRES_PORT_dev (for development only)
+- PYTHON_SERVER_HOST (equal to processing or localhost)
+- PYTHON_SERVER_PORT
+  
+#### SSL certificates
+
+If you don't have any certificates provided by a CA you can generate them yourself with openssl as follow :
+
 ```
-docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
+$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 ```
-> Note: Please consider creating a `.env` file in `/Interface web/` folder with the database informations. The `.env` file must contains :
-POSTGRES_PASSWORD, 
-POSTGRES_USER,
-POSTGRES_DATABASE,
-POSTGRES_HOST,
-POSTGRES_PORT values.
->
-> Note 2: The database files are stored in `/db/data/`.
 
-To stop the database don't forget to run:
+Place the key.perm and the cert.pem in a new folder located in `/KorreKthor/Interface web/certificates/`
+
+### Deployment
+
+You need to install docker and docker-compose. See this [link](https://docs.docker.com/get-docker/) for more informations about it.
+
+Once docker installed, you need to run this command on a terminal in the root folder of the project (let's call it `/KorreKthor/`):
+```
+$ docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up
+```
+
+> Note: The database files are stored in `/data/db/data/`.
+
+To stop the app don't forget to run:
 ```
 $ docker-compose -f docker-compose.yml down
 ```
+
+If you want to update some docker container after updating the code, run:
+```
+$ docker-compose --env-file ./Interface\ web/.env -f docker-compose.yml up --build
+```
+
+You're now able use the KorreKthor app. Open your favourite web browser and access https://localhost:9898  
+
+### Images
+
+The KorreKthor app runs on multiple docker images :
+
+- postgres
+- adminer
+- node
+- korrekthor_backend
+- korrekthor_img_processing
+
+### Data
+
+You can access the docker data in the `/data` folder. The `db/` folder saves the database files and the `files/` folder saves the image processing files.
+
+## Database
+### Set-up the database
+
+You can set up your own database without docker. To do so, you just need to install PostgreSQL and update the `.env` file with your database informations.
 ### Access the database
 To access the database it's recommended to install [pgAdmin4](https://www.pgadmin.org/) (a browser for PostgreSQL database). 
 But, if you don't have any database browser you can use the docker PostgreSQL built-in browser named [adminer](https://www.adminer.org/) and listening on port **1880**. 
@@ -44,6 +109,8 @@ But, if you don't have any database browser you can use the docker PostgreSQL bu
 The PostgreSQL server listen on the port you specified in the `.env` file with the user and password also specified. 
 
 ## Web interface
+
+If you want to run the Web interface by your own (without docker) you can follow these steps in the `/KorreKthor/Interface web/` folder. 
 ### Install dependencies
 ````
 $ npm install
@@ -54,7 +121,7 @@ Only if you're building the whole project, you need to apply the migations (crea
 $ sequelize db:create
 $ sequelize db:migrate
 ```
-> Note: if an error occurred try `export NODE_ENV=developement` before running the above commands.
+> Note: if an error occurred try `export NODE_ENV=development` before running the above commands.
 
 Run :
 ````cmd
@@ -115,7 +182,7 @@ Then, run:
 $ sequelize db:migrate:undo // To undo the migration
 $ sequelize db:migrate // To apply the new migration
 ```
-> Note: if an error occurred try `export NODE_ENV=developement` before running the migation(s)
+> Note: if an error occurred try `export NODE_ENV=development` before running the migation(s)
 
 ### How to use the app
 First, open your favorit browser and enter this url : http://localhost:8000/.
@@ -139,11 +206,62 @@ The student list must contain at least 3 columns :
 - *version*
 
 
-Here is an example of stuent list :
+Here is an example of student list :
 
 ![Student list exemple](Images/StudentList.png)
 
 
+## Python image processing
+
+### Setup
+To setup the python server you need to be in the `/KorreKthor/Traitement_images/` folder and then run:
+```cmd
+$ pip install -r requirements.txt
+```
+> Note : Using a virtual environement is a good practice.
+
+Finally, run :
+```cmd
+$ python server.py
+```
+
+### Run the pdf processing method
+
+You need to make a *POST* request to the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/run`. With form-data as follows:
+```json
+{
+  "my_file":UPLOAD_YOUR_FILE
+}
+```
+
+The response is the form :
+```json
+{
+    "zipFile": "78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip",
+    "data": [
+        {
+            "qrcode": {
+                "matricule": 17076,
+                "version": "B",
+                "lessonId": "78c170ae-8a10-4b1c-9d7f-d3e038141e68"
+            },
+            "answers": [...],
+            "file": "78c170ae-8a10-4b1c-9d7f-d3e038141e68_B_17076.png",
+            "error": "None"
+        },
+        {
+          "error" : "No answers scanned in From_PDF/78c170ae-8a10-4b1c-9d7f-d3e038141e68_C_14136.png"
+        },
+        {
+          ...
+        },
+    ]
+}
+```
+
+### Accessing the zip file 
+
+The zip file is available on the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
 ## Code structure
 The main file to run is in "Interface Web"/
 

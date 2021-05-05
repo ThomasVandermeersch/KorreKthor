@@ -1,0 +1,87 @@
+div(class="row mt-3")
+    form(action="/create/sendCotationCriteria/"+redirection, method="POST" , class="form-inline")
+        if type=='normal'
+            - var showNormal = "display"
+            - var showAdvanced = "display: none;"
+        else
+            - var showNormal = "display: none;"
+            - var showAdvanced = "display"
+        
+        div
+            label(for="fileForm" class="form-label") Choisissez une option
+        
+        if type == 'normal'
+            div
+                select(class="form-select", id="correctionType" name='type')
+                    option(value="normal" name='normal') Normal
+                    option(value="advanced" name='advanced') Advanced
+        else
+            div
+                select(class="form-select", id="correctionType" name='type')
+                    option(value="advanced" name='advanced') Advanced
+                    option(value="normal" name='normal') Normal
+
+        div(id='normal', style=showNormal, class="mt-2")
+            div(class="form-group row")
+                div(class="form-group col-md-6")
+                    label(for="inputEmail4") Une bonne réponse rapporte (pts)
+                    input(type="number",name="ptsRight" class="form-control", value= ptsRight, min=0, step=0.25)
+
+                div(class="form-group col-md-6")
+                    label(for="inputPassword4") Une mauvaiseee réponse fait perdre (pts)
+                    input(type="number",name ="ptsWrong" class="form-control", value=ptsWrong, min=0, step=0.25)
+                
+                div(class="form-group col-md-6")
+                    label(for="inputPassword4") Une abstention rapporte (pts)
+                    input(type="number",name="ptsAbs", class="form-control", value=ptsAbs, min=0, step=0.25)
+
+
+        div(id='advanced',style=showAdvanced, class="mt-2")
+            p Ce type de QCM s'utilise lorsqu'il y a plusieurs choix possibles. Entrez le nombre de points que rapportent chaque propositions. 
+            div(class="form-group row")
+                div(class="form-group col-md-6")
+                    label() Toutes les réponses sont correctes (pts)
+                    input(type="number",name="allGood" class="form-control", value=allGood, min=0, step=0.25)
+
+                div(class="form-group col-md-6")
+                    label() Une des réponse est incorrecte (pts)
+                    input(type="number",name="oneWrong", class="form-control", value=oneWrong, step=0.25)
+                
+                div(class="form-group col-md-6")
+                    label() Deux réponses sont incorrectes (pts)
+                    input(type="number",name="twoWrong", class="form-control", value=twoWrong, step=0.25)
+                
+                div(class="form-group col-md-6")
+                    label() Trois réponses sont incorrectes (pts)
+                    input(type="number",name="threeWrong", class="form-control", value=threeWrong, step=0.25)
+
+                div(class="form-group col-md-6")
+                    label(f) Plus de trois réponses sont incorrectes (pts)
+                    input(type="number",name="threeMoreWrong" class="form-control", value=threeMoreWrong, step=0.25)
+            
+            if isLastExclusive == 'on'
+                - var showLastExcl = "display"
+                div(class="form-check mt-3")
+                    input(type="checkbox",name="isLastExclusive", checked, class="form-check-input", id="checkBoxProposition")
+                    label(class="form-check-label", for="exampleCheck1") La dernière proposition est un tout ou rien
+            else
+                - var showLastExcl = "display: none;"
+
+                div(class="form-check")
+                    input(type="checkbox",name="isLastExclusive" class="form-check-input", id="checkBoxProposition")
+                    label(class="form-check-label", for="exampleCheck1") La dernière proposition est un tout ou rien
+            
+            div(class='mt-3' id="lastPropostion",style=showLastExcl)
+                p(class="mb-1") Si la dernière proposition est correcte, toute la correction se fait sur le modèle ci-dessous.
+                div(class="form-group row")
+                    div(class="form-group col-md-6")
+                        label(for="inputEmail4") La dernière propostion est correcte (pts)
+                        input(type="number",name="lastExclusiveTrue",class="form-control", value=lastExclusiveTrue, min=0, step=0.25)
+    
+                    div(class="form-group col-md-6")
+                        label(for="inputPassword4") La dernière proposition est incorrecte (pts)
+                        input(type="number",name="lastExclusiveFalse", class="form-control", value=lastExclusiveFalse step=0.25)
+                
+        div(class="row mt-3")
+            div(class="col-12")
+                input(class="btn btn-warning float-end" type="submit", value="Enregistrer et confirmer")

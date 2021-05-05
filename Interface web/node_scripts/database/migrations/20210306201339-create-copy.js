@@ -15,11 +15,14 @@ module.exports = {
           type: DataTypes.STRING,
       },
       result:{
-          type: DataTypes.INTEGER,
+        type: DataTypes.ARRAY(DataTypes.FLOAT),
       },
-      userId: {
-        type: DataTypes.UUID,
-        allowNull: false
+      answers:{
+        type: DataTypes.STRING(2048),
+      },
+      userMatricule: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
       examId: {
         type: DataTypes.UUID,

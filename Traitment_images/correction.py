@@ -10,7 +10,7 @@ np_correct = np.array(correct)
 
 img_rgb = cv.imread('From_PDF/3.png')
 img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
-template = cv.imread('result_pdf/vide.PNG',0)
+template = cv.imread('source_pdf/vide.PNG',0)
 template = cv.resize(template, (100,100), interpolation=cv.INTER_LINEAR)
 
 
@@ -26,7 +26,7 @@ for pt in zip(*loc[::-1]):
 cv.imwrite('correction.png',img_rgb)
 
 
-template = cv.imread('result_pdf/rempli.PNG',0)
+template = cv.imread('source_pdf/rempli.PNG',0)
 template = cv.resize(template, (150,150), interpolation=cv.INTER_LINEAR)
 
 w, h = template.shape[::-1]

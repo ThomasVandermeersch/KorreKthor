@@ -1,0 +1,86 @@
+include ../header.pug
+
+- var date = new Date(Date.parse(copy.createdAt))
+
+div(class="container page")
+    if messages.successEmail
+        div(class="alert alert-success my-2" role="alert")= messages.successEmail
+    
+    if messages.successAnswerChange
+        div(class="alert alert-success my-2" role="alert")= messages.successAnswerChange
+    
+    if messages.errorAnswerChange
+        div(class="alert alert-danger my-2" role="alert")= messages.errorAnswerChange
+        
+    div(class="card my-2")
+        div(class="card-body")
+            
+            h4(class="card-title") Copie d'examen - #[strong #{copy.user.fullName}] - Version #[strong #{copy.version}]
+
+            p(class="card-subtitle mb-2 text-muted")= `${copy.exam.name} : ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
+            
+            - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
+            - var questions = JSON.parse(copy.answers)
+
+            if "error" in questions
+                h4(class="text-danger") Cote : #[strong Error]
+            else
+                if point < 10
+                    h4(class="text-danger") Cote : #{point}/20
+                else
+                    h4(class="text-success") Cote : #{point}/20
+
+            div(class="photo my-3 row")
+                div(class="tab col-10 col-sm-5 form-check p-0 m-auto")
+                    if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
+                        div
+                            h4(style="text-align:center") Aperçu de la détection
+                            form(class="form" method="POST" action="/correction/updateUser/")
+                                input(type="hidden" name="matricule" value=copy.user.matricule)
+                                input(type="hidden" name="copyId" value=copy.id)
+
+                                label(for="newMatricule" class="form-label") Entrer le matricule de l'étudiant
+                                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.")
+                                        i(class="fa fa-question-circle" style="font-size:24px;color:red")
+                                input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Ex: 17076")
+                                
+                                div(class="") 
+                                    button(id='submitButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
+
+                    
+                    table(id='tableId' class="table table-sm tableClass mt-0 p-0")
+                        if "error" in questions
+                            each val in [...JSON.parse(copy.exam.corrections)[copy.version].keys()]
+                                tr
+                                    td(class="hide-sm") 
+                                        i Question #{val + 1}
+                                    
+                                    each response in [...JSON.parse(copy.exam.corrections)[copy.version][val].keys()]
+                                        td(style="text-align:center")
+                                            input(disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes")
+
+                        else
+                            each val in [...questions.keys()]
+                                tr
+                                    td(class="hide-sm") 
+                                        i Question #{val + 1}
+                                    
+                                    each response in [...questions[val].keys()]
+                                        td(style="text-align:center")
+                                            input(checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
+                    
+                    if session.userObject.role == 0 && session.userObject.authorizations == 3
+                        a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
+                    else 
+                        button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Enregistrer les modifications de réponses
+       
+                img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
+                
+            div(class="col-4 float-end")
+                div Légende : 
+                    li Cercle = réponse remplie détectée 
+                    li Carré = réponse vide détectée
+
+input(id="copyId",type="hidden", value=copy.id)
+script(src='/javascript/correctImageProcess.js')
+include ../footer.pug  

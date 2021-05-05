@@ -1,0 +1,45 @@
+include ../header.pug
+
+div(class="container page")
+
+    h1 Modifier le profil d'un utilisateur
+
+    h2= user.fullName 
+
+    ul
+        li= 'Email :' + user.email 
+        li= 'Matricule :' + user.matricule 
+        if user.role == 0
+            li Rôle : Etudiant
+        else 
+            li Rôle : Enseignant
+
+    br
+    br
+    h2 Modifier les privillèges
+
+
+    form(action="/admin/modifyUser" method="POST")
+        input(id="versions" type="hidden" name="matricule", value=user.matricule)
+
+        div(class="form-check form-switch")
+            if user.authorizations == 0 || user.authorizations == 1
+                input(type="checkbox",class="form-check-input", checked, name="createQCM")
+
+            else           
+                input(type="checkbox", class="form-check-input", name="createQCM")
+            label(for="subscribeNews") Créer des QCM
+
+
+        div(class="form-check form-switch")
+            if user.authorizations == 0
+                input(type="checkbox", class="form-check-input", checked, name="makeAdmin")
+            else           
+                input(type="checkbox", class="form-check-input", name="makeAdmin")
+            label(for="subscribeNews") Nommer administrateur
+
+        div
+            br
+            input(type="submit", class="btn btn-secondary", value="Enregistrer les modifications")
+
+include ../footer.pug

@@ -1,0 +1,60 @@
+include ../header.pug
+
+div(class="container page")
+    div(class="card mt-2")
+        div(class="card-body")
+            h4(class="card-title") Examen : #[strong #{exam.name}]
+            h6(class="") Statistiques :
+            div(class="row")
+                ul(class="col-5 ms-4") 
+                    li Moyenne : #[strong #{stats.mean}] pts
+                    li Variance : #[strong #{stats.var}] pts
+                ul(class="col-5")
+                    li Participation : #[strong #{stats.participants}] étudiants
+                    li Zeros : #[strong #{stats.blancs}] étudiants
+
+                //- ul(class="col-5") 
+                //-     li Meilleur question : Question n°#[strong #{stats.bestQuestionNum}] (Nombre de correct : #[strong #{stats.bestQuestionQtt}])
+                //-     li Pire question :  Question n°#[strong #{stats.worstQuestionNum}] (Nombre de zero : #[strong #{stats.worstQuestionQtt}])
+        
+    if messages.successNameChange
+        div(class="alert alert-success my-2" role="alert")= messages.successNameChange
+    if messages.successCotationChange 
+        div(class="alert alert-success my-2" role="alert")= messages.successCotationChange
+    
+    table(class="table table-sm table-hover mt-2")
+        thead
+            tr
+                th Nom
+                th Matricule
+                th Cote (pts)
+        tbody
+            each copy in exam.copies 
+                - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
+                - var answers = JSON.parse(copy.answers)
+
+                tr(onClick=`getCopyPreview("${ copy.id }")` style="cursor: pointer;")
+                    if copy.user.fullName == ""
+                        td(class="text-danger") -- Spécifier l'étudiant --
+                            button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
+                                i(class="fa fa-question-circle" style="font-size:24px;color:red")
+                        td(class="text-danger") -- Spécifier l'étudiant --
+                            button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
+                                i(class="fa fa-question-circle" style="font-size:24px;color:red")
+                    else
+                        td= copy.user.fullName
+                        td= copy.user.matricule
+                    if "error" in answers
+                        th 
+                            div(class="text-danger") -- Correction manuelle requise -- 
+                                button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Il y a eu un problème lors de la détection des réponses sur cette copie.\n Il faut rentrer les réponses manuellement")
+                                    i(class="fa fa-question-circle" style="font-size:24px;color:red") 
+                    else
+                        td #{point}/20
+
+include ../footer.pug    
+
+script.
+    function getCopyPreview(id){
+        window.location.href = `/see/copy/${id}`
+    }

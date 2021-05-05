@@ -6,15 +6,38 @@ services:
     image: postgres
     restart: always
     ports:
-      - 5433:5432
+      - 5433:5432 # External access to db on 5433, local access on 5432
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
     volumes:
-      - ./db/data:/var/lib/postgresql/data
+      - ./data/db/data:/var/lib/postgresql/data
 
   adminer:
     image: adminer
     restart: always
     ports:
       - 1880:8080
+
+  backend:
+    build: ./Interface web/
+    restart: always
+    ports: 
+      - 9898:9898
+    depends_on:
+      - db
+    volumes:
+      - ./data/files/zips:/usr/src/korrekthor_backend/zips
+      - ./data/files/uploads:/usr/src/korrekthor_backend/uploads
+
+  processing:
+    build: 
+      context: ./Traitment_images/
+      args: 
+        - PYTHON_SERVER_PORT
+    restart: always
+    ports: 
+      - ${PYTHON_SERVER_PORT}:${PYTHON_SERVER_PORT}
+
+
+      

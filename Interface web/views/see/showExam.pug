@@ -1,0 +1,84 @@
+include ../header.pug
+
+- var correction = JSON.parse(exam.correctionCriterias)
+- var date = new Date(Date.parse(exam.createdAt))
+
+div(class="container page create")
+    if messages.recorrectmsg
+        div(class="alert alert-success my-2" role="alert")= messages.recorrectmsg
+
+    div(class="card mt-2")
+        div(class="card-body")
+            if exam.status == 0
+                h4(class="card-title") Exam #[strong #{exam.name}] - Créé
+            else if exam.status == 1
+                h4(class="card-title text-warning") Exam #[strong #{exam.name}] - Correction en cours...
+            else if exam.status == 3
+                h4(class="card-title text-danger") Exam #[strong #{exam.name}] - Erreur, veuillez réessayer !
+            else
+                h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
+
+            p(class="card-subtitle text-muted")= exam.id
+            p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
+
+            div(class="verison") Nombre de versions : #{exam.numberOfVersion}
+            
+            div(class="criteria my-3") 
+                if correction && correction.type
+                    div(class="criteria mb-2") Critère de cotation : #[strong #{correction.type}]
+                        
+                        if correction.type == "normal"
+                            div(class="mx-2")
+                                table(class="table table-sm mb-1")
+                                    tr
+                                        th Reponses correctes (pts)
+                                        td +#{correction.ptsRight}
+                                    tr
+                                        th Abstentions (pts)
+                                        td +#{correction.ptsAbs}
+                                    tr
+                                        th Reponses fausses (pts)
+                                        td -#{correction.ptsWrong}
+                                
+                        else 
+                            div(class="mx-2")
+                                table(class="table table-sm mb-1")
+                                    tr
+                                        th Reponses correctes (pts)
+                                        td +#{correction.ptsRight}
+                                    tr
+                                        th Abstentions (pts)
+                                        td +#{correction.ptsAbs}
+                                    tr
+                                        th Reponses fausses (pts)
+                                        td -#{correction.ptsWrong}
+                        
+                        div(class="float-end mt-1")
+                            a(href=`/correction/questionStatus/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Annuler des questions
+                            a(href=`/correction/modifyCriteria/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Changer le critère
+
+                else 
+                    h6(class="text-danger mx-2") Correction error
+                    a(href=`/correction/modifyCriteria/${exam.id}` class="btn btn-sm btn-secondary bouton mx-2") Définir une methode de cotation
+                       
+
+            if exam.correctionFile && exam.examFile
+                br
+                div(class="files")
+                    a(href=`/see/exam/${exam.id}/downloadresult` class="bouton") Fichier d'examen
+                    br
+                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="bouton") Fichier de correction
+            else 
+                br
+                div(class="float-end mt-3")
+                    h6(class="text-danger") Fichiers introuvables
+            
+            a(href=`/upload/copies/${exam.id}` class="btn btn-success col-5 mt-4 bouton") Uploader et corriger des copies
+            
+            if exam.status == 2
+                a(href=`/see/copies/${exam.id}` class="btn col-5 btn-secondary mt-4 float-end bouton") Afficher les copies des étudiants
+
+            if exam.status == 2
+                a(href=`/correction/downloadExcel/${exam.id}` class="btn col-12 btn-success mt-4 bouton") Télécharger les résultats (fichier excel) 
+
+include ../footer.pug

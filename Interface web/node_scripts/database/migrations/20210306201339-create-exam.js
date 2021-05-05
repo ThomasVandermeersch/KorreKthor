@@ -16,17 +16,30 @@ module.exports = {
           allowNull: false
       },
       versionsFiles:{
-          type: DataTypes.ARRAY(DataTypes.STRING),
+          type: DataTypes.STRING,
       },
-      correctionFiles:{
-          type: DataTypes.ARRAY(DataTypes.STRING),
+      corrections:{
+        type: DataTypes.STRING(2048),
+      },
+      status:{
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      questionStatus:{
+        type: DataTypes.STRING(2048),
+      },
+      correctionCriterias:{
+        type: DataTypes.STRING(1024)
+      },
+      correctionFile:{
+          type: DataTypes.STRING,
       },
       examFile:{
           type: DataTypes.STRING,
       },
-      userId:{
-        type: DataTypes.UUID,
-        allowNull: false
+      userMatricule:{
+        type: DataTypes.STRING,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
@@ -35,7 +48,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
-      }
+      },
+      excelFile:{
+        type: DataTypes.STRING,
+        allowNull: false
+      },
     });
   },
   down: async (queryInterface, DataTypes) => {

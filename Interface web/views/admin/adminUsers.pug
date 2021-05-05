@@ -1,0 +1,63 @@
+include ../header.pug
+
+div(class="container page")
+    h1(class="mb-0") Bienvenue sur l'interface Admin
+    p(class='text-muted mt-0') Note : Vous ne pouvez pas modifier un Admin autre que vous.
+
+    table(class="table table-sm table-hover userTableClass")
+        thead
+            tr
+                td 
+                    b Matricule 
+                td 
+                    b Nom 
+                td(class="email") 
+                    b Email 
+                td 
+                    b Role 
+                td(class="authorizations") 
+                    b Privilèges             
+
+
+        tbdoy
+            for user in users
+                if (user.authorizations != 0  || user.email == session.userObject.email)
+                    tr(onClick=`getUser("${ user.matricule}")` style="cursor: pointer;" )
+                        td= user.matricule
+                        td= user.fullName 
+                        td(class="email")= user.email 
+                        if user.role == 1
+                            td Enseingnant 
+                        else
+                            td Etudiant
+                        
+                        if user.authorizations == 0
+                            td(class="authorizations") Admin
+                        else if user.authorizations == 1
+                            td(class="authorizations") Create                        
+                        else 
+                            td(class="authorizations")  Aucun
+                
+                else
+                    tr(class="text-muted" style="cursor: not-allowed;" )
+                        td= user.matricule
+                        td= user.fullName 
+                        td(class="email")= user.email 
+                        if user.role == 1
+                            td Enseignant 
+                        else 
+                            td Etudiant
+                        
+                        if user.authorizations == 0
+                            td(class="authorizations") Admin
+                        else if user.authorizations == 1
+                            td(class="authorizations") Create                        
+                        else 
+                            td(class="authorizations")  Aucun
+
+include ../footer.pug
+
+script.
+    function getUser(matricule){
+        window.location.href = `/admin/${matricule}`
+    }

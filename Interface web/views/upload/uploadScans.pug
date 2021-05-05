@@ -1,0 +1,20 @@
+include ../header.pug
+
+div(class="container page create")
+    h2(class="mb-4") Veuillez uploader votre examen scanné
+
+    h6(class="text-muted") Examen à uploader : #[strong #{exam.name}]
+
+    form(action="/upload/scans/manual" method="POST" enctype="multipart/form-data")
+        div(class="row")
+            div(class="col-6 col-md-9")
+                input(class="form-control" id="fileForm" type="file" name="file" required)
+                input(type="hidden" name="examid" value=exam.id)
+
+            div(class="col-5 col-md-3")
+                input(class="btn btn-warning float-end" type="submit", value="Envoyer")
+    
+    if messages.errormsg
+        div(class="alert alert-danger mt-2" role="alert")= messages.errormsg  
+
+include ../footer.pug

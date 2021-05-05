@@ -4,7 +4,7 @@ module.exports = {
     await queryInterface.createTable('users', {
       id: {
         allowNull: false,
-        primaryKey: true,
+        unique: true,
         type: DataTypes.UUID
       },
       fullName: {
@@ -15,6 +15,7 @@ module.exports = {
       },
       matricule: {
         type: DataTypes.STRING,
+        primaryKey: true,
       },
       authorizations: {
         type: DataTypes.INTEGER

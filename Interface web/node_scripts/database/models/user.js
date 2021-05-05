@@ -12,15 +12,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Exam, Copy }) {
       // define association here
-      this.hasMany(Exam, {foreignKey: "userId", as:"exams"})
-      this.hasMany(Copy, {foreignKey: "userId", as:"copies"})
+      this.hasMany(Exam, {foreignKey: "userMatricule", as:"exams"})
+      this.hasMany(Copy, {foreignKey: "userMatricule", as:"copies"})
     }
   };
   User.init({
     id: {
       type: DataTypes.UUID,
       defaultValue: Sequelize.UUIDV4,
-      primaryKey: true,
     },
     fullName: {
       type: DataTypes.STRING,
@@ -31,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     matricule: {
       type: DataTypes.STRING,
+      primaryKey: true,
     },
     authorizations:{
       type: DataTypes.INTEGER,

@@ -3,18 +3,73 @@
     float: right;
 }
 
-.bouton{
-    margin-right: 1rem;
-}
-
 .page{
     position: relative;
-    min-height: 75vh;
+    min-height: 83vh;
+}
+
+.login{
+    width: 50%;
+    padding: 0;
+}
+
+.login-container{
+    width: 100%;
+    position: absolute;
+    top:20%;
+}
+
+.create{
+    width: 60%;
 }
 
 .footer {
     position: absolute;
-    bottom: -15vh;
-    left: -50%;
-    width: 200%;
+    bottom: auto;
+}
+
+body {
+    padding-bottom: 55px;
+    }
+
+@media screen and (max-width:991px){
+    .create{
+        width: 90%;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .container {
+       max-width: none;
+   }
+   .userTableClass, .examsTable, .copiesTable{
+       font-size: 13px;
+   }
+   .userTableClass .email, .userTableClass .authorizations, .hide-sm{
+        display: none;
+   }
+}
+
+@media screen and (max-width:720px){
+    .page{
+        position: relative;
+        min-height: 79vh;
+    }
+    .login{
+        width: 90%;
+        padding: 0;
+    } 
+}
+
+@media screen and (max-width:460px){
+    .bouton{
+        font-size: 60%;
+    }
+    .copiesTable .version, .copiesTable .date{
+        display: none;
+    }
+
+    .examsTable .versions, .examsTable .date{
+        display: none;
+    }
 }

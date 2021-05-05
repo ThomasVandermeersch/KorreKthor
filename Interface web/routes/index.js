@@ -1,10 +1,22 @@
-
 const router = require('express-promise-router')();
-const acces = require('../node_scripts/hasAcces')
+const access = require('../node_scripts/hasAccess')
 
-app.get("/", acces.hasAcces, function(req,res){
-        //res.render('index',{name:"Beta"})    
-        res.render('index',{name:req.session.userObject.fullName})    
+router.get("/", access.hasAccess, function(req,res){
+        res.render('index/index')    
+});
+
+router.get("/viewProfile", access.hasAccess, function(req,res){
+        res.render('index/viewProfile')    
+});
+
+router.get("/noAccess", access.hasAccess, function(req,res){
+        res.status(403)    
+        res.render('index/noAccess')    
+});
+
+router.get("/unloggederror", function(req,res){
+        res.status(403)    
+        res.render('index/error')    
 });
 
 module.exports = router
