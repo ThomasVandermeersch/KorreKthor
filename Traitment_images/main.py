@@ -24,14 +24,14 @@ def compute(pdf):
             if len(listPages) == 0 :
                 jsonToSend.append({"error" : f"No image in {pdf}"})
             else:
-
+                
                 i = 0
                 firstQRCode = None
                 while firstQRCode == None:
-                    if i > 10:
+                    if i > 10 or i >= len(listPages):
                         jsonToSend.append({"error" : f"No QRCode available in {pdf}"})
-                        break
-
+                        return jsonToSend
+                    
                     firstQRCode = process_img.decodeQRCode(listPages[i])
                     i+=1
 

@@ -93,7 +93,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.85):
+def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="result_pdf/vide.PNG", emptyThreshold=0.75):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -114,7 +114,7 @@ def getImageResponses(img, fullTemplatePath="result_pdf/rempli.PNG", fullThresho
     # cv2.destroyAllWindows()
 
     fullTemplate = cv2.imread(fullTemplatePath, 0)
-    fullTemplate = cv2.resize(fullTemplate, (30, 30), interpolation=cv2.INTER_LINEAR)
+    fullTemplate = cv2.resize(fullTemplate, (40, 40), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", fullTemplate)
     # cv2.waitKey(delay=5000)
@@ -234,9 +234,18 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     return boolArray
     
 def decodeQRCode(imagePath):
-    preQRCode = decode(cv2.imread(imagePath))
-    if len(preQRCode) == 0:
-        return None
+    img = cv2.imread(imagePath)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ratio  = img.shape[1]/1191
+    img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
+    preQRCode = decode(img)
+
+    if len(preQRCode) == 0: # One more chance to get the QRCode 
+            img = img[0:500, 0:500]
+            preQRCode = decode(img)
+            
+            if len(preQRCode) == 0:
+                return None
     
     try:
         qrcode = json.loads(preQRCode[0].data)

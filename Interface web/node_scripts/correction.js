@@ -36,32 +36,6 @@ function saveCopy(copy, result, examId, req, error=null){
     })
 }
 
-// async function saveCopy(copy, result, examId, req){
-//     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
-//         dbCopy = await Copy.findOne({where:{"examId":examId, "userMatricule": user.matricule}})
-
-//         if(dbCopy){
-//             dbCopy.version = copy.qrcode.version, 
-//             dbCopy.result =result, 
-//             dbCopy.file = copy.file,
-//             dbCopy.answers = JSON.stringify(copy.answers)
-//             dbCopy.save()
-//             console.log('Resave copy')
-//         }
-//         else{
-//             Copy.create({"userMatricule": user.matricule, 
-//                         "examId":examId, 
-//                         "version":copy.qrcode.version, 
-//                         "result": result, 
-//                         "file": copy.file,
-//                         "answers": JSON.stringify(copy.answers)
-//                     })
-//         }
-//     }).catch(err=>{
-//         console.log(err);
-//     })
-// }
-
 // This function is called when correction criterias or question status are changed
 function reCorrect(examId){
     return new Promise((resolve,reject)=>{
@@ -76,61 +50,26 @@ function reCorrect(examId){
                 correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
                 .then(result=>{
 
-                    // dbCopy = await Copy.findOne({where:{id:copy.id}})
-                    // dbCopy.result = result
                     copy.result = result
                     copy.save().catch(err=>{
                         console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
                     })
-                    //await dbCopy.save()
                 })
                 .catch(err=>{
-                    // dbCopy = await Copy.findOne({where:{id:copy.id}})
-                    // dbCopy.result = [0, 0]
-                    // dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
                     copy.result = [0, 0]
                     copy.answers = JSON.stringify({"error": "error while re correcting"})
                     copy.save().catch(err=>{
                         console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
                     })
-                    //reject(err)
                 })
             })
+
             resolve('Done')
 
         }).catch(err=>{
             console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
             reject(err)
         })
-
-        // const exam = await Exam.findOne({where:{id:examId}})
-        // const copies = await Copy.findAll({where:{examId:examId}})
-        // const corrections = JSON.parse(exam.corrections)
-        // const questionStatus = JSON.parse(exam.questionStatus)
-        // const correctionCriterias = JSON.parse(exam.correctionCriterias)
-        
-        // copies.forEach((copy)=>{
-            
-        //     console.log(corrections[copy.version])
-        //     console.log(copy.answers)
-        //     correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
-        //     .then(async result=>{
-        //         console.log('OK')
-        //         console.log(result)
-        //         dbCopy = await Copy.findOne({where:{id:copy.id}})
-        //         dbCopy.result = result
-        //         await dbCopy.save()
-        //     })
-        //     .catch(async err=>{
-        //         console.log('KO')
-        //         dbCopy = await Copy.findOne({where:{id:copy.id}})
-        //         dbCopy.result = [0, 0]
-        //         dbCopy.answers = JSON.stringify({"error": "error while re correcting"})
-        //         reject(err)
-        //     })
-        // })
-        // resolve('Done')
-
     })
 }
 
@@ -171,7 +110,6 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
     return new Promise((resolve, reject) => {                                  
         if (correction.length != response.length) reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
         
-
         totalPoints = 0
         maxPoints = 0
         
@@ -182,7 +120,6 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
                 // Copy proposition length == Correction proposition length
                 if(response[questionIndex].length != correction[questionIndex].length) reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
                 
-
                 // Normal correction
                 if(correctionCriterias.type == 'normal'){    
                     const positif = parseFloat(correctionCriterias.ptsRight,10)
@@ -256,7 +193,6 @@ function correctionAdvancedProp(correction, response, correctionCriterias){
     }
 }
 
-//J'ai supprimé la fonction error copy, il faut voir qu'elle se trouve nulle part ailleurs mais je ne pense pas
 exports.saveCopy = saveCopy
 exports.correctAll = correctAll
 exports.correctionCopy = correctionCopy

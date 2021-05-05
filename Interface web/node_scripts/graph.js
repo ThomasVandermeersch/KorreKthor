@@ -19,7 +19,6 @@ function getName(email, msalClient, userId){
                     console.log('Could not find client')
                     reject(err)
                 })
-
             })
             .catch(err=>{
                 console.log('Could not get accesToken')
@@ -46,7 +45,7 @@ async function getAccessToken(userId, msalClient) {
         account: userAccount
       });
   
-      if (reponse) return resolve(response.accessToken);
+      if (response) return resolve(response.accessToken);
       else return reject("Response empty, error 666")
 
     } catch (err) {

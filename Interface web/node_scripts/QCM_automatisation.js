@@ -19,7 +19,7 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
 
   extraStudents = []
   for (var i=0; i<extraCopies; i++){
-    User.create({"fullName":"", "matricule": `${lesson.id}_${i}`, "email": "", "authorizations":3, "role":2})
+    // User.create({"fullName":"", "matricule": `${lesson.id}_${i}`, "email": "", "authorizations":3, "role":2})
     student = {"extra": true, "name":"", "matricule":`${lesson.id}_${i}`, "version":lesson.versions[i%lesson.versions.length]}
     extraStudents.push(student)
   }
