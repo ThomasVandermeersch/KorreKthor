@@ -15,7 +15,7 @@ div(class="container page create")
                         td 
                             b Question 
                         td 
-                            b Status
+                            b Statut
                 each criteria, index in question
                     tr
                         td= 'Question ' + (index+1)
@@ -23,11 +23,11 @@ div(class="container page create")
                             if criteria=='normal'            
                                 select(class="form-select", id="correctionType" name='type')
                                     option(value="normal" name='normal') Normal
-                                    option(value="cancelled" name='cancelled') Cancelled
+                                    option(value="cancelled" name='cancelled') Annulé
                                                 if criteria=='normal'            
                             else
                                 select(class="form-select", id="correctionType" name='type')
-                                    option(value="cancelled" name='cancelled') Cancelled
+                                    option(value="cancelled" name='cancelled') Annulé
                                     option(value="normal" name='normal') Normal
         div(class="row my-4")
                 div(class="col-12")

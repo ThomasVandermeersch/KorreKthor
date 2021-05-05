@@ -35,7 +35,7 @@ div(class="container page")
                     if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
                         div
                             h4(style="text-align:center") Aperçu de la détection
-                            form(class="form" method="POST" action="/see/updateUser/")
+                            form(class="form" method="POST" action="/correction/updateUser/")
                                 input(type="hidden" name="matricule" value=copy.user.matricule)
                                 input(type="hidden" name="copyId" value=copy.id)
 

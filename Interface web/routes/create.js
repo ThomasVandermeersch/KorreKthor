@@ -259,6 +259,7 @@ router.post("/sendCotationCriteria/:redirection", access.hasAccess, async (req, 
             
             if(req.params.redirection == 'create') return res.redirect('/create/Step5')
             else corrector.reCorrect(req.session.examId).then(suc=>{
+                req.flash('recorrectmsg', 'Les critères de cotation ont été enregistrés et les copies recorrigées')
                 return res.redirect('/see/exam/' + req.session.examId)
             }).catch(err=>{
                 console.log(err)

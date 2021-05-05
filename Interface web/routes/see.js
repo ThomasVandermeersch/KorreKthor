@@ -202,38 +202,4 @@ router.get("/copy/:copyid/download", access.hasAccess, async (req, res) => {
     })
 });
 
-// TODO :)
-router.post("/updateUser/", access.hasAccess, async (req, res) => {
-    if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
-
-
-        const userEmail = matriculeConverter.matriculeToEmail(req.body.newMatricule)
-        getUser.getUser(userEmail,req)
-            .then(user=>{
-                Copy.findOne({where:{id:req.body.copyId}})
-                .then(copy=>{
-                    console.log("update userId")
-                    copy.userId = user.id
-                    copy.save()
-                    console.log(user)
-                    req.flash('successNameChange',"L'étudiant " + user.fullName  + " a été assigné.")
-                    res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
-                })
-                .catch(err=> {
-                    console.log(err)
-                    req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
-                    res.render("index/error")
-                })
-            })
-            .catch(err=>{
-                console.log(err)
-                req.flash('errormsg', "Somthing went wrong while changing the user, error : 1005");
-                res.render("index/error")
-            })
-    }
-    else{
-        res.render("index/noAcces")
-    }
-})
-
 module.exports = router;

@@ -101,68 +101,70 @@ async function exportStudents(exam, data){
    * Function that fills the initial excel file with the student results
    * Return true if something went wrong
    */
-  try {
-    console.log(exam.excelFile);
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(exam.excelFile);
-    const worksheet = workbook.worksheets[0];
 
-    var target = 100000
-    var matriculeInd = 0
-    var coteInd = 0
-    var versionInd = 0
+  return new Promise(async(resolve, reject)=>{
+    try {
+      console.log(exam.excelFile);
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.readFile(exam.excelFile);
+      const worksheet = workbook.worksheets[0];
 
-    var errors = []
-    var maxRows = 0
+      var target = 100000
+      var matriculeInd = 0
+      var coteInd = 0
+      var versionInd = 0
 
-    worksheet.eachRow(function(row, rowNumber) {
-      console.log("in row:", rowNumber)
-      var indexMatr = row.values.indexOf("matricule")
-      var indexCote = row.values.indexOf("cote")
-      var indexName = row.values.indexOf("etudiant")
-      var indexVersion = row.values.indexOf("version")
-      maxRows += 1
+      var errors = []
+      var maxRows = 0
 
-      if (indexMatr > 0 && indexCote > 0){
-        target = rowNumber
-        matriculeInd = indexMatr
-        coteInd = indexCote
-        nameInd = indexName
-        versionInd = indexVersion
-      }
+      worksheet.eachRow(function(row, rowNumber) {
+        var indexMatr = row.values.indexOf("matricule")
+        var indexCote = row.values.indexOf("cote")
+        var indexName = row.values.indexOf("etudiant")
+        var indexVersion = row.values.indexOf("version")
+        maxRows += 1
 
-      if (target < rowNumber){
-        matricule = row.values[matriculeInd]
+        if (indexMatr > 0 && indexCote > 0){
+          target = rowNumber
+          matriculeInd = indexMatr
+          coteInd = indexCote
+          nameInd = indexName
+          versionInd = indexVersion
+        }
 
-        if (matricule in data){
-          row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
-          delete data[matricule]
+        if (target < rowNumber){
+          matricule = row.values[matriculeInd]
+
+          if (matricule in data){
+            row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
+            delete data[matricule]
+          }
+        }
+      })
+
+      var i = 0
+      for ([matricule, error] of Object.entries(data)){
+        if (error.user.role != 2){
+          i += 1
+          worksheet.getRow(maxRows+i).getCell(matriculeInd).value = parseInt(error.user.matricule)
+          worksheet.getRow(maxRows+i).getCell(coteInd).value = Math.round(((error.result[0]/error.result[1])*20)*100)/100
+          worksheet.getRow(maxRows+i).getCell(nameInd).value = error.user.fullName
+          worksheet.getRow(maxRows+i).getCell(versionInd).value = error.version
         }
       }
-    })
 
-    var i = 0
-    for ([matricule, error] of Object.entries(data)){
-      if (error.user.role != 2){
-        i += 1
-        worksheet.getRow(maxRows+i).getCell(matriculeInd).value = parseInt(error.user.matricule)
-        worksheet.getRow(maxRows+i).getCell(coteInd).value = Math.round(((error.result[0]/error.result[1])*20)*100)/100
-        worksheet.getRow(maxRows+i).getCell(nameInd).value = error.user.fullName
-        worksheet.getRow(maxRows+i).getCell(versionInd).value = error.version
+      if (errors.length > 0){
+        throw "One or more copy.user.matricule don't match the matricules in excel";
       }
+
+      await workbook.xlsx.writeFile(exam.excelFile)
+      resolve()
     }
-
-    if (errors.length > 0){
-      throw "One or more copy.user.matricule don't match the matricules in excel";
+    catch(e){
+      console.log(e);
+      reject(e)
     }
-
-    await workbook.xlsx.writeFile(exam.excelFile)
-
-  }
-  catch(e){
-    console.log(e);
-    return e
-  }
+  })
 }
 
 exports.importStudents = importStudents

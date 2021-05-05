@@ -2,8 +2,9 @@
 const graph = require('./graph')
 const matriculeConverter = require('./convertMatricule')
 const { User } = require("../node_scripts/database/models");
+const { GraphError } = require('@microsoft/microsoft-graph-client');
 
-function getUser( email , req, createIfNotExist = true){
+function getUser(email, req, createIfNotExist=true){
     // STEP 1 : Search User in the database
     return new Promise((resolve,reject)=>{
         User.findOne({where:{email:email}})
@@ -12,7 +13,7 @@ function getUser( email , req, createIfNotExist = true){
             
             else if(createIfNotExist){
                 //Call Graph API to find users displayName
-                graph.getName(email,req.app.locals.msalClient,req.session.userId)
+                graph.getName(email, req.app.locals.msalClient, req.session.userId)
                     .then(graphUser=>{
                         const matricule = matriculeConverter.emailToMatricule(email)
                         // Determine user role
@@ -33,8 +34,15 @@ function getUser( email , req, createIfNotExist = true){
                             })
                             .catch(err=> reject(err))
                     }).catch(err=>{
-                        console.log('User does not exist in Graph API')
-                        reject(err)
+                        if (err instanceof GraphError){
+                            User.create({fullName:"", matricule:matriculeConverter.emailToMatricule(email), authorizations:3, role:0, email:email}).then(user=>{
+                                resolve(user)
+                            })
+                        }
+                        else{
+                            console.log('User does not exist in Graph API')
+                            reject(err)
+                        }
                     })
             }
             else{

@@ -2,7 +2,6 @@ const { reject } = require("async");
 const { sendEmail } = require("nodejs-nodemailer-outlook");
 const { resolve } = require("path");
 const { User, Exam, Copy } = require("./database/models");
-const exam = require("./database/models/exam");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
@@ -40,7 +39,7 @@ async function saveErrorCopy(copy, error, examId, req){
 }
 
 
-async function saveCopy(copy,result,examId, req){
+async function saveCopy(copy, result, examId, req){
     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(async user=>{
         dbCopy = await Copy.findOne({where:{"examId":examId, "userMatricule": user.matricule}})
 
