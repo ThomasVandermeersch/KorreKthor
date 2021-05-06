@@ -2,7 +2,6 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
-const { User } = require("../node_scripts/database/models");
 
 
 async function createInvoice(students, lesson, answers, fileVersions, extraCopies) {
