@@ -22,7 +22,10 @@ div(class="container page create")
             p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
 
             div(class="verison") Nombre de versions : #{exam.numberOfVersion}
-            
+            div(class="form-check form-switch") Activer la lecture des copies
+                input(type="checkbox", class="form-check-input", name="createQCM")
+
+
             div(class="criteria my-3") 
                 if correction && correction.type
                     div(class="criteria mb-2") Critère de cotation : #[strong #{correction.type}]

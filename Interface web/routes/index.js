@@ -5,6 +5,10 @@ router.get("/", access.hasAccess, function(req,res){
         res.render('index/index')    
 });
 
+router.get("/favicon.ico",function(req,res){
+        res.redirect('/');
+});
+
 router.get("/viewProfile", access.hasAccess, function(req,res){
         res.render('index/viewProfile')    
 });
