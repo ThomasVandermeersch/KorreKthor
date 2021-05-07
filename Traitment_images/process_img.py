@@ -16,7 +16,8 @@ def process(imgPath):
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
     ratio  = img.shape[1]/1191
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
-
+    img[img > 170 ] = 255
+        	
     goodPage = isGoodPage(img)
     print(f" {imgPath}")
     if goodPage:
@@ -93,7 +94,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.75):
+def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.77):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
