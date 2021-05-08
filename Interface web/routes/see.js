@@ -62,8 +62,10 @@ router.get("/exam/:examid", access.hasAccess, async (req, res) => {
     else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
 
     Exam.findOne(query).then(exam=>{
-        if (exam) return res.render("see/showExam", {exam:exam})
-        
+        if(exam){
+            exam["copyViewAvailable"] = false;
+            return res.render("see/showExam", {exam:exam})
+        }
         console.log(" --- EXAM DOES NOT EXIST ERROR -- SEE/exam ---\n ")
         req.flash('errormsg', 'This exam does not exist, error : 1019')
         return res.redirect("/error")
