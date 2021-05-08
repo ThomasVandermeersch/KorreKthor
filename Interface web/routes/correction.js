@@ -255,4 +255,34 @@ router.post("/updateUser/", access.hasAccess, async (req, res) => {
     }
 })
 
+router.post('/changeCopyStatus',access.hasAccess,(req,res)=>{    
+    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
+
+    const userMatricule = req.session.userObject.matricule
+    var query;
+
+    if (req.session.userObject.authorizations == 0) query = {where:{id:req.body.examid}}
+    else query = {where:{userMatricule:userMatricule, id:req.body.examid}}
+
+    Exam.findOne(query).then(exam=>{
+        exam.save().then(exam=>{
+            if(exam){
+                req.flash('succCopyStatusChange', "Copy visibilty changed succesfully");
+                return res.redirect('/see/exam/'+req.body.examid)
+            }
+            console.log(" --- EXAM DOES NOT EXIST ERROR -- CORRECTION/changeCopyStatus ---\n ")
+            req.flash('errormsg', 'This exam does not exist, error : 1019')
+            return res.redirect("/error")
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- CORRECTION/changeCopyStatus ---\n " + err)
+            req.flash('errCopyStatusChange', "Error while saving the copy visibility, error : 1005");
+            res.redirect('/see/exam/'+req.body.examid)()
+        })
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- CORRECTION/changeCopyStatus ---\n " + err)
+        req.flash('errormsg', "Error while changing copy visibility, error : 1005");
+        res.redirect('/see/exam/'+req.body.examid)
+    })
+});
+
 module.exports = router

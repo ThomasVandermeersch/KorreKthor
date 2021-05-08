@@ -6,6 +6,12 @@ include ../header.pug
 div(class="container page create")
     if messages.recorrectmsg
         div(class="alert alert-success my-2" role="alert")= messages.recorrectmsg
+    
+    if messages.succCopyStatusChange
+        div(class="alert alert-success my-2" role="alert")= messages.succCopyStatusChange
+    
+    if messages.errCopyStatusChange
+        div(class="alert alert-danger my-2" role="alert")= messages.errCopyStatusChange
 
     div(class="card mt-2")
         div(class="card-body")
@@ -23,7 +29,11 @@ div(class="container page create")
 
             div(class="verison") Nombre de versions : #{exam.numberOfVersion}
             div(class="form-check form-switch") Activer la lecture des copies
-                input(type="checkbox", class="form-check-input", name="createQCM")
+                if exam.copyViewAvailable
+                    input(type="checkbox", class="form-check-input", checked, name="createQCM",onclick=`changeCopyStatus(this,'${exam.id}')`)
+                else
+                    input(type="checkbox", class="form-check-input", name="createQCM",onclick=`changeCopyStatus(this,'${exam.id}')`)
+
 
 
             div(class="criteria my-3") 
@@ -84,4 +94,35 @@ div(class="container page create")
             if exam.status == 2
                 a(href=`/correction/downloadExcel/${exam.id}` class="btn col-12 btn-success mt-4 bouton") Télécharger les résultats (fichier excel) 
 
+
+script.
+    function post(path, params, method='post') {
+        /**
+        * "handmade" javascript POST function
+        * This function make a posts request to path with params as args
+        */
+        console.log(params)
+        const form = document.createElement('form');
+        form.method = method;
+        form.action = path;
+    
+        for (const key in params) {
+            if (params.hasOwnProperty(key)) {
+                const hiddenField = document.createElement('input');
+                hiddenField.type = 'hidden';
+                hiddenField.name = key;
+                hiddenField.value = params[key];
+                form.appendChild(hiddenField);
+            }
+        }
+
+        document.body.appendChild(form);
+        console.log(form)
+        form.submit();
+    }
+
+    function changeCopyStatus(event ,examID){
+        object =  {"copyViewAvailable":event.checked, "examid":examID}
+        post("/correction/changeCopyStatus",object)
+    }
 include ../footer.pug
