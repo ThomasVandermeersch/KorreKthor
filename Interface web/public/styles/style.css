@@ -30,7 +30,17 @@
 
 body {
     padding-bottom: 55px;
-    }
+}
+
+.changeCopyVisibility{
+    display: flex;
+    text-align: center;
+}
+
+.changeCopyVisibility .switch-helper{
+    position: relative;
+    top: -2px;
+}
 
 @media screen and (max-width:991px){
     .create{
