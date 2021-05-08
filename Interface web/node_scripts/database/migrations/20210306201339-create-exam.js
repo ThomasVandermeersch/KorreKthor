@@ -25,6 +25,10 @@ module.exports = {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      copyViewAvailable:{
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       questionStatus:{
         type: DataTypes.STRING(2048),
       },

@@ -63,7 +63,6 @@ router.get("/exam/:examid", access.hasAccess, async (req, res) => {
 
     Exam.findOne(query).then(exam=>{
         if(exam){
-            exam["copyViewAvailable"] = false;
             return res.render("see/showExam", {exam:exam})
         }
         console.log(" --- EXAM DOES NOT EXIST ERROR -- SEE/exam ---\n ")
@@ -84,7 +83,7 @@ router.get("/copy/:copyid", access.hasAccess, async (req, res) => {
             const examOwner = copy.exam.user.matricule
             const copyOwner = copy.userMatricule
             
-            if (examOwner == userMatricule || copyOwner == userMatricule || req.session.userObject.authorizations == 0){
+            if (examOwner == userMatricule || (copyOwner == userMatricule && copy.exam.copyViewAvailable == 2)|| req.session.userObject.authorizations == 0){
                 return res.render("see/showCopy", {copy:copy})
             }
             return res.redirect("/noAccess")

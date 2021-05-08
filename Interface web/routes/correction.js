@@ -265,23 +265,36 @@ router.post('/changeCopyStatus',access.hasAccess,(req,res)=>{
     else query = {where:{userMatricule:userMatricule, id:req.body.examid}}
 
     Exam.findOne(query).then(exam=>{
-        exam.save().then(exam=>{
-            if(exam){
-                req.flash('succCopyStatusChange', "Copy visibilty changed succesfully");
-                return res.redirect('/see/exam/'+req.body.examid)
-            }
-            console.log(" --- EXAM DOES NOT EXIST ERROR -- CORRECTION/changeCopyStatus ---\n ")
-            req.flash('errormsg', 'This exam does not exist, error : 1019')
+        if(!exam){
+            console.log(" --- EXAM DOES NOT EXIST ERROR -- POST correction/changeCopyStatus ---\n ")
+            req.flash('errormsg', 'This exam does not exist, error : 1003a')
             return res.redirect("/error")
-        }).catch(err=>{
-            console.log(" --- DATABASE ERROR -- CORRECTION/changeCopyStatus ---\n " + err)
-            req.flash('errCopyStatusChange', "Error while saving the copy visibility, error : 1005");
-            res.redirect('/see/exam/'+req.body.examid)()
-        })
+        }
+        if ("copyViewAvailable" in req.body){
+            exam.copyViewAvailable = req.body.copyViewAvailable
+
+            return exam.save().then(exam=>{
+                if(exam){
+                    req.flash('succCopyStatusChange', "La visibilité des copies a été changé avec succès.");
+                    return res.redirect('/see/exam/'+req.body.examid)
+                }
+                console.log(" --- EXAM DOES NOT EXIST ERROR -- CORRECTION/changeCopyStatus ---\n ")
+                req.flash('errormsg', 'This exam does not exist, error : 1003b')
+                return res.redirect("/error")
+            }).catch(err=>{
+                console.log(" --- DATABASE ERROR -- CORRECTION/changeCopyStatus ---\n " + err)
+                req.flash('errCopyStatusChange', "Error while saving the copy visibility, error : 1003c");
+                res.redirect('/see/exam/'+req.body.examid)()
+            })
+        }
+
+        console.log(" --- BODY ERROR ERROR -- POST correction/changeCopyStatus ---\n ")
+        req.flash('errormsg', 'The body does not contian the copyViewAvailable key, error : 1003d')
+        return res.redirect("/error") 
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- CORRECTION/changeCopyStatus ---\n " + err)
-        req.flash('errormsg', "Error while changing copy visibility, error : 1005");
-        res.redirect('/see/exam/'+req.body.examid)
+        req.flash('errormsg', "Error while changing copy visibility, error : 1003e");
+        return res.redirect('/see/exam/'+req.body.examid)
     })
 });
 

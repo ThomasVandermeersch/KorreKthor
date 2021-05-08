@@ -9,7 +9,6 @@ const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
 
 var multer  = require('multer'); // Specific import for files 
-const exam = require('../node_scripts/database/models/exam');
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
@@ -107,15 +106,15 @@ router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req,
     })
 })
 
-// router.post("/scans/robot", upload.single("file"), async (req, res) => {
-//     // IMPORTANT GET THE EXAM //
-//     var exam = null; 
-// 	if (req.params.token == "secretToken"){
-//         callCorrection(req.file.originalname, exam)
-//     }
-//     else{
-//         res.end("Error, you're not allowed to do that, please check your token")
-//     }
-// })
+router.post("/scans/robot", upload.single("file"), async (req, res) => {
+    // IMPORTANT GET THE EXAM //
+    var exam = null; 
+	if (req.params.token == "secretToken"){
+        callCorrection(req.file.originalname, exam)
+    }
+    else{
+        res.end("Error, you're not allowed to do that, please check your token")
+    }
+})
 
 module.exports = router;
