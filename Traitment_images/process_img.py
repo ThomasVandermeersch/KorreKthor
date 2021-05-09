@@ -17,7 +17,7 @@ def process(imgPath):
     ratio  = img.shape[1]/1191
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
     #img[img > 130 ] = 255
-    img[img > 170 ] = 255
+    #img[img > 170 ] = 255
         	
 
     goodPage = isGoodPage(img)
@@ -96,7 +96,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.77):
+def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.75):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -106,7 +106,7 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
     - The emptyThreshold param is the resemblance ratio between the empty template and a block in the image
     """
     emptyTemplate = cv2.imread(emptyTemplatePath, 0)
-    emptyTemplate = cv2.resize(emptyTemplate, (30, 30), interpolation=cv2.INTER_LINEAR)
+    emptyTemplate = cv2.resize(emptyTemplate, (29, 29), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", emptyTemplate)
     # cv2.waitKey(delay=5000)
@@ -116,7 +116,7 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
     # cv2.destroyAllWindows()
 
     fullTemplate = cv2.imread(fullTemplatePath, 0)
-    fullTemplate = cv2.resize(fullTemplate, (40, 40), interpolation=cv2.INTER_LINEAR)
+    fullTemplate = cv2.resize(fullTemplate, (35, 35), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", fullTemplate)
     # cv2.waitKey(delay=5000)
@@ -129,7 +129,8 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
 
     for i in fullListe:
         cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
-
+    
+    print(emptyListe)
     for i in emptyListe:
         cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
 
