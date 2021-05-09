@@ -49,7 +49,7 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    # template = cv2.resize(template, (140, 140), interpolation=cv2.INTER_LINEAR)
+    #template = cv2.resize(template, (60, 60), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", template)
     # cv2.waitKey(delay=5000)
@@ -68,7 +68,7 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
     points = []
     prev = (0,0)
     for pt in zip(*loc[::-1]):
-        # cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,0), 5)
+        #cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,0), 5)
         distance = math.sqrt(((pt[0]-prev[0])**2)+((pt[1]-prev[1])**2))
         
         if distance > minDistance : 
@@ -96,7 +96,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.75):
+def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.65):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
