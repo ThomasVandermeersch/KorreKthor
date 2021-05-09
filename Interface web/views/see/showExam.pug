@@ -24,16 +24,22 @@ div(class="container page create")
             else
                 h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
 
-            p(class="card-subtitle text-muted")= exam.id
+            p(class="card-subtitle text-muted bouton")= exam.id
             p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
 
             div(class="verison") Nombre de versions : #{exam.numberOfVersion}
-            div(class="form-check form-switch") Activer la lecture des copies
-                if exam.copyViewAvailable
-                    input(type="checkbox", class="form-check-input", checked, name="createQCM",onclick=`changeCopyStatus(this,'${exam.id}')`)
-                else
-                    input(type="checkbox", class="form-check-input", name="createQCM",onclick=`changeCopyStatus(this,'${exam.id}')`)
-
+            
+            div(class="changeCopyVisibility")
+                div(class="form-check form-switch") 
+                    label(class="form-check-label bouton" for="changeCopyStatus") Activer la lecture des copies
+                    
+                    if exam.copyViewAvailable == 2
+                        input(type="checkbox" class="form-check-input" id="changeCopyVisibility" checked, name="changeCopyVisibility" onclick=`changeCopyStatus(this,'${exam.id}')`)
+                    else
+                        input(type="checkbox" class="form-check-input" id="changeCopyVisibility" name="changeCopyVisibility" onclick=`changeCopyStatus(this,'${exam.id}')`)
+                
+                button(type="button" class='btn btn-sm switch-helper text-muted' data-toggle="tooltip" data-placement="bottom" title="Décider d'activer ou non la publication des résultats des copies de cet examen.")
+                    i(class="fa fa-question-circle" style="font-size:20px;")
 
 
             div(class="criteria my-3") 
@@ -101,7 +107,6 @@ script.
         * "handmade" javascript POST function
         * This function make a posts request to path with params as args
         */
-        console.log(params)
         const form = document.createElement('form');
         form.method = method;
         form.action = path;
@@ -117,12 +122,11 @@ script.
         }
 
         document.body.appendChild(form);
-        console.log(form)
         form.submit();
     }
 
-    function changeCopyStatus(event ,examID){
-        object =  {"copyViewAvailable":event.checked, "examid":examID}
-        post("/correction/changeCopyStatus",object)
+    function changeCopyStatus(event, examID){
+        object = {"copyViewAvailable":event.checked ? 2 : 0, "examid":examID}
+        post("/correction/changeCopyStatus", object)
     }
 include ../footer.pug

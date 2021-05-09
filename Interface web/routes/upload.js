@@ -9,7 +9,6 @@ const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
 
 var multer  = require('multer'); // Specific import for files 
-const exam = require('../node_scripts/database/models/exam');
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
@@ -116,7 +115,6 @@ router.post("/scans/robot", upload.single("file"), async (req, res) => {
 			callCorrection(req.file.originalname, exam)
 		}).catch(err=>{
 			res.end("Error, this exam does not exist")
-
 		})
     }
     else{

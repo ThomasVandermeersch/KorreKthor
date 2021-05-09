@@ -20,8 +20,9 @@ def index():
     file = f"./saves/{now}_{pdf_file.filename}"
     pdf_file.save(file)
     print("Got file in:", file) 
-
-    return main.compute(file)
+    a = main.compute(file)
+    print(a)
+    return a
 
 @route('/static/<filename:path>')
 def send_static(filename):
