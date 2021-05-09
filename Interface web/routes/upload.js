@@ -29,11 +29,12 @@ function callCorrection(filename, exam, req){
 	}
     
     request.post({url:`${url}/run`, formData:formData}, function (err, httpResponse, body) {
-        if (err){
+        if (err || !body ||JSON.parse(body).error){
             exam.status = 3 // 3 = correction error
             exam.save()
         }
         else{
+            console.log(body)
             zipFile = JSON.parse(body).zipFile
             const file = fs.createWriteStream(`zips/${zipFile}`);
             
@@ -106,11 +107,15 @@ router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req,
     })
 })
 
-router.post("/scans/robot", upload.single("file"), async (req, res) => {
-    // IMPORTANT GET THE EXAM //
-    var exam = null; 
-	if (req.params.token == "secretToken"){
-        callCorrection(req.file.originalname, exam)
+router.post("/scans/robot", upload.single("file"), async (req, res) => { 
+	if (req.body.token == "secretToken"){
+		console.log(req.body)
+		console.log(req.body.examid)
+		Exam.findOne({where:{id:req.body.examid}}).then(exam=>{
+			callCorrection(req.file.originalname, exam)
+		}).catch(err=>{
+			res.end("Error, this exam does not exist")
+		})
     }
     else{
         res.end("Error, you're not allowed to do that, please check your token")
