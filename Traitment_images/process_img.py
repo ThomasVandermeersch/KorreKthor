@@ -16,8 +16,10 @@ def process(imgPath):
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
     ratio  = img.shape[1]/1191
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
+    #img[img > 130 ] = 255
     img[img > 170 ] = 255
         	
+
     goodPage = isGoodPage(img)
     print(f" {imgPath}")
     if goodPage:
