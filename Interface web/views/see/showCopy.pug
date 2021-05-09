@@ -32,9 +32,9 @@ div(class="container page")
 
             div(class="photo my-3 row")
                 div(class="tab col-10 col-sm-5 form-check p-0 m-auto")
+                    h4(style="text-align:center") Aperçu de la détection
                     if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
                         div
-                            h4(style="text-align:center") Aperçu de la détection
                             form(class="form" method="POST" action="/correction/updateUser/")
                                 input(type="hidden" name="matricule" value=copy.user.matricule)
                                 input(type="hidden" name="copyId" value=copy.id)
@@ -57,7 +57,7 @@ div(class="container page")
                                     
                                     each response in [...JSON.parse(copy.exam.corrections)[copy.version][val].keys()]
                                         td(style="text-align:center")
-                                            input(disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes")
+                                            input(class="form-check-input checkboxClass p-2 m-1" disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) type="checkbox" name=response value="yes")
 
                         else
                             each val in [...questions.keys()]
@@ -67,7 +67,7 @@ div(class="container page")
                                     
                                     each response in [...questions[val].keys()]
                                         td(style="text-align:center")
-                                            input(checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
+                                            input(class="form-check-input checkboxClass p-2 m-1" checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
                     
                     if session.userObject.role == 0 && session.userObject.authorizations == 3
                         a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
