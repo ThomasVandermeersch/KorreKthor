@@ -4,8 +4,8 @@ package-lock.json
 pre_pdf/
 .env
 .env.prod
-certificates/
-downloads/
+certificates/*
+downloads/*
 zips/*
 copies/*
 uploads/*

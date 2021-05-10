@@ -115,8 +115,8 @@ router.get("/exam/:examid/downloadresult", access.hasAccess, async (req, res) =>
                 (err) => {
                     if (err){
                         console.log(" --- DOWNLOAD ERROR -- SEE/exam/downloadresult ---\n " + err)
-                        req.flash('errormsg', 'Error while downloading the file, error : 1024')
-                        return res.redirect('/error')
+                        //req.flash('errormsg', 'Error while downloading the file, error : 1024')
+                        //return res.redirect('/error')
                     } 
                 }
             );
@@ -149,8 +149,8 @@ router.get("/exam/:examid/downloadcorrection", access.hasAccess, async (req, res
                 (err) => {
                     if (err){
                         console.log(" --- DOWNLOAD ERROR -- SEE/exam/downloadcorrection ---\n " + err)
-                        req.flash('errormsg', 'Error while downloading the file, error : 1027')
-                        return res.redirect('/error')
+                        //req.flash('errormsg', 'Error while downloading the file, error : 1027')
+                        //return res.redirect('/error')
                     } 
                 }
             );
@@ -181,8 +181,8 @@ router.get("/copy/:copyid/download", access.hasAccess, async (req, res) => {
                     (err) => {
                         if (err) {
                             console.log(" --- DOWNLOAD ERROR -- SEE/copy/download ---\n " + err)
-                            req.flash('errormsg', 'Error while downloading the file, error : 1030')
-                            return res.redirect('/error')
+                            //req.flash('errormsg', 'Error while downloading the file, error : 1030')
+                            //return res.redirect('/error')
                         }
                     }
                 );

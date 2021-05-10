@@ -90,11 +90,12 @@ app.get("*", access.hasAccess, function (req, res) {
 const httpsServer = https.createServer(credentials, app)
 
 httpsServer.listen(9898)
+//app.listen(8282)
 
 console.log("-------------------------------------")
 console.log("| RUNNING KorrKthor on: " + env + " |")
 console.log("-------------------------------------")
-console.log(" [Listening] https://" + process.env.ENDPOINT + "/")
+console.log(" [Listening] https://" + process.env.ENDPOINT + ":9898/")
 console.log(" [PostgrSQL]    " + config.host + ":" + config.port +"/")
 console.log(" [Python]     http://" + process.env.PYTHON_SERVER_HOST + ":" + process.env.PYTHON_SERVER_PORT + "/" )
 console.log("-------------------------------------")

@@ -35,7 +35,8 @@ router.get("/downloadresult", access.hasAccess, async (req, res) => {
         res.download(
             path.resolve(exam.examFile),
             (err) => {
-                if (err) res.redirect("/error")
+		console.log("--- DOWNLOAD ERROR CREATE/downloadresult ---\n", err) 
+               // if (err) res.redirect("/error")
             }
         );
     }).catch(err=> {
@@ -50,7 +51,8 @@ router.get("/downloadcorrection", access.hasAccess, async (req, res) => {
         res.download(
             path.resolve(exam.correctionFile),
             (err) => {
-                if (err) res.redirect("error")
+		console.log("--- DOWNLOAD ERROR CREATE/downloadcorrection ---\n", err) 
+                //if (err) res.redirect("error")
             }
         ); 
     }).catch(err=> {

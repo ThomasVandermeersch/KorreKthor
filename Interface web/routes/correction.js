@@ -107,8 +107,8 @@ router.get("/downloadExcel/:examid", access.hasAccess, async (req,res)=>{
                     (err) => {
                         if (err) {
                             console.log(" --- DOWNLOAD ERROR -- correction/downloadExcel/:examid ---\n " + err)
-                            req.flash('errormsg', 'Error while downloading the file, error : 1041')
-                            return res.redirect('/error')
+                            //req.flash('errormsg', 'Error while downloading the file, error : 1041')
+                            //return res.redirect('/error')
                         }
                     }
                 );
