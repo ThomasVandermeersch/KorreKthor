@@ -1,5 +1,6 @@
 # KorreKthor <!-- omit in TOC -->
 
+- [Usage](#usage)
 - [Run for production](#run-for-production)
   - [Setting up](#setting-up)
     - [Dotenv file](#dotenv-file)
@@ -25,6 +26,14 @@
   - [Accessing the zip file](#accessing-the-zip-file)
 - [Code structure](#code-structure)
 
+## Usage
+
+For using KorreKthor please watch those videos :
+
+- [Create an exam](https://youtu.be/6foOI38oW10)
+- [Upload copies](https://youtu.be/aUPqT1mtdQw)
+- [View an exam copy](https://youtu.be/k0v1PA8TOX0)
+
 ## Run for production
 
 ### Setting up
@@ -34,12 +43,15 @@ First thing first, clone this github repo in `/` (for example). Then you have th
 
 Please consider creating a `.env` file in `/KorreKthor/Interface web/` folder with the database informations. The `.env` file must contains :
 - NODE_ENV (equal to development or production)
-- OAUTH_APP_ID
-- OAUTH_APP_SECRET
-- OAUTH_REDIRECT_URI
-- OAUTH_SCOPES
-- OAUTH_AUTHORITY
-- SESSION_SECRET
+- OAUTH_APP_ID (oauth config var)
+- OAUTH_APP_SECRET (oauth config var)
+- OAUTH_REDIRECT_URI (oauth config var)
+- OAUTH_SCOPES (oauth config var)
+- OAUTH_AUTHORITY (oauth config var)
+- EMAIL_ADDRESS (For sending complain)
+- EMAIL_PASSWORD (For sending complain)
+- ENDPOINT (Your ip/url address to locate the server)
+- SESSION_SECRET (Your secret token session)
 - POSTGRES_PASSWORD
 - POSTGRES_USER
 - POSTGRES_DATABASE_prod (for production only)
