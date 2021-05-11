@@ -16,6 +16,7 @@ def process(imgPath):
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
     ratio  = img.shape[1]/1191
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
+    print("img shape :", img.shape)
     #img[img > 130 ] = 255
     #img[img > 170 ] = 255
         	
@@ -128,11 +129,14 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
     w, h = fullTemplate.shape[::-1]
 
     for i in fullListe:
+        i = (i[0]+200, i[1]+120) # replace the matched points in the area
         cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
     
-    print(emptyListe)
     for i in emptyListe:
+        i = (i[0]+200, i[1]+120) # replace the matched points in the area
         cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
+
+    # cv2.rectangle(img, (120, 200), (1000, 1550), (0,100,0), 1) # Display the matching area
 
     boolArray = getBoolArray(emptyListe, fullListe, 25)
     return boolArray
@@ -143,7 +147,9 @@ def getPatternList(img, template, threshold, minDistance):
     - The thresold param is the resemblance ratio
     - The minDistance param is the minimal distance between 2 "same" point 
     """
-    result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+
+    # img[120:1550, 200:1000] : define the matching area
+    result = cv2.matchTemplate(img[120:1550, 200:1000], template, cv2.TM_CCOEFF_NORMED)
     location = np.where(result >= threshold)
 
     liste = []
