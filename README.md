@@ -25,14 +25,19 @@
   - [Run the pdf processing method](#run-the-pdf-processing-method)
   - [Accessing the zip file](#accessing-the-zip-file)
 - [Code structure](#code-structure)
+  - [Web Interface](#web-interface-1)
+  - [Image Processing](#image-processing)
+  - [Hardware](#hardware)
 
 ## Usage
 
-For using KorreKthor please watch those videos :
+For using KorreKthor web interface please watch those videos :
 
 - [Create an exam](https://youtu.be/6foOI38oW10)
 - [Upload copies](https://youtu.be/aUPqT1mtdQw)
 - [View an exam copy](https://youtu.be/k0v1PA8TOX0)
+
+For using the KorreKthor scanner please read the [user's manual](https://github.com/ThomasVandermeersch/KorreKthor/raw/main/Hardware/KorreKthor-Manuel_d_utilisation.docx).
 
 ## Run for production
 
@@ -148,7 +153,7 @@ The project use a ORM dependency named [sequelize](https://sequelize.org/).
 
 Here is the database working draft :
 
-![Database draft](Images/Database.jpg)
+![Database draft](Images/Database.png)
 
 Well, for creating a instance of a User, you just  have to insert the following lines:
 ```js
@@ -275,10 +280,34 @@ The response is the form :
 
 The zip file is available on the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
 ## Code structure
-The main file to run is in "Interface Web"/
 
-The embedded javascript files are in "Interface web"/public/javascript/
+The code is splitted in 3 parts : the Web Interface, the Image Processing, and the Hardware. 
 
-The backend files are located in "Interface web"/node_scripts/
+### Web Interface
 
-The .pug view files are in  "Interface web"/views/
+Files are located in `/KorreKthor/Interface Web/`
+- The main file to run is in `app.js`
+- The embedded javascript files are in `/public/javascript/`
+- The backend files are located in `/node_scripts/`
+- The router files are located in `/routes/`
+- The .pug view files are in  `/views/`
+
+### Image Processing
+
+Files are located in `/KorreKthor/Traitement_images/`
+
+- The server file is `server.py` (Note: You need to specify PYTHON_SERVER_HOST and PYTHON_SERVER_PORT in order to run this file outside a docker container)
+- The `main.py` file calls all the python scripts and make the request response
+- The `process_img.py` file makes all the images processing scripts in order to return the decoded answers list
+- The `process_pdf.py` file is used to extract all page to a .png file from the source pdf file
+- The `source_pdf` folder contians the original patten images
+
+### Hardware
+
+Files are located in `/KorreKthor/Hardware/`
+
+- The `Modèle_3D/` folder contains the 3D printing files: LEDS supports, camera support, raspberry case, … 
+- `PI_funct.py`: File including the functions of moving the arm, taking pictures, operating the valve and the motor. 
+- `selection.py`: Creating the movement sequence, taking pictures, and saving pictures 
+- `booting.py`: allows you to operate the interface, LED brightness and start buttons. This file is to be run on the Raspberry Pi boot, allowing the user to use the physical interface without the need of any screen (to be added in “/etc/rc.local”). 
+- The `PCB/` folder contains the pdf schemas and the Altium project
