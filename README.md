@@ -159,7 +159,7 @@ Well, for creating a instance of a User, you just  have to insert the following 
 ```js
 const { User } = require("./node_scripts/database/models");
 
-await User.create({"fullName":"Tom DELVAUX", "matricule":"17098", "authorizations":0, "role":0})
+await User.create({"fullName":"Tom DELVAUX","email":"17098@domain.be" "matricule":"17098", "authorizations":0, "role":0})
 ```
 
 Here are some example for querying the datas:
@@ -202,7 +202,7 @@ $ sequelize db:migrate // To apply the new migration
 > Note: if an error occurred try `export NODE_ENV=development` before running the migation(s)
 
 ### How to use the app
-First, open your favorit browser and enter this url : http://localhost:8000/.
+First, open your favorite browser and enter this url : http://localhost:9898/.
 
 Then, upload you student list and click **Submit file**.
 > Note : this list must follow the [Student list format section](#student-list-format)
