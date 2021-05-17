@@ -12,8 +12,8 @@ const env = process.env.NODE_ENV || 'development';
 const config = require('./node_scripts/database/config/config')[env]
 
 var credentials = {
-  key: fs.readFileSync("certificates/key.pem"),
-  cert: fs.readFileSync("certificates/cert.pem")
+  key: fs.readFileSync("certificates/fluke_ecam.key"),
+  cert: fs.readFileSync("certificates/fluke_ecam.cer")
 }
 
 
