@@ -134,7 +134,8 @@ async function exportStudents(exam, data){
           matricule = row.values[matriculeInd]
 
           if (matricule in data){
-            row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
+            // row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
+            row.getCell(coteInd).value = data[matricule].result[0]
             delete data[matricule]
           }
         }

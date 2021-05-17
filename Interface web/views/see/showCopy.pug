@@ -26,9 +26,10 @@ div(class="container page")
                 h4(class="text-danger") Cote : #[strong Error]
             else
                 if point < 10
-                    h4(class="text-danger") Cote : #{point}/20
-                else
-                    h4(class="text-success") Cote : #{point}/20
+                //-     h4(class="text-danger") Cote : #{point}/20
+                //- else
+                //-     h4(class="text-success") Cote : #{point}/20
+                h4= copy.result[0] + '/' + copy.result[1]
 
             div(class="photo my-3 row")
                 div(class="tab col-10 col-sm-5 form-check p-0 m-auto")

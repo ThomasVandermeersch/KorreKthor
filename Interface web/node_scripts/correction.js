@@ -125,11 +125,16 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
                     const positif = parseFloat(correctionCriterias.ptsRight,10)
                     const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
                     const abstention = parseFloat(correctionCriterias.ptsAbs,10)
-                    maxPoints += positif
+                    const poidsQuestion =  [ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1.5 , 1.5 , 1.5 , 1.5 , 1 , 2 , 2 , 2 , 1, 0]
+                    //hard Code == examen techno
+                    maxPoints += positif * poidsQuestion[questionIndex] // HARDCODE EXAM TECHNO
+
+
+
 
                     // Check if any proposition is checked to detect absentention
                     if(response[questionIndex].some(elem => elem == true)){            
-                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif
+                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif * poidsQuestion[questionIndex] // HARDCODE EXAM TECHNO
                         else totalPoints -= negatif
                     }
                     else totalPoints += abstention
