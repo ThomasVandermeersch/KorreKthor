@@ -30,6 +30,7 @@ services:
       - ./data/files/zips:/usr/src/korrekthor_backend/zips
       - ./data/files/downloads:/usr/src/korrekthor_backend/downloads
       - ./data/files/uploads:/usr/src/korrekthor_backend/uploads
+      - ./data/files/copies:/usr/src/korrekthor_backend/copies
 
   processing:
     build: 

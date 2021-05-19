@@ -18,7 +18,7 @@ def process(imgPath):
     img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
     print("img shape :", img.shape)
     #img[img > 130 ] = 255
-    #img[img > 170 ] = 255
+    #img[img < 100 ] = 0
         	
 
     goodPage = isGoodPage(img)
@@ -97,7 +97,7 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.65):
+def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.5):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -129,11 +129,11 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
     w, h = fullTemplate.shape[::-1]
 
     for i in fullListe:
-        i = (i[0]+200, i[1]+120) # replace the matched points in the area
-        cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/3), (0,255,0), 1)
+        i = (i[0]+200, i[1]+290) # replace the matched points in the area
+        cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/2), (0,255,0), 1)
     
     for i in emptyListe:
-        i = (i[0]+200, i[1]+120) # replace the matched points in the area
+        i = (i[0]+200, i[1]+290) # replace the matched points in the area
         cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
 
     # cv2.rectangle(img, (120, 200), (1000, 1550), (0,100,0), 1) # Display the matching area
@@ -149,7 +149,9 @@ def getPatternList(img, template, threshold, minDistance):
     """
 
     # img[120:1550, 200:1000] : define the matching area
-    result = cv2.matchTemplate(img[120:1550, 200:1000], template, cv2.TM_CCOEFF_NORMED)
+    area = img[290:1550, 200:1000]
+    area[area < 210] = 0
+    result = cv2.matchTemplate(area, template, cv2.TM_CCOEFF_NORMED)
     location = np.where(result >= threshold)
 
     liste = []
