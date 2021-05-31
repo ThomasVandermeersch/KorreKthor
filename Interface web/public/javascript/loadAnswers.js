@@ -28,7 +28,7 @@ document.querySelectorAll(".addChoice").forEach(item=>{
     item.addEventListener("click",function(){
         var table = item.parentNode.parentNode.parentNode
         var row = table.rows[item.parentNode.parentNode.rowIndex]
-        if (row.cells.length <= 12){
+        if (row.cells.length <= 13){
             row.insertCell(row.cells.length - 2).innerHTML +=  `<input type='checkbox' class='form-check-input checkboxClass'  id='question' name='${row.cells.length-4}' value='yes'>`
         }
     })
@@ -76,7 +76,7 @@ document.querySelectorAll(".addQuestion").forEach(item=>{
 
             button.addEventListener("click",function(){
                 var row2 = table.rows[button.parentNode.parentNode.rowIndex]
-                if (row2.cells.length <= 12){
+                if (row2.cells.length <= 13){
                     row.insertCell(row.cells.length - 2).innerHTML +=  `<input type='checkbox' class='form-check-input checkboxClass'  id='question' name='${row2.cells.length-4}' value='yes'>`
                 }
             })

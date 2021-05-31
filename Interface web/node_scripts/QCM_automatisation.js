@@ -121,7 +121,7 @@ function generateTemplate(doc) {
   doc.image("source_pdf/squares.PNG", 10, 10, { valign: "top" });
   doc.image("source_pdf/squares.PNG", 10, 765, { valign: "top" });
   doc.fontSize(20);
-  doc.text("Feuilles de réponses", 105, 47, { align: "center" });
+  doc.text("Feuilles de réponse", 105, 47, { align: "center" });
   doc.moveDown();
 }
 
@@ -134,9 +134,11 @@ function generateHeader(doc, student, lesson, writeStream) {
    doc.fontSize(10)
    doc.text(`Nom et prénom: ${student.name}`, 140, 75);
    doc.text(`Matricule: ${student.matricule}`, 140, 90);
-   doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
+   //doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
+   doc.text(`Date: 17/06/2021`, 140, 105);
+
    doc.text(`Cours: ${lesson.name}`, 140, 120);
-   doc.text(`Version: ${student.version}`, 140, 135);
+   //doc.text(`Version: ${student.version}`, 140, 135);
 
    // QRCode generator
    studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
@@ -152,7 +154,7 @@ function generateTable(doc, answers) {
    * Function that generate table for the answers 
    */
 
-  const alph = "ABCDEFGHIJ" 
+  const alph = "ABCDEFGHIJKLMNOP" 
   var max = 0
   doc.fontSize(10);
 
