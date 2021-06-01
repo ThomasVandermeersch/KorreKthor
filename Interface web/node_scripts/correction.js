@@ -120,8 +120,23 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
                 // Copy proposition length == Correction proposition length
                 if(response[questionIndex].length != correction[questionIndex].length) reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
                 
+
+                if(questionIndex==10){
+                    // Syntaxe : arr.indexOf(élémentRecherché, indiceDébut)
+                    indexA = response[questionIndex].indexOf(true)
+                    indexB = response[questionIndex].indexOf(true, indexA+1)
+                    
+
+                    if(indexB == -1 && indexA != -1 ) points = indexA
+                    else if(indexB != -1 && indexA != -1) points = (indexA + indexB)/2
+                    else points = 0
+                    
+                    totalPoints += points
+                    maxPoints += 10
+                }
+
                 // Normal correction
-                if(correctionCriterias.type == 'normal'){    
+                else if(correctionCriterias.type == 'normal'){    
                     const positif = parseFloat(correctionCriterias.ptsRight,10)
                     const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
                     const abstention = parseFloat(correctionCriterias.ptsAbs,10)
