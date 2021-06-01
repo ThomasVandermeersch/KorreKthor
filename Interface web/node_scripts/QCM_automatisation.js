@@ -121,7 +121,7 @@ function generateTemplate(doc) {
   doc.image("source_pdf/squares.PNG", 10, 10, { valign: "top" });
   doc.image("source_pdf/squares.PNG", 10, 765, { valign: "top" });
   doc.fontSize(20);
-  doc.text("Feuilles de réponse", 105, 47, { align: "center" });
+  doc.text("Feuille de réponses", 105, 47, { align: "center" });
   doc.moveDown();
 }
 
