@@ -23,10 +23,11 @@ def process(imgPath):
 
     goodPage = isGoodPage(img)
     print(f" {imgPath}")
-    if goodPage:
-        if not getGoodOrientation(img, goodPage):
-            print("Make a rotation of 180 degrees...")
-            img = cv2.rotate(img, cv2.ROTATE_180)
+    if True:
+    # if goodPage: # Check the 3 sheet corners 
+    #     if not getGoodOrientation(img, goodPage):
+    #         print("Make a rotation of 180 degrees...")
+    #         img = cv2.rotate(img, cv2.ROTATE_180)
 
         resp = getImageResponses(img)
 
