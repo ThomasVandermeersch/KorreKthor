@@ -150,7 +150,7 @@ def getPatternList(img, template, threshold, minDistance):
     """
 
     # img[120:1550, 200:1000] : define the matching area
-    area = img[290:1550, 200:1000]
+    area = img[290:1550, 200:1100]
     area[area < 210] = 0
     result = cv2.matchTemplate(area, template, cv2.TM_CCOEFF_NORMED)
     location = np.where(result >= threshold)
