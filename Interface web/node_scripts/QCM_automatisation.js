@@ -4,7 +4,7 @@ const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
 
 
-async function createInvoice(students, lesson, answers, fileVersions, extraCopies) {
+async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate) {
   /**
    * Function that create a printable pdf for teachers
    * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
@@ -36,10 +36,14 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
 
       generateTemplate(doc); //Mise des carés et d'un titre
       generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
-      generateHeader(doc, student, lesson, writeStream)
+      generateHeader(doc, student, lesson, writeStream,examDate)
     
       sources.push("pre_pdf/" + (student.matricule).toString() + ".pdf")
-      const files = JSON.parse(fileVersions)
+      
+      let files;
+      if(fileVersions != null){
+        files = JSON.parse(fileVersions)
+      }
 
       writeStream.on('finish', async function () {
         nbDone++;
@@ -59,7 +63,9 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
           sources.forEach(path => {
             try{
               index = sources.indexOf(path);
-              m.add("uploads/" + files[students[index].version]);
+              if(fileVersions != null){
+                m.add("uploads/" + files[students[index].version]);
+              }
               m.add(path);
             }
             catch (err){
@@ -118,27 +124,25 @@ function generateTemplate(doc) {
    * Fucntion that generate pdf template (top-left, top-right, bottom-left squares) for each student sheet
    */
   doc.image("source_pdf/squares.PNG", 530, 10, { valign: "top" });
-  doc.image("source_pdf/squares.PNG", 10, 10, { valign: "top" });
+  doc.image("source_pdf/squares.PNG", 530, 765, { valign: "top" });
   doc.image("source_pdf/squares.PNG", 10, 765, { valign: "top" });
   doc.fontSize(20);
   doc.text("Feuille de réponses", 105, 47, { align: "center" });
   doc.moveDown();
 }
 
-function generateHeader(doc, student, lesson, writeStream) {
+function generateHeader(doc, student, lesson, writeStream,examDate) {
   /**
    * Fucntion that generate pdf header (QRCoed, name, matricule, version...) for each student sheet
    */
 
-   date = new Date();
+   date = new Date(examDate);
    doc.fontSize(10)
    doc.text(`Nom et prénom: ${student.name}`, 140, 75);
    doc.text(`Matricule: ${student.matricule}`, 140, 90);
-   //doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
-   doc.text(`Date: 17/06/2021`, 140, 105);
-
+   doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
    doc.text(`Cours: ${lesson.name}`, 140, 120);
-   //doc.text(`Version: ${student.version}`, 140, 135);
+   doc.text(`Version: ${student.version}`, 140, 135);
 
    // QRCode generator
    studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }

@@ -1,0 +1,32 @@
+include ../header.pug
+
+div(class="container page create")
+    div(class="progress mt-3 mb-2")
+        <div class="progress-bar" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+    
+    h2 Etape 2.1 : Entrer les informations de l'examen
+
+    form(action="/create/sendexamInfo" method="POST")
+    
+        div(class="container border border-1 rounded mt-3")
+            div(class="row row-cols-auto my-2") 
+                div(class="col") Nom du cours :
+                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="C'est sous ce nom qu'apparaîtra votre examen sur la plateforme et sur les copies des étudiants.")
+                        i(class="fa fa-question-circle" style="font-size:20px;color:grey")
+
+                div(class="col p-0" id="lesson")
+                    input(class="form-control" type="text", name="lesson", value=lesson, required, min=4 max=65)
+            
+            div(class="row row-cols-auto my-2") 
+                div(class="col") Date de l'examen :
+            
+                div(class="col p-0" id="lesson")
+                    input(type="date" required name="date")
+        div(class="row row-cols-auto my-2") 
+
+            <div class="container">
+                <div class="col-md-12 text-center">
+                    <button type="submit" name="singleGrid"class="btn btn-success"> Générer uniquement des grilles de réponses</button>
+                    <button type="submit" name="merge" class="btn btn-success"> Joindre les questionnaires aux grilles de réponses </button>
+                </div>
+

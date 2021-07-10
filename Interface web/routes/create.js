@@ -6,6 +6,7 @@ const access = require('../node_scripts/hasAccess')
 const { Exam } = require("../node_scripts/database/models");
 const corrector = require('../node_scripts/correction')
 const { v4: uuidv4 } = require('uuid');
+const { body, validationResult } = require('express-validator');
 
 var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(
@@ -72,7 +73,7 @@ router.get("/Step1",access.hasAccess, function(req,res){
 })
 
 // Route to upload questions
-router.get("/Step2", access.hasAccess, function(req,res){
+router.get("/Step22", access.hasAccess, function(req,res){
     if (!req.session.excelFile){
         req.flash('errormsg', "You cannot go directly to step 2, error 1014a");
         return res.redirect("/create/Step1")
@@ -84,16 +85,25 @@ router.get("/Step2", access.hasAccess, function(req,res){
         })
 })
 
+router.get("/Step21", access.hasAccess, (req,res)=>{
+    if (!req.session.excelFile){
+        req.flash('errormsg', "You cannot go directly to step 2, error 1014a");
+        return res.redirect("/create/Step1")
+    }
+    res.render('create/examInfo',{
+        lesson : req.session.excelFile.lesson
+    })
+})
+
 // Route to load the answers
 router.get("/Step3",access.hasAccess, function(req, res){
-    if (!req.session.excelFile || !req.session.pdffiles){
+    if (!req.session.excelFile){
         req.flash('errormsg', "You cannot go directly to step 3, error 1014b");
         return res.redirect("/create/Step1")
     }
     return res.render('create/loadAnswers', {
-            versions :JSON.parse(req.session.excelFile.versions), 
-            files :JSON.parse(req.session.pdffiles),
-            lesson : req.session.excelFile.lesson
+            versions :JSON.parse(req.session.excelFile.versions),
+            lesson : req.session.excelFile.lesson          
         })
 })
 
@@ -153,7 +163,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         questionStatus[key] = array
     });
     
-    const files = JSON.parse(req.body.files)
+    //const files = JSON.parse(req.body.files)
 
     Exam.create({
         "userMatricule":req.session.userObject.matricule, 
@@ -170,7 +180,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
             versions: JSON.parse(req.session.excelFile.versions)
         }
 
-        QCM_automatisation.createInvoice(students, lesson, answers, files, req.session.extraCopies)
+        QCM_automatisation.createInvoice(students, lesson, answers, req.session["pdffiles"], req.session.extraCopies, req.session.examDate)
             .then(async(ret) => {
                 // handle errors
                 if (ret.error){
@@ -238,7 +248,7 @@ router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), asyn
             }
 
             req.session["excelFile"] = excelFile
-            res.redirect("/create/Step2")
+            res.redirect("/create/Step21")
         }
     }
     else{
@@ -257,7 +267,7 @@ router.post("/sendQuestions", access.hasAccess, upload.array("question"), (req, 
         var fileName = req.files[i].filename
         if(path.extname(fileName) != '.pdf'){
             req.flash('errormsg', 'You can only send PDF files');
-            return res.redirect('/create/Step2')
+            return res.redirect('/create/Step22')
         }
         else{
             files[liste[i]] = fileName
@@ -267,6 +277,23 @@ router.post("/sendQuestions", access.hasAccess, upload.array("question"), (req, 
     res.redirect("/create/Step3")
 })
 
+router.post('/sendexamInfo', access.hasAccess ,body('lesson').isLength({ min: 5,max:65 }),
+    function(req,res){
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors)
+            return res.send("ERROR")
+        } 
+        console.log(req.body)
+        req.session.excelFile["lesson"] = req.body.lesson
+        req.session.examDate = req.body.date
+
+        if('singleGrid' in req.body){
+            req.session["pdffiles"] = null
+            res.redirect("Step3")
+        }
+        else res.redirect("Step22")
+})
 
 router.post("/sendCotationCriteria/:redirection", access.hasAccess, async (req, res)=>{
     var criteria = req.body

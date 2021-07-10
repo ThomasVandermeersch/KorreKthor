@@ -226,5 +226,5 @@ document.getElementById("send").addEventListener("click", function(){
 
     var files = document.getElementById("filesList")
 
-    post("/create/quest", {"liste":JSON.stringify(responseObject), "files":JSON.stringify(files.value)})
+    post("/create/quest", {"liste":JSON.stringify(responseObject)})
 })
