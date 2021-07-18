@@ -2,7 +2,8 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
-
+var zipBuilder = require('adm-zip');
+const { resolveCname } = require("dns");
 
 async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate) {
   /**
@@ -32,12 +33,14 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
   return new Promise((resolve, reject) => {
     students.forEach(async (student) => {
       let doc = new PDFDocument({size: 'A4'});
-      let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
       generateTemplate(doc); //Mise des carés et d'un titre
       generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
-      generateHeader(doc, student, lesson, writeStream,examDate)
-    
+      generateHeader(doc, student, lesson,examDate)
+      
+      writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
+      doc.pipe(writeStream);
+
       sources.push("pre_pdf/" + (student.matricule).toString() + ".pdf")
       
       let files;
@@ -45,52 +48,86 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
         files = JSON.parse(fileVersions)
       }
 
-      writeStream.on('finish', async function () {
+      writeStream.on('finish', async function (info) {
         nbDone++;
         if (nbDone == max) {
-          m = new PDFMerger();
+          const finalZip = new zipBuilder()
+          
           c = new PDFMerger();
           var version = Object.keys(answers);
-
           version.forEach(letter => {
             c.add("pre_pdf/correction" + letter + ".pdf");
           });
-
           correctionPath = `./downloads/Correction_${lesson.id}.pdf`;
           await c.save(correctionPath);
+          finalZip.addLocalFile(correctionPath)
 
-          
-          sources.forEach(path => {
-            try{
-              index = sources.indexOf(path);
-              if(fileVersions != null){
-                m.add("uploads/" + files[students[index].version]);
-              }
-              m.add(path);
-            }
-            catch (err){
-              console.log(err)
-              reject({error:`File ${files[students[index].version]} is not correct`})
-            }
-          });
+          if(fileVersions != null){
+            buildMergeExam(sources,files,students).then(()=>{
+              finalZip.addLocalFolder('./pre_pdf/merged')
+              examPath = `./downloads/Exam_${lesson.id}.zip`;
+              finalZip.writeZip(examPath);
+              ret = {
+                correction: correctionPath,
+                exam: examPath,
+                error: null
+              };
+              resolve(ret)
+            })
+          }
+          else{
+            merge = new PDFMerger();
+            sources.forEach(path => {
+              merge.add(path);
+            })
+            await merge.save('./pre_pdf/finalExam.pdf'); //save under given name
+            finalZip.addLocalFile('./pre_pdf/finalExam.pdf')
+          }
 
-          examPath = `./downloads/Exam_${lesson.id}.pdf`;
-          await m.save(examPath); //save under given name
 
-          removeUnnecessary();
-
-          ret = {
-            correction: correctionPath,
-            exam: examPath,
-            error: null
-          };
-
-          resolve(ret)
+          // examPath = `./downloads/Exam_${lesson.id}.zip`;
+          // finalZip.writeZip(examPath);
         }
       })
     })
   })
 }
+
+
+function buildMergeExam(sources,files,students){
+  return new Promise(async (resolve,reject)=>{
+      // var merge = new PDFMerger();
+      // merge.add("./uploads/" + files[students[0].version]);
+      // merge.add(sources[0]);
+      // await merge.save('./pre_pdf/merged/merged.pdf')
+      // console.log("donne ahah")
+      // resolve()
+    var merge = new PDFMerger();
+    sources.forEach(async (path,index,array)=>{
+
+      merge.add("./uploads/" + files[students[index].version]);
+      merge.add(path);
+      await merge.save(`./pre_pdf/Exam_${path}.zip`)
+      if(index == array.length) resolve()
+    })
+  })
+}
+
+async function buildSingleGridExam(zipFile,sources){
+  merge = new PDFMerger();
+  sources.forEach(path => {
+    merge.add(path);
+  })
+  await merge.save('./pre_pdf/finalExam.pdf'); //save under given name
+  zipFile.addLocalFile('./pre_pdf/finalExam.pdf')
+  console.log("donneee")
+}
+
+function buildCorrection(){
+
+}
+
+
 
 function setUp(){
   /**
@@ -126,12 +163,11 @@ function generateTemplate(doc) {
   doc.image("source_pdf/squares.PNG", 530, 10, { valign: "top" });
   doc.image("source_pdf/squares.PNG", 530, 765, { valign: "top" });
   doc.image("source_pdf/squares.PNG", 10, 765, { valign: "top" });
-  doc.fontSize(20);
-  doc.text("Feuille de réponses", 105, 47, { align: "center" });
-  doc.moveDown();
+  doc.fontSize(20).text("Feuille de réponses", 105, 47, { align: "center" });
+  //doc.moveDown();
 }
 
-function generateHeader(doc, student, lesson, writeStream,examDate) {
+function generateHeader(doc, student, lesson,examDate) {
   /**
    * Fucntion that generate pdf header (QRCoed, name, matricule, version...) for each student sheet
    */
@@ -148,7 +184,6 @@ function generateHeader(doc, student, lesson, writeStream,examDate) {
    studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
    QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
      doc.image('pre_pdf/' + student.matricule + ".png", 55, 70, { scale: 0.40 });
-     doc.pipe(writeStream);
      doc.end();
    })
 }
