@@ -1,0 +1,27 @@
+include ../header.pug 
+
+div(class="container page create")
+
+    h2(class="mb-3") Modifier les questions de #[strong #{exam.name}]
+
+    form(action="/correction/modifyWeighting/"+exam.id, method="POST" , class="form-inline")
+        each questions, versionID in questionWeights
+            h3= 'Version ' +  versionID
+            table(class="table table-sm tableClass mt-0 p-0")
+                thead
+                    tr
+                        td 
+                            b Question 
+                        td 
+                            b Pondération
+                each question, index in questions
+                    tr
+                        td= 'Question ' + (index+1)
+                        td
+                            input(type='number' min=0 max=10 step=0.10 value=question.weight name='weight')
+
+        div(class="row my-4")
+                div(class="col-12")
+                    input(class="btn btn-warning float-end" type="submit", value="Enregistrer et confirmer")
+
+include ../footer.pug

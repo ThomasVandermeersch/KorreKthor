@@ -106,9 +106,16 @@ function correctAll(exam, scanResultString, req){
 }
 
 //Correction file
-function correctionCopy( correction, response, questionStatus, correctionCriterias){
-    return new Promise((resolve, reject) => {                                  
-        if (correction.length != response.length) reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
+function correctionCopy( corrections, response, questionStatus, correctionCriterias){
+    return new Promise((resolve, reject) => { 
+        // console.log(correction)
+        correction = corrections.map(item=>item.response)
+        questionWeigths = corrections.map(item => item.weight)
+        questionType = corrections.map(item => item.type)
+
+        if (correction.length != response.length){
+            reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
+        } 
         
         totalPoints = 0
         maxPoints = 0
@@ -118,8 +125,9 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
             if(questionStatus[questionIndex] == 'normal'){
                 // Copy proposition length == Correction proposition length
-                if(response[questionIndex].length != correction[questionIndex].length) reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
-                
+                if(response[questionIndex].length != correction[questionIndex].length) 
+                {reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            }
 
                 if(questionIndex==10){
                     // Syntaxe : arr.indexOf(élémentRecherché, indiceDébut)
@@ -136,29 +144,24 @@ function correctionCopy( correction, response, questionStatus, correctionCriteri
                 }
 
                 // Normal correction
-                else if(correctionCriterias.type == 'normal'){    
+                else if(correctionCriterias.type == 'normal'){ 
                     const positif = parseFloat(correctionCriterias.ptsRight,10)
                     const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
                     const abstention = parseFloat(correctionCriterias.ptsAbs,10)
-                    const poidsQuestion =  [ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1.5 , 1.5 , 1.5 , 1.5 , 1 , 2 , 2 , 2 , 1, 0]
-                    //hard Code == examen techno
-                    maxPoints += positif * poidsQuestion[questionIndex] // HARDCODE EXAM TECHNO
-
-
-
+                    maxPoints += positif * questionWeigths[questionIndex]
 
                     // Check if any proposition is checked to detect absentention
                     if(response[questionIndex].some(elem => elem == true)){            
-                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif * poidsQuestion[questionIndex] // HARDCODE EXAM TECHNO
-                        else totalPoints -= negatif
+                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif * questionWeigths[questionIndex]
+                        else totalPoints -= negatif * questionWeigths[questionIndex]
                     }
-                    else totalPoints += abstention
+                    else totalPoints += abstention * questionWeigths[questionIndex]
                 }
                 // Advanced correction
                 else{
                     correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],correctionCriterias)
-                    totalPoints += correctProp[0]
-                    maxPoints += correctProp[1]
+                    totalPoints += correctProp[0] * questionWeigths[questionIndex]
+                    maxPoints += correctProp[1] * questionWeigths[questionIndex]
                 }
             }
         }

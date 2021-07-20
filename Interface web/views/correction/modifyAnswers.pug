@@ -1,0 +1,47 @@
+include ../header.pug 
+
+div(class="container page create")
+    input(type="hidden" id='examId' value=examid)
+
+    h2(class="mb-3") Modifier les réponses aux QCM
+
+
+
+    div(class="mt-3 row" id="questions")
+        each versionVal, versionKey in correction
+            div(class="" id=questID)
+                div(class="h4")
+                    label(for="table" class="form-label")
+                        b= "Questionnaire " + versionKey
+            
+                table(id=versionKey class="table tableClass mt-0 p-0")
+                    each val,index in versionVal
+                        tr
+                            td
+                                i= "Question " + (index+1)
+                            
+                            each response in val
+                                td
+                                    if(response)
+                                        input(
+                                            class="form-check-input checkboxClass"
+                                            type="checkbox" 
+                                            id="question"
+                                            name= response -1 
+                                            value="yes"
+                                            checked
+                                            )
+                                    else
+                                        input(
+                                            class="form-check-input checkboxClass"
+                                            type="checkbox" 
+                                            id="question"
+                                            name= response -1 
+                                            value="yes"
+                                            )
+
+    div(class="row mb-4")
+            div(class="col-12")
+                button(id="send" type="button" class="btn btn-warning float-end") Confirmer les modifications
+    
+script(src='/javascript/modifyAnswers.js')

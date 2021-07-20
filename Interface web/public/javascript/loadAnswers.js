@@ -211,7 +211,8 @@ document.getElementById("send").addEventListener("click", function(){
         responseObject[table.id] = []
 
         for(let i=0; i<table.rows.length ; i++){
-            responseObject[table.id].push([])
+            object = {type:'qcm',response:['e'],weight:1}
+            responseObject[table.id].push(object)
         }
     })
 
@@ -221,10 +222,8 @@ document.getElementById("send").addEventListener("click", function(){
         var id = item.parentNode.parentNode.parentNode.parentNode.parentNode.id //lol
         var row = item.parentNode.parentNode.rowIndex
         var col = item.parentNode.cellIndex
-        responseObject[id][row][col -1] = item.checked
+        responseObject[id][row].response[col -1] = item.checked
     })
-
-    var files = document.getElementById("filesList")
 
     post("/create/quest", {"liste":JSON.stringify(responseObject)})
 })

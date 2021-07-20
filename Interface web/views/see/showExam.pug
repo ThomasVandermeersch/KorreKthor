@@ -73,8 +73,10 @@ div(class="container page create")
                                         td -#{correction.ptsWrong}
                         
                         div(class="float-end mt-1")
-                            a(href=`/correction/questionStatus/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Annuler des questions
+                            a(href=`/correction/questionWeighting/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Pondération des questions
                             a(href=`/correction/modifyCriteria/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Changer le critère
+                            a(href=`/correction/modifyAnswers/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Modifier les réponses
+
 
                 else 
                     h6(class="text-danger mx-2") Correction error

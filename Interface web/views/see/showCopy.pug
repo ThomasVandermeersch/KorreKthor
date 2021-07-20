@@ -56,7 +56,7 @@ div(class="container page")
                                     td(class="hide-sm") 
                                         i Question #{val + 1}
                                     
-                                    each response in [...JSON.parse(copy.exam.corrections)[copy.version][val].keys()]
+                                    each response in [...JSON.parse(copy.exam.corrections)[copy.version][val].response.keys()]
                                         td(style="text-align:center")
                                             input(class="form-check-input checkboxClass p-2 m-1" disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) type="checkbox" name=response value="yes")
 

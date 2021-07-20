@@ -35,7 +35,7 @@ router.get("/modifyCriteria/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
-router.get("/questionStatus/:examid", access.hasAccess, (req,res)=>{
+router.get("/questionWeighting/:examid", access.hasAccess, (req,res)=>{
     if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
 
     const userMatricule = req.session.userObject.matricule
@@ -45,14 +45,14 @@ router.get("/questionStatus/:examid", access.hasAccess, (req,res)=>{
     else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
 
     Exam.findOne(query).then(exam=>{
-        if(exam) return res.render('correction/questionStatus', {questionStatus:JSON.parse(exam.questionStatus), exam:exam})
+        if(exam) return res.render('correction/questionWeighting', {questionWeights:JSON.parse(exam.corrections), exam:exam})
 
-        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/questionStatus/:examid ---\n ")
+        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/questionWeighting/:examid ---\n ")
         req.flash('errormsg', 'This exam does not exist, error : 1035')
         return res.redirect("/error")
 
     }).catch(err=>{
-        console.log(" --- DATABASE ERROR -- correction/questionStatus/:examid ---\n " + err)
+        console.log(" --- DATABASE ERROR -- correction/questionWeighting/:examid ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1036')
         return res.redirect('/error')
     })
@@ -130,7 +130,71 @@ router.get("/downloadExcel/:examid", access.hasAccess, async (req,res)=>{
     })
 })
 
-router.post('/modifyQuestionStatus/:examid',async(req,res)=>{ 
+router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
+    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
+
+    const userMatricule = req.session.userObject.matricule
+    var query;
+
+    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
+    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
+
+    Exam.findOne(query).then((exam)=>{
+        if(exam){
+            corrections = JSON.parse(exam.corrections)
+            correctionFormat = {}
+            Object.entries(corrections).forEach(([key,value]) =>{
+                value = value.map(item=>item.response)
+                correctionFormat[key] = value
+            })
+            return res.render('correction/modifyAnswers.pug',{correction:correctionFormat,examid:req.params.examid})
+        }
+        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/modifyAnswers/:examid ---\n ")
+        req.flash('errormsg', 'This exam does not exist, error : 1035')
+        return res.redirect("/error")
+        
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- correction/modifyAnswers/:examid ---\n ", err)
+        req.flash('errormsg', 'Database error, error : 1039')
+        return res.redirect("/error")
+    })
+})
+
+router.post('/modifyAnswers/:examid', access.hasAccess, (req,res)=>{
+    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
+
+    const userMatricule = req.session.userObject.matricule
+    var query;
+
+    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
+    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
+
+    Exam.findOne(query).then((exam)=>{
+        exam.corrections = req.body.liste
+        exam.save().then(exam=>{
+            corrector.reCorrect(req.params.examid).then(suc=>{
+                req.flash('recorrectmsg', 'Les réponses aux questions ont été enregistrées et les copies recorrigées')
+                return res.redirect(`/see/exam/${req.params.examid}`)
+            })
+            .catch(err=>{
+                console.log(" ---  ERROR WHILE RECORECT EXAM -- POST correction/modifyAnswers/examId ---\n " +err)
+                req.flash('errormsg', 'Error while re-correct exam, error : 1044')
+                return res.redirect("/error")
+            })
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- correction/modifyAnswers/:examid ---\n ", err)
+            req.flash('errormsg', 'Database error, error : 1039')
+            return res.redirect("/error")
+        })
+
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- correction/modifyAnswers/:examid ---\n ", err)
+        req.flash('errormsg', 'Database error, error : 1039')
+        return res.redirect("/error")
+    })
+})
+
+router.post('/modifyWeighting/:examid',async(req,res)=>{ 
     if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
 
     const userMatricule = req.session.userObject.matricule
@@ -145,18 +209,19 @@ router.post('/modifyQuestionStatus/:examid',async(req,res)=>{
             req.flash('errormsg', 'This exam does not exist, error : 1043')
             return res.redirect("/error")
         }
-        var questionStatus = JSON.parse(req.body.questionStatusObject)
-        var newStatus = req.body.type
         var index = 0
-        Object.entries(questionStatus).forEach(([key,value]) =>{
-            slice = newStatus.slice(index, index + value.length);
-            index += value.length
-            questionStatus[key] = slice
+        var corrections = JSON.parse(exam.corrections)
+        Object.entries(corrections).forEach(([key,value]) =>{
+            value.forEach(question=>{
+                question.weight = req.body.weight[index]
+                index += 1
+            })
         })
-        exam.questionStatus = JSON.stringify(questionStatus)
+        
+        exam.corrections = JSON.stringify(corrections)
         exam.save().then(exam=>{
             corrector.reCorrect(req.params.examid).then(suc=>{
-                req.flash('recorrectmsg', 'Le statut de la question a été enregistré et les copies recorrigées')
+                req.flash('recorrectmsg', 'Les poids des questions ont été enregistrés et les copies recorrigées')
                 return res.redirect(`/see/exam/${req.params.examid}`)
             })
             .catch(err=>{

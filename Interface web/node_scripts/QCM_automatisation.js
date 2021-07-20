@@ -166,7 +166,7 @@ function generateTable(doc, answers) {
     if (max < answers[question].length) max = answers[question].length
 
     doc.text("Question " + (question + 1).toString() + " :", 60, 174 + (question * 20));
-    for (answer = 0; answer < answers[question].length; answer++) {
+    for (answer = 0; answer < answers[question].response.length; answer++) {
       doc.image("source_pdf/vide.PNG", 135 + (answer * 35), 170 + (question * 20), {scale: 0.15});
     }
   }
@@ -190,6 +190,7 @@ function generateCorection(answers) {
     correction.text("Correctif version " + letter, 110, 57, { align: "center" });
     Qindex = 0;
     answers[letter].forEach((questions) => {
+      questions = questions.response
       Aindex = 0;
       correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString() + " :", 50, 105 + Qindex * 20);
       questions.forEach((answer) => {
