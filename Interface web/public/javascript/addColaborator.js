@@ -25,7 +25,7 @@ function post(path, params, method='post') {
 
 document.getElementById('submitUserButton').addEventListener('click', async ()=>{
     matricule = document.getElementById('newMatricule').value
-    const response = await fetch('https://localhost:9898/correction/getUserName/'+ matricule);
+    const response = await fetch('https://fluke.ecam.be:9898/correction/getUserName/'+ matricule);
     const myJson = await response.json(); //extract JSON from the http response
     if('error' in myJson) alert( myJson.error)
     
