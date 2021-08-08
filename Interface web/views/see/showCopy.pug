@@ -21,14 +21,11 @@ div(class="container page")
             
             - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
             - var questions = JSON.parse(copy.answers)
-
             if "error" in questions
                 h4(class="text-danger") Cote : #[strong Error]
+            else if questions.propError
+                h4(class="text-danger") Cote : #[strong Error]
             else
-                if point < 10
-                //-     h4(class="text-danger") Cote : #{point}/20
-                //- else
-                //-     h4(class="text-success") Cote : #{point}/20
                 h4= copy.result[0] + '/' + copy.result[1]
 
             div(class="photo my-3 row")
@@ -36,9 +33,10 @@ div(class="container page")
                     h4(style="text-align:center") Aperçu de la détection
                     if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
                         div
-                            form(class="form" method="POST" action="/correction/updateUser/")
-                                input(type="hidden" name="matricule" value=copy.user.matricule)
-                                input(type="hidden" name="copyId" value=copy.id)
+                            form(class="form")
+
+                                input(type="hidden" name="examId" value=copy.exam.id id="examId")
+                                input(type="hidden" name="copyId" value=copy.id id='copyID')
 
                                 label(for="newMatricule" class="form-label") Entrer le matricule de l'étudiant
                                     button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.")
@@ -46,35 +44,61 @@ div(class="container page")
                                 input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Ex: 17076")
                                 
                                 div(class="") 
-                                    button(id='submitButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
+                                    button(id='submitUserButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
 
                     
-                    table(id='tableId' class="table table-sm tableClass mt-0 p-0")
-                        if "error" in questions
-                            each val in [...JSON.parse(copy.exam.corrections)[copy.version].keys()]
-                                tr
+                    table(id='tableId' class="table table-sm tableClass mt-0 p-0")                        
+                        - var questionIndex = 0
+                        each val,index in [...JSON.parse(copy.exam.corrections)[copy.version]]
+                            tr
+                                if(val.type == 'qcm')
+                                    - questionIndex = questionIndex + 1
                                     td(class="hide-sm") 
-                                        i Question #{val + 1}
+                                        i Q.#{questionIndex}
+                                        each response,rep in val.response
+                                            td(style="text-align:center")
+                                                if "error" in questions
+                                                    input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
+                                                else if "error" in questions.response[index]
+                                                    input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
+                                                else
+                                                    input(class="form-check-input checkboxClass p-2 m-1", checked=questions.response[index].list[rep],disabled=(disableChanges), type="checkbox", name=response value="yes" )
                                     
-                                    each response in [...JSON.parse(copy.exam.corrections)[copy.version][val].response.keys()]
-                                        td(style="text-align:center")
-                                            input(class="form-check-input checkboxClass p-2 m-1" disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) type="checkbox" name=response value="yes")
+                                    td(class="hide-sm")
+                                        if "error" in questions
+                                            strong(class="text-danger") ERROR
+                                        else if "error" in questions.response[index]
+                                            strong(class="text-danger") ERROR
+                                        else
+                                            strong= questions.response[index].totalPoint + '/' + questions.response[index].maxPoint
 
-                        else
-                            each val in [...questions.keys()]
-                                tr
-                                    td(class="hide-sm") 
-                                        i Question #{val + 1}
+                                if(val.type == 'version')
+                                    td(class="hide-sm")
+                                        i Version
+                                        - for(let i = 0; i < val.nbVersion; i++)
+                                            td(style="text-align:center")
+                                                if "error" in questions
+                                                    input(class="form-check-input checkboxClass p-2 m-1" disabled=(disableChanges) type="checkbox" name=response value="yes")
+                                                else if "error" in questions.response[index]
+                                                    input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
+                                                else
+                                                    input(class="form-check-input checkboxClass p-2 m-1" checked=questions.response[index].list[i] disabled=(disableChanges) type="checkbox" name=response value="yes" )
                                     
-                                    each response in [...questions[val].keys()]
-                                        td(style="text-align:center")
-                                            input(class="form-check-input checkboxClass p-2 m-1" checked=questions[val][response] disabled=(session.userObject.role == 0 && session.userObject.authorizations != 0) class="" type="checkbox" name=response value="yes" )
+                                    td(class="hide-sm")
+                                        if "error" in questions
+                                            strong(class="text-danger") ERROR
+                                        else if "error" in questions.response[index]
+                                            strong(class="text-danger") ERROR
+                                        else
+                                            strong= questions.response[index].version
+
+
                     
-                    if session.userObject.role == 0 && session.userObject.authorizations == 3
+                    if disableChanges
                         a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
                     else 
-                        button(id='submitButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Enregistrer les modifications de réponses
-       
+                        button(id='submitAnswersButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Enregistrer les modifications de réponses
+        
                 img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
                 
             div(class="col-4 float-end")

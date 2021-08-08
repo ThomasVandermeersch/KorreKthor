@@ -1,0 +1,29 @@
+include ../header.pug
+
+div(class="container page")
+    h1= "Collaborateurs de l'examen de : " + exam.name
+
+    br
+    br
+    
+    h2 Liste des collaborateurs
+    ul
+    each user in users
+        if(exam.userMatricule == user.matricule) 
+            li= '[' + user.matricule + ']  ' + user.fullName + ' (Propriétaire)'
+        else
+            li= '[' + user.matricule + ']  ' + user.fullName 
+
+    br
+    br
+
+    form(class="form")
+        input(type="hidden" name="examId" value=exam.id id="examId")
+
+        h2 Ajouter un collaborateur
+        input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Entrez le trigramme/matricule du collaborateur")
+        div(class="") 
+            button(id='submitUserButton' class="btn btn-sm btn-success bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Ajouter
+
+
+script(src='/javascript/addColaborator.js')

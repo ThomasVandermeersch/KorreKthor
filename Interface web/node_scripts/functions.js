@@ -14,34 +14,33 @@ async function importStudents(path){
       var target = 1000
       var matricule = 0
       var student = 0
-      var version = 0
+      var version = -1
 
       worksheet.eachRow(function(row, rowNumber) {
         var indexMatr = row.values.indexOf("matricule")
         var indexEtu = row.values.indexOf("etudiant")
         var indexVersion = row.values.indexOf("version")
 
-        if (indexMatr >= 0 && indexEtu >= 0 && indexVersion >= 0){
+        if (indexMatr >= 0 && indexEtu >= 0){
           target = rowNumber
           matricule = indexMatr
           student = indexEtu
-          version = indexVersion
+          if(indexVersion >= 0){
+            version = indexVersion
+          }
         }
 
         if (target < rowNumber){
           studentDict = {}
           studentDict["name"] = row.values[student]
-          studentDict["version"] = row.values[version]
+          if(version >= 0) studentDict["version"] = row.values[version]
           studentDict["matricule"] = row.values[matricule]
           table.push(studentDict)
         }
       });
 
-      if (table.length < 0){
-        return null
-      }
+      if (table.length < 0) return null
       return table
-
     }
     catch (err) {
       console.log(err)
@@ -50,49 +49,44 @@ async function importStudents(path){
 }
 
 async function getExcelInfo(path){
-  /**
-   * Function that returns the number of version in a list
-   * Return structure : ["A", "B", ... ]
-   */
-  try {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(path);
-    const worksheet = workbook.worksheets[0];
+  return new Promise(async(resolve,reject)=>{  
+    /**
+     * Function that returns the number of version in a list
+     * Return structure : ["A", "B", ... ]
+     */
+    try {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.readFile(path);
+      const worksheet = workbook.worksheets[0];
 
-    var target = 10000
-    var versions = []
-    var version = 0
+      var target = 10000
+      var versions = []
+      var version = 0
 
-    worksheet.eachRow(function(row, rowNumber) {
-      var indexVersion = row.values.indexOf("version")
-      if (indexVersion >= 0){
-        target = rowNumber
-        version = indexVersion
-      }
-
-      if (target < rowNumber){
-        if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
-          versions.push(row.values[version])
+      worksheet.eachRow(function(row, rowNumber) {
+        var indexVersion = row.values.indexOf("version")
+        if (indexVersion >= 0){
+          target = rowNumber
+          version = indexVersion
         }
-      }
-    })
 
-    lesson = worksheet.getCell("A1").value
+        if (target < rowNumber){
+          if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
+            versions.push(row.values[version])
+          }
+        }
+      })
 
-    if (version == 0) {
-      return ["Il manque un champ 'version' dans le fichier Excel", "version row not found", null]
+      lesson = worksheet.getCell("A1").value
+
+      if (version == 0 || versions.length==0) resolve({versions:false, lesson:lesson})
+      else resolve({versions:versions, lesson:lesson}) 
     }
 
-    if(versions.length > 0){
-      return [null, null, versions, lesson]
+    catch{
+      reject("Internal error")
     }
-
-    return ["Il n'y a aucune version dans le fichier excel", "version row found but no cols found", null]
-  }
-
-  catch{
-    return ["Internal error", "Error in getExcelInfo method"]
-  }
+  })
 }
 
 async function exportStudents(exam, data){

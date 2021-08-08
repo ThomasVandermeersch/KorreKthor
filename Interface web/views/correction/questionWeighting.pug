@@ -14,11 +14,15 @@ div(class="container page create")
                             b Question 
                         td 
                             b Pondération
+                - var questionIndex = 0
                 each question, index in questions
-                    tr
-                        td= 'Question ' + (index+1)
-                        td
-                            input(type='number' min=0 max=10 step=0.10 value=question.weight name='weight')
+
+                    if question.type != 'version'
+                        - questionIndex = questionIndex + 1
+                        tr
+                            td= 'Question ' + questionIndex
+                            td
+                                input(type='number' min=0 max=10 step=0.10 value=question.weight name='weight')
 
         div(class="row my-4")
                 div(class="col-12")

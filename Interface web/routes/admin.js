@@ -15,13 +15,9 @@ router.get('/', access.hasAccess, (req,res)=>{
 router.get('/:matricule', access.hasAccess, (req,res)=>{
     User.findOne({where:{matricule:req.params.matricule}})
         .then(user =>{
-            // An Admin User, other than me cannot be modified.
-            if (user.id != req.session.userObject.id && user.authorizations == 0){
-                res.render('index/noAcces')
-            }
-            else{
-                res.render('admin/adminModifyUser', {user:user})
-            }
+            // An admin User, cannot be modified.
+            if (user.id != req.session.userObject.id && user.authorizations == 0) res.render('index/noAcces')
+            else res.render('admin/adminModifyUser', {user:user})
         })
         .catch(err => {
             console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
@@ -30,25 +26,28 @@ router.get('/:matricule', access.hasAccess, (req,res)=>{
         })
 })
 
-router.post('/modifyUser', access.hasAccess, (req,res)=>{
+router.post('/:matricule', access.hasAccess, (req,res)=>{
     if(req.body.makeAdmin) auth=0
     else if(req.body.createQCM) auth=1
     else auth= 3
 
-    User.findOne({where:{matricule:req.body.matricule}}).then(user=>{
-        if ( user.authorizations != 0 || user.email == req.session.userObject.email) {
+    User.findOne({where:{matricule:req.params.matricule}}).then(user=>{
+        // An admin User, cannot be modified.
+        if (user.id != req.session.userObject.id && user.authorizations == 0) res.render('index/noAcces')
+        else{
             user.authorizations = auth
             user.save()
             .then(()=>{
                 res.redirect("/admin")
             }
             ).catch(err=>{
+                console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
                 req.flash('errormsg','Database error, error : 1009')
                 res.render('index/error')  
             })
         }
-        else res.redirect('/noAccess')
     }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- ADMIN/:matricule ---\n " + err)
         req.flash('errormsg','Database error, error : 1010')
         res.render('index/error')  
     })

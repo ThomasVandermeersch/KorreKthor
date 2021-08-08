@@ -9,9 +9,9 @@ div(class="container page create")
             i(class="fa fa-question-circle" style="font-size:24px;")   
 
     div(class="download")
-        a(href="/create/downloadresult" class="bouton")
+        a(href="/see/exam/" + examId + "/downloadresult" class="bouton")
             button(class="btn btn-success float-end me-2") Télécharger le fichier d'examen
-        a(href="/create/downloadcorrection" class="bouton")
+        a(href="/see/exam/" + examId + "/downloadcorrection" class="bouton")
             button(class="btn btn-success float-end") Télécharger le fichier de correction
 
 include ../footer.pug

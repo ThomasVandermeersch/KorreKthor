@@ -5,40 +5,42 @@ div(class="container page create")
 
     h2(class="mb-3") Modifier les réponses aux QCM
 
-
-
     div(class="mt-3 row" id="questions")
         each versionVal, versionKey in correction
             div(class="" id=questID)
                 div(class="h4")
                     label(for="table" class="form-label")
                         b= "Questionnaire " + versionKey
-            
+                - var questionIndex = 0
                 table(id=versionKey class="table tableClass mt-0 p-0")
-                    each val,index in versionVal
-                        tr
-                            td
-                                i= "Question " + (index+1)
-                            
-                            each response in val
+                    each val in versionVal
+                        if val.type == 'version'
+                            input(type="hidden", id="nbVersion", value=val.nbVersion)
+                        else
+                            - questionIndex = questionIndex + 1
+                            tr
                                 td
-                                    if(response)
-                                        input(
-                                            class="form-check-input checkboxClass"
-                                            type="checkbox" 
-                                            id="question"
-                                            name= response -1 
-                                            value="yes"
-                                            checked
-                                            )
-                                    else
-                                        input(
-                                            class="form-check-input checkboxClass"
-                                            type="checkbox" 
-                                            id="question"
-                                            name= response -1 
-                                            value="yes"
-                                            )
+                                    i= "Question " + questionIndex
+                                
+                                each response in val.response
+                                    td
+                                        if(response)
+                                            input(
+                                                class="form-check-input checkboxClass"
+                                                type="checkbox" 
+                                                id="question"
+                                                name= response -1 
+                                                value="yes"
+                                                checked
+                                                )
+                                        else
+                                            input(
+                                                class="form-check-input checkboxClass"
+                                                type="checkbox" 
+                                                id="question"
+                                                name= response -1 
+                                                value="yes"
+                                                )
 
     div(class="row mb-4")
             div(class="col-12")

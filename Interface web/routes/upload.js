@@ -107,19 +107,4 @@ router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req,
     })
 })
 
-router.post("/scans/robot", upload.single("file"), async (req, res) => { 
-	if (req.body.token == "secretToken"){
-		console.log(req.body)
-		console.log(req.body.examid)
-		Exam.findOne({where:{id:req.body.examid}}).then(exam=>{
-			callCorrection(req.file.originalname, exam)
-		}).catch(err=>{
-			res.end("Error, this exam does not exist")
-		})
-    }
-    else{
-        res.end("Error, you're not allowed to do that, please check your token")
-    }
-})
-
 module.exports = router;

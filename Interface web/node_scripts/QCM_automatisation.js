@@ -3,8 +3,7 @@ const fs = require("fs");
 const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
 
-
-async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate) {
+async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate,noVersion) {
   /**
    * Function that create a printable pdf for teachers
    * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
@@ -35,8 +34,16 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
       let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
       generateTemplate(doc); //Mise des carés et d'un titre
-      generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
-      generateHeader(doc, student, lesson, writeStream,examDate)
+      
+      if(!noVersion){
+        generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
+        generateHeader(doc, student, lesson, writeStream,examDate,true)
+      }
+      else{
+        generateTable(doc, answers['A']); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
+        generateHeader(doc, student, lesson, writeStream,examDate)
+      }
+      
     
       sources.push("pre_pdf/" + (student.matricule).toString() + ".pdf")
       
@@ -131,7 +138,7 @@ function generateTemplate(doc) {
   doc.moveDown();
 }
 
-function generateHeader(doc, student, lesson, writeStream,examDate) {
+function generateHeader(doc, student, lesson, writeStream,examDate,versionHeader=false) {
   /**
    * Fucntion that generate pdf header (QRCoed, name, matricule, version...) for each student sheet
    */
@@ -142,10 +149,12 @@ function generateHeader(doc, student, lesson, writeStream,examDate) {
    doc.text(`Matricule: ${student.matricule}`, 140, 90);
    doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
    doc.text(`Cours: ${lesson.name}`, 140, 120);
-   doc.text(`Version: ${student.version}`, 140, 135);
+   if(versionHeader) doc.text(`Version: ${student.version}`, 140, 135);
 
    // QRCode generator
-   studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
+   var studentJson
+   if(versionHeader) studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
+   else studentJson = {"matricule": student.matricule, "version": 'noVersion', "lessonId": lesson.id }
    QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
      doc.image('pre_pdf/' + student.matricule + ".png", 55, 70, { scale: 0.40 });
      doc.pipe(writeStream);
@@ -162,11 +171,23 @@ function generateTable(doc, answers) {
   var max = 0
   doc.fontSize(10);
 
-  for (question = 0; question < answers.length; question++) {
-    if (max < answers[question].length) max = answers[question].length
 
-    doc.text("Question " + (question + 1).toString() + " :", 60, 174 + (question * 20));
-    for (answer = 0; answer < answers[question].response.length; answer++) {
+  var questionIndex = 1
+  for (question = 0; question < answers.length; question++) {
+    var nbProp;
+    if(answers[question].type == 'qcm'){
+      nbProp = answers[question].response.length
+      doc.text("Question " + (questionIndex).toString() + " :", 60, 174 + (question * 20));
+      questionIndex++;
+    } 
+    else if(answers[question].type == 'version'){
+      nbProp =  answers[question].nbVersion
+      doc.text("Version :", 60, 174 + (question * 20));
+    } 
+    if (max < nbProp) max = nbProp
+
+
+    for (answer = 0; answer < nbProp; answer++) {
       doc.image("source_pdf/vide.PNG", 135 + (answer * 35), 170 + (question * 20), {scale: 0.15});
     }
   }
@@ -190,20 +211,22 @@ function generateCorection(answers) {
     correction.text("Correctif version " + letter, 110, 57, { align: "center" });
     Qindex = 0;
     answers[letter].forEach((questions) => {
-      questions = questions.response
-      Aindex = 0;
-      correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString() + " :", 50, 105 + Qindex * 20);
-      questions.forEach((answer) => {
-        if (answer == true) {
-          correction.image("source_pdf/rempli.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
-        }
-        else {
-          correction.image("source_pdf/vide.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
-        }
-        Aindex++;
-      });
+      if(questions.type == 'qcm'){
+        questions = questions.response
+        Aindex = 0;
+        correction.text("Question " + (answers[letter].indexOf(questions) + 1).toString() + " :", 50, 105 + Qindex * 20);
+        questions.forEach((answer) => {
+          if (answer == true) {
+            correction.image("source_pdf/rempli.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
+          }
+          else {
+            correction.image("source_pdf/vide.PNG", 130 + (Aindex * 35), 100 + (Qindex * 20), {scale: 0.15})
+          }
+          Aindex++;
+        });
 
-      Qindex++;
+        Qindex++;
+      }
     });
 
     correction.end();

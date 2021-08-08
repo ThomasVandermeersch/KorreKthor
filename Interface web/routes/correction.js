@@ -6,28 +6,11 @@ const sendEmail = require('../node_scripts/sendEmail');
 const path = require("path")
 const functions = require("../node_scripts/functions")
 const matriculeConverter = require("../node_scripts/convertMatricule")
-const getUser = require("../node_scripts/getUser")
+const getUser = require("../node_scripts/getUser");
 
 router.get("/modifyCriteria/:examid", access.hasAccess, (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
-
-    Exam.findOne(query).then(exam=>{
-        if(exam){
-            var correctionCriterias = JSON.parse(exam.correctionCriterias)
-            correctionCriterias['redirection'] = 'modify'
-            req.session['examId'] = req.params.examid        
-            return res.render('correction/modifyCriteria.pug', correctionCriterias)
-        }
-        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/modifyCriteria/examid ---\n ")
-        req.flash('errormsg', 'This exam does not exist, error : 1033')
-        return res.redirect("/error")
-
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
+        return res.render('correction/modifyCriteria.pug', {correctionCriterias:JSON.parse(exam.correctionCriterias),redirection:'modify',examId:req.params.examid})
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- correction/modifyCriteria/examid ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1034')
@@ -36,21 +19,8 @@ router.get("/modifyCriteria/:examid", access.hasAccess, (req,res)=>{
 })
 
 router.get("/questionWeighting/:examid", access.hasAccess, (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
-
-    Exam.findOne(query).then(exam=>{
-        if(exam) return res.render('correction/questionWeighting', {questionWeights:JSON.parse(exam.corrections), exam:exam})
-
-        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/questionWeighting/:examid ---\n ")
-        req.flash('errormsg', 'This exam does not exist, error : 1035')
-        return res.redirect("/error")
-
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
+        return res.render('correction/questionWeighting', {questionWeights:JSON.parse(exam.corrections), exam:exam})
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- correction/questionWeighting/:examid ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1036')
@@ -58,42 +28,8 @@ router.get("/questionWeighting/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
-router.get('/sendEmail/:copyid', access.hasAccess, (req,res)=>{
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    Copy.findOne({where:{userMatricule:userMatricule, id:req.params.copyid}, include:[{model:Exam, as:"exam", include:[{model:User, as:"user"}]}]}).then(copy=>{
-        if (copy){
-            return res.render('correction/complainEmail',{
-                destinationName: copy.exam.user.fullName,
-                name:req.session.userObject.fullName,
-                examName:copy.exam.name,
-                email: copy.exam.user.email,
-                object: `[ERREUR DE CORRECTION] ${copy.exam.name}`,
-                url:`https://${process.env.ENDPOINT}/see/copy/${copy.id}`,
-                copyId:copy.id
-            })
-        }
-        console.log(" --- COPY DOES NOT EXIST ERROR -- correction/sendEmail/:copyid ---\n ")
-        req.flash('errormsg', 'This copy does not exist, error : 1037')
-        return res.redirect("/error")
-    }).catch(err=>{
-        console.log(" --- DATABASE ERROR -- correction/sendEmail/:copyid ---\n ", err)
-        req.flash('errormsg', 'Database error, error : 1038')
-        return res.redirect("/error")
-    })
-})
-
 router.get("/downloadExcel/:examid", access.hasAccess, async (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}, include:[{model:Copy, as:"copies", include:[{model:User, as:"user"}]}]}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}, include:[{model:Copy, as:"copies", include:[{model:User, as:"user"}]}]}
-
-    Exam.findOne(query).then(exam=>{
+    Exam.findOne({where:{id:req.params.examid}, include:[{model:Copy, as:"copies", include:[{model:User, as:"user"}]}]}).then(exam=>{
         if (exam && exam.copies){
             data = {}
             exam.copies.forEach((copy) => {
@@ -131,28 +67,8 @@ router.get("/downloadExcel/:examid", access.hasAccess, async (req,res)=>{
 })
 
 router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
-
-    Exam.findOne(query).then((exam)=>{
-        if(exam){
-            corrections = JSON.parse(exam.corrections)
-            correctionFormat = {}
-            Object.entries(corrections).forEach(([key,value]) =>{
-                value = value.map(item=>item.response)
-                correctionFormat[key] = value
-            })
-            return res.render('correction/modifyAnswers.pug',{correction:correctionFormat,examid:req.params.examid})
-        }
-        console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/modifyAnswers/:examid ---\n ")
-        req.flash('errormsg', 'This exam does not exist, error : 1035')
-        return res.redirect("/error")
-        
+    Exam.findOne({where:{id:req.params.examid}}).then((exam)=>{    
+        return res.render('correction/modifyAnswers.pug',{correction:JSON.parse(exam.corrections),examid:req.params.examid})
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- correction/modifyAnswers/:examid ---\n ", err)
         req.flash('errormsg', 'Database error, error : 1039')
@@ -160,17 +76,31 @@ router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
+router.get("/getUserName/:matricule", access.hasAccess, (req,res)=>{
+    getUser.getUser(matriculeConverter.matriculeToEmail(req.params.matricule),req,true,false).then(user=>{
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ name: user.fullName,matricule: user.matricule }));
+    })
+    .catch(err=>{
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error : "L'utilisateur n'existe pas"}));
+    })
+})
+
 router.post('/modifyAnswers/:examid', access.hasAccess, (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
-
-    Exam.findOne(query).then((exam)=>{
-        exam.corrections = req.body.liste
+    Exam.findOne({where:{id:req.params.examid}}).then((exam)=>{
+        newCorrections = JSON.parse(req.body.liste)
+        corrections = JSON.parse(exam.corrections)
+        Object.entries(corrections).forEach(([key,value]) =>{
+            index = 0
+            value.forEach(questionObject=>{
+                if(questionObject.type == 'qcm'){
+                    questionObject.response = newCorrections[key][index].response
+                    index++
+                }
+            })
+        });
+        exam.corrections = JSON.stringify(corrections)
         exam.save().then(exam=>{
             corrector.reCorrect(req.params.examid).then(suc=>{
                 req.flash('recorrectmsg', 'Les réponses aux questions ont été enregistrées et les copies recorrigées')
@@ -186,7 +116,6 @@ router.post('/modifyAnswers/:examid', access.hasAccess, (req,res)=>{
             req.flash('errormsg', 'Database error, error : 1039')
             return res.redirect("/error")
         })
-
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- correction/modifyAnswers/:examid ---\n ", err)
         req.flash('errormsg', 'Database error, error : 1039')
@@ -195,29 +124,17 @@ router.post('/modifyAnswers/:examid', access.hasAccess, (req,res)=>{
 })
 
 router.post('/modifyWeighting/:examid',async(req,res)=>{ 
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.params.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.params.examid}}
-    
-    Exam.findOne(query).then(exam=>{
-        if(!exam){
-            console.log(" --- EXAM DOES NOT EXIST ERROR -- POST correction/modifyQuestionStatus/examid ---\n ")
-            req.flash('errormsg', 'This exam does not exist, error : 1043')
-            return res.redirect("/error")
-        }
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
         var index = 0
         var corrections = JSON.parse(exam.corrections)
         Object.entries(corrections).forEach(([key,value]) =>{
             value.forEach(question=>{
-                question.weight = req.body.weight[index]
-                index += 1
+                if(question.type != 'version'){
+                    question.weight = req.body.weight[index]
+                    index += 1  
+                }
             })
         })
-        
         exam.corrections = JSON.stringify(corrections)
         exam.save().then(exam=>{
             corrector.reCorrect(req.params.examid).then(suc=>{
@@ -225,36 +142,34 @@ router.post('/modifyWeighting/:examid',async(req,res)=>{
                 return res.redirect(`/see/exam/${req.params.examid}`)
             })
             .catch(err=>{
-                console.log(" ---  ERROR WHILE RECORECT EXAM -- POST correction/modifyQuestionStatus/examId ---\n " +err)
+                console.log(" ---  ERROR WHILE RECORECT EXAM -- POST correction/modifyWeighting/examId ---\n " +err)
                 req.flash('errormsg', 'Error while re-correct exam, error : 1044')
                 return res.redirect("/error")
             })
         }).catch(err=>{
-            console.log(" ---  ERROR WHILE SAVING EXAM -- POST correction/modifyQuestionStatus/examId ---\n " + err)
+            console.log(" ---  ERROR WHILE SAVING EXAM -- POST correction/modifyWeighting/examId ---\n " + err)
             req.flash('errormsg', 'Error while saving exam, error : 1045')
             return res.redirect("/error")
         })
     }).catch(err=>{
-        console.log(" --- DATABASE ERROR -- correction/questionStatus/:examId ---\n " + err)
+        console.log(" --- DATABASE ERROR -- correction/modifyWeighting/:examId ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1046')
         return res.redirect('/error')
     })
 })
 
 router.post('/modifyImageTreatment/:copyid', access.hasAccess, (req,res)=>{
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
     Copy.findOne({where:{id:req.params.copyid}, include:[{model:Exam, as:"exam"}]}).then(copy=>{
         copy.answers = req.body.response
-        const correction = JSON.parse(copy.exam.corrections)[copy.version] //GET corrections
+        const correction = JSON.parse(copy.exam.corrections) //GET corrections
         const correctionCriterias = JSON.parse(copy.exam.correctionCriterias) //Get correction criterias
-        const questionStatus = JSON.parse(copy.exam.questionStatus)[copy.version] //Get question status
     
         corrector.correctionCopy( 
-            correction,JSON.parse(req.body.response),questionStatus,correctionCriterias           
-        )
-        .then((newResult) =>{
-            copy.result = newResult      
+            correction,JSON.parse(req.body.response),correctionCriterias,copy.version           
+        ).then((newData) =>{
+            copy.result = newData.result
+            copy.version = newData.version
+            copy.answers = newData.newResponse
             copy.save().then(copy=>{
                 req.flash('successCotationChange',"La note de l'étudiant a été modifiée correctement ! ");
                 res.redirect('/see/copies/'+copy.exam.id)
@@ -276,6 +191,25 @@ router.post('/modifyImageTreatment/:copyid', access.hasAccess, (req,res)=>{
     })
 })
 
+router.get('/sendEmail/:copyid', access.hasAccess, (req,res)=>{
+    const userMatricule = req.session.userObject.matricule
+    Copy.findOne({where:{userMatricule:userMatricule, id:req.params.copyid}, include:[{model:Exam, as:"exam", include:[{model:User, as:"user"}]}]}).then(copy=>{
+        return res.render('correction/complainEmail',{
+            destinationName: copy.exam.user.fullName,
+            name:req.session.userObject.fullName,
+            examName:copy.exam.name,
+            email: copy.exam.user.email,
+            object: `[ERREUR DE CORRECTION] ${copy.exam.name}`,
+            url:`https://${process.env.ENDPOINT}/see/copy/${copy.id}`,
+            copyId:copy.id
+        })
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- correction/sendEmail/:copyid ---\n ", err)
+        req.flash('errormsg', 'Database error, error : 1038')
+        return res.redirect("/error")
+    })
+})
+
 router.post('/sendComplainEmail', access.hasAccess,(req,res)=>{
     sendEmail.sendEmail(req.body.email, req.session.userObject.email, req.body.object, req.body.message)
     .then(response=>{
@@ -289,55 +223,34 @@ router.post('/sendComplainEmail', access.hasAccess,(req,res)=>{
     })
 })
 
-
-router.post("/updateUser/", access.hasAccess, async (req, res) => {
-    if (req.session.userObject.role == 1 || req.session.userObject.authorizations == 0){
-
-        const userEmail = matriculeConverter.matriculeToEmail(req.body.newMatricule)
-        getUser.getUser(userEmail,req)
-            .then(user=>{
-                Copy.findOne({where:{id:req.body.copyId}})
-                .then(copy=>{
-                    copy.userMatricule = user.matricule
-                    copy.save()
-                    req.flash('successNameChange',"L'étudiant " + user.fullName  + " a été assigné.")
-                    res.redirect(`/see/copies/${req.body.matricule.split("_")[0]}`)
-                })
-                .catch(err=> {
-                    console.log(err)
-                    req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
-                    res.render("index/error")
-                })
+router.post("/updateUser/:copyid", access.hasAccess, async (req, res) => {
+    const userEmail = matriculeConverter.matriculeToEmail(req.body.newMatricule)
+    getUser.getUser(userEmail,req)
+        .then(user=>{
+            Copy.findOne({where:{id:req.params.copyid}})
+            .then(copy=>{
+                copy.userMatricule = user.matricule
+                copy.save()
+                req.flash('successNameChange',"L'étudiant " + user.fullName  + " a été assigné.")
+                res.redirect(`/see/copies/${req.body.examId}`)
             })
-            .catch(err=>{
+            .catch(err=> {
                 console.log(err)
-                req.flash('errormsg', "Somthing went wrong while changing the user, error : 1005");
+                req.flash('errormsg', "Somthing went wrong while saving the copy, error : 1004");
                 res.render("index/error")
             })
-    }
-    else{
-        res.render("index/noAcces")
-    }
+        })
+        .catch(err=>{
+            console.log(err)
+            req.flash('errormsg', "Somthing went wrong while changing the user, error : 1005");
+            res.render("index/error")
+        })
 })
 
-router.post('/changeCopyStatus',access.hasAccess,(req,res)=>{    
-    if (req.session.userObject.authorizations == 3 && req.session.userObject.role == 0) return res.redirect("/noAccess")
-
-    const userMatricule = req.session.userObject.matricule
-    var query;
-
-    if (req.session.userObject.authorizations == 0) query = {where:{id:req.body.examid}}
-    else query = {where:{userMatricule:userMatricule, id:req.body.examid}}
-
-    Exam.findOne(query).then(exam=>{
-        if(!exam){
-            console.log(" --- EXAM DOES NOT EXIST ERROR -- POST correction/changeCopyStatus ---\n ")
-            req.flash('errormsg', 'This exam does not exist, error : 1003a')
-            return res.redirect("/error")
-        }
+router.post('/changeCopyStatus/:examid',access.hasAccess,(req,res)=>{    
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
         if ("copyViewAvailable" in req.body){
             exam.copyViewAvailable = req.body.copyViewAvailable
-
             return exam.save().then(exam=>{
                 if(exam){
                     req.flash('succCopyStatusChange', "La visibilité des copies a été changé avec succès.");
@@ -362,5 +275,26 @@ router.post('/changeCopyStatus',access.hasAccess,(req,res)=>{
         return res.redirect('/see/exam/'+req.body.examid)
     })
 });
+
+router.post("/sendCotationCriteria/:redirection/:examid", access.hasAccess, async (req, res)=>{
+    Exam.findOne({where:{id:req.params.examid}}).then(async exam=>{
+        exam.correctionCriterias = JSON.stringify(req.body)
+        await exam.save()
+        
+        if(req.params.redirection == 'create') return res.redirect('/create/Step5')
+        else corrector.reCorrect(req.params.examid).then(suc=>{
+            req.flash('recorrectmsg', 'Les critères de cotation ont été enregistrés et les copies recorrigées')
+            return res.redirect('/see/exam/' + req.params.examid)
+        }).catch(err=>{
+            console.log(err)
+            req.flash("errormsg", "Error while recorrecting the exam")
+            return res.redirect("/error")
+        })
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- CREATE/sendCotationCriteria ---\n " + err)
+        req.flash('errormsg', 'Database error, error : 1015')
+        res.redirect('/error')
+    })
+})
 
 module.exports = router

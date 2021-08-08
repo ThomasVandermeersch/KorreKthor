@@ -46,6 +46,7 @@ router.get('/callback',
 
       getUser.getUser(response.account.username,req).then(user=>{ 
         req.session["userObject"] = user
+        req.session["accesses"] = {examIds:[],copyIds:[]}
         
         //REDIRECTION
         if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])

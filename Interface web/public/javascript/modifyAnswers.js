@@ -1,5 +1,3 @@
-console.log("Hello World !!! ")
-
 function post(path, params, method='post') {
     /**
      * "handmade" javascript POST function
@@ -39,12 +37,11 @@ document.getElementById("send").addEventListener("click", function(){
     document.querySelectorAll(".checkboxClass").forEach(item=>{
         //associate the item to a table.
         var id = item.parentNode.parentNode.parentNode.parentNode.id //lol
-        console.log(id)
         var row = item.parentNode.parentNode.rowIndex
         var col = item.parentNode.cellIndex
         responseObject[id][row].response[col -1] = item.checked
     })
-
-    console.log(responseObject)
-    post("/correction/modifyAnswers/"+document.getElementById('examId').value, {"liste":JSON.stringify(responseObject)})
+    var nbVersionHTML = document.getElementById("nbVersion")
+    if(nbVersionHTML) post("/correction/modifyAnswers/"+document.getElementById('examId').value, {"liste":JSON.stringify(responseObject),nbVersion:nbVersionHTML.value})
+    else post("/correction/modifyAnswers/"+document.getElementById('examId').value, {"liste":JSON.stringify(responseObject)})
 })

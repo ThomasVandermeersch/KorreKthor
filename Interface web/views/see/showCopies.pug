@@ -49,6 +49,13 @@ div(class="container page")
                             div(class="text-danger") -- Correction manuelle requise -- 
                                 button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Il y a eu un problème lors de la détection des réponses sur cette copie.\n Il faut rentrer les réponses manuellement")
                                     i(class="fa fa-question-circle" style="font-size:24px;color:red") 
+                    
+                    else if answers.propError
+                        th 
+                            div(class="text-danger") -- Correction manuelle requise -- 
+                                button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Il y a eu un problème lors de la détection des réponses sur cette copie.\n Il faut rentrer les réponses manuellement")
+                                    i(class="fa fa-question-circle" style="font-size:24px;color:red") 
+
                     else
                         //- td #{point}/20
                         td=copy.result[0] + "/" + copy.result[1]

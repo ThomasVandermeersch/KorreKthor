@@ -1,6 +1,6 @@
 div(class="row mt-3")
-    form(action="/create/sendCotationCriteria/"+redirection, method="POST" , class="form-inline")
-        if type=='normal'
+    form(action="/correction/sendCotationCriteria/"+ redirection + "/" + examId, method="POST" , class="form-inline")
+        if correctionCriterias.type=='normal'
             - var showNormal = "display"
             - var showAdvanced = "display: none;"
         else
@@ -10,7 +10,7 @@ div(class="row mt-3")
         div
             label(for="fileForm" class="form-label") Choisissez une option
         
-        if type == 'normal'
+        if correctionCriterias.type == 'normal'
             div
                 select(class="form-select", id="correctionType" name='type')
                     option(value="normal" name='normal') Normal
@@ -25,15 +25,15 @@ div(class="row mt-3")
             div(class="form-group row")
                 div(class="form-group col-md-6")
                     label(for="inputEmail4") Une bonne réponse rapporte (pts)
-                    input(type="number",name="ptsRight" class="form-control", value= ptsRight, min=0, step=0.25)
+                    input(type="number",name="ptsRight" class="form-control", value= correctionCriterias.ptsRight, min=0, step=0.25)
 
                 div(class="form-group col-md-6")
                     label(for="inputPassword4") Une mauvaiseee réponse fait perdre (pts)
-                    input(type="number",name ="ptsWrong" class="form-control", value=ptsWrong, min=0, step=0.25)
+                    input(type="number",name ="ptsWrong" class="form-control", value=correctionCriterias.ptsWrong, min=0, step=0.25)
                 
                 div(class="form-group col-md-6")
                     label(for="inputPassword4") Une abstention rapporte (pts)
-                    input(type="number",name="ptsAbs", class="form-control", value=ptsAbs, min=0, step=0.25)
+                    input(type="number",name="ptsAbs", class="form-control", value=correctionCriterias.ptsAbs, min=0, step=0.25)
 
 
         div(id='advanced',style=showAdvanced, class="mt-2")
@@ -41,25 +41,25 @@ div(class="row mt-3")
             div(class="form-group row")
                 div(class="form-group col-md-6")
                     label() Toutes les réponses sont correctes (pts)
-                    input(type="number",name="allGood" class="form-control", value=allGood, min=0, step=0.25)
+                    input(type="number",name="allGood" class="form-control", value=correctionCriterias.allGood, min=0, step=0.25)
 
                 div(class="form-group col-md-6")
                     label() Une des réponse est incorrecte (pts)
-                    input(type="number",name="oneWrong", class="form-control", value=oneWrong, step=0.25)
+                    input(type="number",name="oneWrong", class="form-control", value=correctionCriterias.oneWrong, step=0.25)
                 
                 div(class="form-group col-md-6")
                     label() Deux réponses sont incorrectes (pts)
-                    input(type="number",name="twoWrong", class="form-control", value=twoWrong, step=0.25)
+                    input(type="number",name="twoWrong", class="form-control", value=correctionCriterias.twoWrong, step=0.25)
                 
                 div(class="form-group col-md-6")
                     label() Trois réponses sont incorrectes (pts)
-                    input(type="number",name="threeWrong", class="form-control", value=threeWrong, step=0.25)
+                    input(type="number",name="threeWrong", class="form-control", value=correctionCriterias.threeWrong, step=0.25)
 
                 div(class="form-group col-md-6")
                     label(f) Plus de trois réponses sont incorrectes (pts)
-                    input(type="number",name="threeMoreWrong" class="form-control", value=threeMoreWrong, step=0.25)
+                    input(type="number",name="threeMoreWrong" class="form-control", value=correctionCriterias.threeMoreWrong, step=0.25)
             
-            if isLastExclusive == 'on'
+            if correctionCriterias.isLastExclusive == 'on'
                 - var showLastExcl = "display"
                 div(class="form-check mt-3")
                     input(type="checkbox",name="isLastExclusive", checked, class="form-check-input", id="checkBoxProposition")
@@ -76,11 +76,11 @@ div(class="row mt-3")
                 div(class="form-group row")
                     div(class="form-group col-md-6")
                         label(for="inputEmail4") La dernière propostion est correcte (pts)
-                        input(type="number",name="lastExclusiveTrue",class="form-control", value=lastExclusiveTrue, min=0, step=0.25)
+                        input(type="number",name="lastExclusiveTrue",class="form-control", value=correctionCriterias.lastExclusiveTrue, min=0, step=0.25)
     
                     div(class="form-group col-md-6")
                         label(for="inputPassword4") La dernière proposition est incorrecte (pts)
-                        input(type="number",name="lastExclusiveFalse", class="form-control", value=lastExclusiveFalse step=0.25)
+                        input(type="number",name="lastExclusiveFalse", class="form-control", value=correctionCriterias.lastExclusiveFalse step=0.25)
                 
         div(class="row mt-3")
             div(class="col-12")

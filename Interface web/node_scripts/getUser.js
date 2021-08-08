@@ -4,7 +4,7 @@ const matriculeConverter = require('./convertMatricule')
 const { User } = require("../node_scripts/database/models");
 const { GraphError } = require('@microsoft/microsoft-graph-client');
 
-function getUser(email, req, createIfNotExist=true){
+function getUser(email, req, createIfNotExist=true, createFakeUser=true){
     // STEP 1 : Search User in the database
     return new Promise((resolve,reject)=>{
         User.findOne({where:{email:email}})
@@ -34,8 +34,8 @@ function getUser(email, req, createIfNotExist=true){
                             })
                             .catch(err=> reject(err))
                     }).catch(err=>{
-                        if (err instanceof GraphError){
-                            User.create({fullName:"", matricule:matriculeConverter.emailToMatricule(email), authorizations:3, role:2, email:email}).then(user=>{
+                        if (err instanceof GraphError && createFakeUser){
+                            User.create({fullName:"f", matricule:matriculeConverter.emailToMatricule(email), authorizations:3, role:2, email:email}).then(user=>{
                                 resolve(user)
                             })
                         }

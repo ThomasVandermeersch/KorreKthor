@@ -2,15 +2,16 @@ const { User, Exam, Copy } = require("./database/models");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
-function saveCopy(copy, result, examId, req, error=null){
+function saveCopy(copy, data, examId, req, error=null){
     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(user=>{
         Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}}).then(dbCopy=>{
             var answers
             if(error) answers = JSON.stringify({"error":error})
-            else answers = JSON.stringify(copy.answers)
+            else answers = JSON.stringify(data.newResponse)
+            
             if(dbCopy){
-                dbCopy.version = copy.qrcode.version, 
-                dbCopy.result = result, 
+                dbCopy.version = data.version, 
+                dbCopy.result = data.result, 
                 dbCopy.file = copy.file,
                 dbCopy.answers = answers
                 dbCopy.save().catch(err=>{
@@ -42,15 +43,23 @@ function reCorrect(examId){
         const query = {where:{id:examId}, include:[{model:Copy, as:"copies"}]}
         Exam.findOne(query).then(exam=>{
             const corrections = JSON.parse(exam.corrections)
-            const questionStatus = JSON.parse(exam.questionStatus)
             const correctionCriterias = JSON.parse(exam.correctionCriterias)
 
             exam.copies.forEach((copy)=>{
- 
-                correctionCopy(corrections[copy.version],JSON.parse(copy.answers),questionStatus[copy.version],correctionCriterias)
-                .then(result=>{
+                dbAnswers = JSON.parse(copy.answers)
+                if('response' in dbAnswers) dbAnswers = dbAnswers.response.map(item => item.list)
+                
+                correctionCopy(
+                    corrections,
+                    dbAnswers,
+                    correctionCriterias,
+                    copy.version)
+                .then(data=>{
 
-                    copy.result = result
+                    copy.result = data.result
+                    copy.version = data.version
+                    copy.answers = data.newResponse
+
                     copy.save().catch(err=>{
                         console.log(" --- DATABASE ERROR -- Function correction/recorrect --\n " + err)
                     })
@@ -77,21 +86,20 @@ function correctAll(exam, scanResultString, req){
     const scanResult = JSON.parse(scanResultString)
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
-    const questionStatus = JSON.parse(exam.dataValues.questionStatus)
 
     // Correct all copies
     scanResult.data.forEach( copy =>{
         if (copy.error == "None"){
             correctionCopy( 
-                    corrections[copy.qrcode.version],
+                    corrections,
                     copy.answers,
-                    questionStatus[copy.qrcode.version],
-                    correctionCriterias
-            ).then( result =>{
-                saveCopy(copy,result,exam.id, req)
+                    correctionCriterias,
+                    copy.qrcode.version
+            ).then( data =>{
+                saveCopy(copy,data,exam.id, req)
             })
             .catch(err=>{
-                saveCopy(copy,[0,0],exam.id,req,err)
+                saveCopy(copy,{result:[0,0],version:copy.qrcode.version},exam.id,req,err)
             })
         }
     })
@@ -106,67 +114,109 @@ function correctAll(exam, scanResultString, req){
 }
 
 //Correction file
-function correctionCopy( corrections, response, questionStatus, correctionCriterias){
-    return new Promise((resolve, reject) => { 
-        // console.log(correction)
-        correction = corrections.map(item=>item.response)
-        questionWeigths = corrections.map(item => item.weight)
-        questionType = corrections.map(item => item.type)
+function correctionCopy( corrections, response, correctionCriterias,recivedVersion){
+    return new Promise((resolve, reject) => {
+        var propError = false // We suppose that their is no Error
+        const newResponses = []
 
-        if (correction.length != response.length){
-            reject("Le nombre de questions de la correction et de la copie ne correspondent pas")
-        } 
+        // Set up the version
+        var version
+        if(recivedVersion == 'noVersion') version = 'A'
+        else version = recivedVersion
         
+        // Take the correction of the selected version
+        correction = corrections[version]
+
+        if(correction.length != response.length) reject({error:'Detection error'})
+        
+        // Declare points 'buffers'
         totalPoints = 0
         maxPoints = 0
-        
-        const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b); // Comparaison de deux listes
-        
+
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
-            if(questionStatus[questionIndex] == 'normal'){
-                // Copy proposition length == Correction proposition length
-                if(response[questionIndex].length != correction[questionIndex].length) 
-                {reject("Le nombre de propositions de la correction et de la copie ne correspondent pas")
+            
+            if(correction[questionIndex].type == 'version'){
+                versionObject = changeVersion(response[questionIndex],correction[questionIndex].nbVersion)
+                if('error' in versionObject){
+                   propError = true
+                   newResponses.push({list:response[questionIndex],error:versionObject.error})
+                } 
+                else{
+                    correction = corrections[versionObject.version]
+                    newResponses.push({list:response[questionIndex],version:versionObject.version})
+                }
             }
 
-                if(questionIndex==10){
+            else if(correction[questionIndex].type == 'qcm'){
+                if(correctionCriterias.type == 'normal'){
+                    correctNormalRep = correctNormal(response[questionIndex],correctionCriterias,correction[questionIndex])
+                    
+                    if('error' in correctNormalRep){
+                        newResponses.push(correctNormalRep)
+                    }
+                    else{
+                        newResponses.push(correctNormalRep)
+                        totalPoints += correctNormalRep.totalPoint
+                        maxPoints += correctNormalRep.maxPoint
+                    }
+                }
+                
+                else{
+                    // To implement
+                }
+            }
+        }
+        finalResponse = {version:version,result:[totalPoints,maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})}
+        resolve(finalResponse)
+    });
+}
+
+function changeVersion(list,nbVersion){
+    if(nbVersion != list.length) return {error:'Error, please select a version'}
+    const alphabet = 'ABCDEFGH'
+    i = list.indexOf(true)
+    if(i==-1) return {error:'No selected version'}
+    if(list.indexOf(true,i + 1) != -1) return {error:'Two versions selected'}
+    version = alphabet[i]
+    return {version:version}
+}
+
+function correctNormal(responseList,correctionCriterias,correction){
+    if(responseList.length != correction.response.length) return {error: 'Detection error'}
+    const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b); // Comparaison de deux listes
+    const positif = parseFloat(correctionCriterias.ptsRight,10)
+    const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
+    const abstention = parseFloat(correctionCriterias.ptsAbs,10)
+    const maxPoint = positif * correction.weight
+    var totalPoint = 0
+
+    // Check if any proposition is checked to detect absentention
+    if(responseList.some(elem => elem == true)){            
+        if(equals(correction.response,responseList)) totalPoint += positif * correction.weight
+        else totalPoint -= negatif * correction.weight
+    }
+    else totalPoint = abstention * correction.weight
+    return {totalPoint:totalPoint,maxPoint:maxPoint,list:responseList}
+}
+
+function correctAdvanced(){
+    correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],correctionCriterias)
+    totalPoints += correctProp[0] * questionWeigths[questionIndex]
+    maxPoints += correctProp[1] * questionWeigths[questionIndex]
+}
+
+function correctOpen(){
                     // Syntaxe : arr.indexOf(élémentRecherché, indiceDébut)
                     indexA = response[questionIndex].indexOf(true)
                     indexB = response[questionIndex].indexOf(true, indexA+1)
                     
-
+    
                     if(indexB == -1 && indexA != -1 ) points = indexA
                     else if(indexB != -1 && indexA != -1) points = (indexA + indexB)/2
                     else points = 0
                     
                     totalPoints += points
                     maxPoints += 10
-                }
-
-                // Normal correction
-                else if(correctionCriterias.type == 'normal'){ 
-                    const positif = parseFloat(correctionCriterias.ptsRight,10)
-                    const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
-                    const abstention = parseFloat(correctionCriterias.ptsAbs,10)
-                    maxPoints += positif * questionWeigths[questionIndex]
-
-                    // Check if any proposition is checked to detect absentention
-                    if(response[questionIndex].some(elem => elem == true)){            
-                        if(equals(correction[questionIndex],response[questionIndex])) totalPoints += positif * questionWeigths[questionIndex]
-                        else totalPoints -= negatif * questionWeigths[questionIndex]
-                    }
-                    else totalPoints += abstention * questionWeigths[questionIndex]
-                }
-                // Advanced correction
-                else{
-                    correctProp = correctionAdvancedProp(correction[questionIndex],response[questionIndex],correctionCriterias)
-                    totalPoints += correctProp[0] * questionWeigths[questionIndex]
-                    maxPoints += correctProp[1] * questionWeigths[questionIndex]
-                }
-            }
-        }
-        resolve([totalPoints,maxPoints])
-    });
 }
 
 // This function computes the result of an advanced

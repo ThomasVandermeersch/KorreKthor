@@ -5,20 +5,20 @@ router.get("/", access.hasAccess, function(req,res){
         res.render('index/index')    
 });
 
-router.get("/favicon.ico",function(req,res){
+router.get("/favicon.ico",(req,res)=>{
         res.redirect('/');
 });
 
-router.get("/viewProfile", access.hasAccess, function(req,res){
+router.get("/viewProfile", access.hasAccess,(req,res)=>{
         res.render('index/viewProfile')    
 });
 
-router.get("/noAccess", access.hasAccess, function(req,res){
+router.get("/noAccess", access.hasAccess,(req,res)=>{
         res.status(403)    
         res.render('index/noAccess')    
 });
 
-router.get("/unloggederror", function(req,res){
+router.get("/unloggederror",(req,res)=>{
         res.status(403)    
         res.render('index/error')    
 });

@@ -9,17 +9,6 @@ div(class="container page create")
             i(class="fa fa-question-circle" style="font-size:24px;")
 
     form(action="/create/sendQuestions" method="POST" enctype="multipart/form-data")
-    
-        div(class="container border border-1 rounded mt-3")
-            div(class="row row-cols-auto my-2") 
-                div(class="col") Nom du cours :
-                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="C'est sous ce nom qu'apparaîtra votre examen sur la plateforme et sur les copies des étudiants.")
-                        i(class="fa fa-question-circle" style="font-size:20px;color:grey")
-
-                div(class="col p-0" id="lesson")
-                    input(class="form-control" type="text", name="lesson", value=lesson)
-
-        
         each questID in versions 
             div(class="row mt-3" id="question" + questID)
                 div
