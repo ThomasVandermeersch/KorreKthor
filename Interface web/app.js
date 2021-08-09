@@ -6,10 +6,10 @@ const flash = require('express-flash');
 const msal = require('@azure/msal-node');
 const https = require('https');
 const fs = require("fs");
-const access = require('./node_scripts/hasAccess')
 require('dotenv').config();
 const env = process.env.NODE_ENV || 'development';
 const config = require('./node_scripts/database/config/config')[env]
+const access = require('./node_scripts/hasAccess')
 
 var credentials = {
   key: fs.readFileSync("certificates/fluke_ecam.key"),
