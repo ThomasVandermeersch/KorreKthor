@@ -21,8 +21,8 @@ function saveCopy(copy, data, examId, req, error=null){
             else{
                 Copy.create({"userMatricule": user.matricule, 
                             "examId": examId, 
-                            "version": copy.qrcode.version, 
-                            "result": result, 
+                            "version": data.version, 
+                            "result": data.result, 
                             "file": copy.file,
                             "answers": answers
                         }).catch(err=>{
