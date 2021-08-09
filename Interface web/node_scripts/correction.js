@@ -13,7 +13,7 @@ function saveCopy(copy, data, examId, req, error=null){
                 dbCopy.version = data.version, 
                 dbCopy.result = data.result, 
                 dbCopy.file = copy.file,
-                dbCopy.answers = answers
+                dbCopy.answers = data.newResponse
                 dbCopy.save().catch(err=>{
                     console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
                 })
@@ -24,7 +24,7 @@ function saveCopy(copy, data, examId, req, error=null){
                             "version": data.version, 
                             "result": data.result, 
                             "file": copy.file,
-                            "answers": answers
+                            "answers": data.answers
                         }).catch(err=>{
                             console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
                         })
