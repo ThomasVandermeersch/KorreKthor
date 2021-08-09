@@ -18,7 +18,7 @@ module.exports = {
         type: DataTypes.ARRAY(DataTypes.FLOAT),
       },
       answers:{
-        type: DataTypes.STRING(2048),
+        type: DataTypes.STRING(4096),
       },
       userMatricule: {
         type: DataTypes.STRING,

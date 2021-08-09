@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ARRAY(DataTypes.FLOAT),
     },
     answers:{
-      type: DataTypes.STRING(2048),
+      type: DataTypes.STRING(4096),
     },
   }, {
     sequelize,

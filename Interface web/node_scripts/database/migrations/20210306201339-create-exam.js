@@ -19,7 +19,7 @@ module.exports = {
           type: DataTypes.STRING,
       },
       corrections:{
-        type: DataTypes.STRING(4096),
+        type: DataTypes.STRING(8192),
       },
       status:{
         type: DataTypes.INTEGER,
