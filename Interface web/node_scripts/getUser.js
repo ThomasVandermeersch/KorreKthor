@@ -35,7 +35,7 @@ function getUser(email, req, createIfNotExist=true, createFakeUser=true){
                             .catch(err=> reject(err))
                     }).catch(err=>{
                         if (err instanceof GraphError && createFakeUser){
-                            User.create({fullName:"f", matricule:matriculeConverter.emailToMatricule(email), authorizations:3, role:2, email:email}).then(user=>{
+                            User.create({fullName:"", matricule:matriculeConverter.emailToMatricule(email), authorizations:3, role:2, email:email}).then(user=>{
                                 resolve(user)
                             })
                         }

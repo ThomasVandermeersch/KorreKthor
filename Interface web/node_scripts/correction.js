@@ -148,11 +148,13 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
             }
 
             else if(correction[questionIndex].type == 'qcm'){
-                if(correctionCriterias.type == 'normal'){
+                //if(correctionCriterias.type == 'normal'){
+                if(true){
                     correctNormalRep = correctNormal(response[questionIndex],correctionCriterias,correction[questionIndex])
                     
                     if('error' in correctNormalRep){
                         newResponses.push(correctNormalRep)
+                        propError = true
                     }
                     else{
                         newResponses.push(correctNormalRep)
