@@ -5,9 +5,9 @@ const convertMatricule = require("./convertMatricule")
 function saveCopy(copy, data, examId, req, error=null){
     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(user=>{
         Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}}).then(dbCopy=>{
-            var answers
-            if(error) answers = JSON.stringify({"error":error})
-            else answers = JSON.stringify(data.newResponse)
+            // var answers
+            // if(error) answers = JSON.stringify({"error":error})
+            // else answers = JSON.stringify(data.newResponse)
             
             if(dbCopy){
                 dbCopy.version = data.version, 
@@ -24,7 +24,7 @@ function saveCopy(copy, data, examId, req, error=null){
                             "version": data.version, 
                             "result": data.result, 
                             "file": copy.file,
-                            "answers": data.answers
+                            "answers": data.newResponse
                         }).catch(err=>{
                             console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
                         })
