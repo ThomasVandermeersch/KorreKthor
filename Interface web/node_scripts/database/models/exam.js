@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    questionStatus:{
+    collaborators:{
       type: DataTypes.STRING(4096),
     },
     correctionCriterias:{
