@@ -10,7 +10,7 @@ router.get("/", access.hasAccess, async (req, res) => {
     Exam.findAll({order:[["createdAt", "DESC"]]}).then(exams=>{
         returnedExams = []
         exams.forEach(exam => {
-            if(exam.userMatricule == matricule || req.session.userObject.authorizations == 0 || JSON.parse(exam.questionStatus).includes(matricule)) returnedExams.push(exam)
+            if(exam.userMatricule == matricule || req.session.userObject.authorizations == 0 || JSON.parse(exam.collaborators).includes(matricule)) returnedExams.push(exam)
         });
         // query.include = [{model:Exam, as:'exam', attributes:["name"]}]
         Copy.findAll({where:{userMatricule:matricule},include:[{model:Exam, as:'exam', attributes:["name"]}]}).then(copies=>{
@@ -98,7 +98,7 @@ router.get("/exam/:examid/downloadcorrection", access.hasAccess, async (req, res
 
 router.get("/collaborators/:examid",access.hasAccess,async (req,res)=>{
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
-        var collaborators = JSON.parse(exam.questionStatus)
+        var collaborators = JSON.parse(exam.collaborators)
         collaborators.push(exam.userMatricule)
         User.findAll({where:{matricule:collaborators},order:[['matricule', 'ASC']]}).then(users=>{
             return res.render('see/showCollaborators',{exam:exam,users:users})
@@ -117,9 +117,9 @@ router.get("/collaborators/:examid",access.hasAccess,async (req,res)=>{
 
 router.post("/collaborators/:examid",access.hasAccess,async (req,res)=>{
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
-        var collaborators = JSON.parse(exam.questionStatus)
+        var collaborators = JSON.parse(exam.collaborators)
         collaborators.push(req.body.newCollaborator)
-        exam.questionStatus = JSON.stringify(collaborators)
+        exam.collaborators = JSON.stringify(collaborators)
         exam.save().then(exam=>{
             return res.redirect('/see/collaborators/'+ req.params.examid)
         }).catch(err=>{
@@ -158,10 +158,7 @@ router.get("/copy/:copyid/download", access.hasAccess, async (req, res) => {
 router.get("/copy/:copyid", access.hasAccess, async (req, res) => {
     Copy.findOne({where:{id:req.params.copyid}, include:[{model:User, as:"user"}, {model:Exam, as:"exam", include:[{model:User, as:"user"}]}]}).then(copy=>{        
         var user = req.session.userObject
-        console.log(copy.exam.userMatricule)
-        console.log(copy.exam.questionStatus)
-        console.log(user.matricule)
-        var disableChanges = !(copy.exam.userMatricule == user.matricule || user.authorizations == 0 || JSON.parse(copy.exam.questionStatus).includes(user.matricule))
+        var disableChanges = !(copy.exam.userMatricule == user.matricule || user.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule))
         return res.render("see/showCopy", {copy:copy,disableChanges:disableChanges})
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- SEE/copy ---\n " + err)
