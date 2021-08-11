@@ -45,7 +45,7 @@ function hasAccess(req,res,next){
 
         Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
             if(exam){
-                if(user.authorizations==0 || exam.userMatricule == user.matricule || JSON.parse(exam.questionStatus).includes(user.matricule)){
+                if(user.authorizations==0 || exam.userMatricule == user.matricule || JSON.parse(exam.collaborators).includes(user.matricule)){
                     req.session.accesses.examIds.push(req.params.examid)
                     return next()
                 }
@@ -69,11 +69,11 @@ function hasAccess(req,res,next){
             if(copy){
                 const examOwner = copy.exam.user.matricule
                 const copyOwner = copy.userMatricule
-                if ((examOwner == user.matricule || copyOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.questionStatus).includes(user.matricule)) && req.method == "GET"){
+                if ((examOwner == user.matricule || copyOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)) && req.method == "GET"){
                     req.session.accesses.copyIds.push(req.params.copyid)
                     return next()
                 }
-                else if(examOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.questionStatus).includes(user.matricule)){
+                else if(examOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)){
                     req.session.accesses.copyIds.push(req.params.copyid)
                     return next() 
                 }

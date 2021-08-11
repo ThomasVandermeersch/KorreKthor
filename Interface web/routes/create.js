@@ -131,7 +131,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         "numberOfVersion":JSON.parse(req.session.excelFile.versions).length, 
         "versionsFiles":req.session.excelFile.versions, 
         "corrections":JSON.stringify(answers),
-        "questionStatus":JSON.stringify({}), 
+        "collaborators":JSON.stringify({}), 
         "excelFile":excelFile,
         "correctionCriterias": JSON.stringify({type:'normal', ptsRight:1, ptsWrong:0, ptsAbs:0, allGood:1, oneWrong:0.75, twoWrong:0.50, threeWrong:0.25,threeMoreWrong:0,isLastExclusive : 'on',lastExclusiveTrue:1, lastExclusiveFalse:0 })
     }).then(exam => {
