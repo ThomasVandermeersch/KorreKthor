@@ -2,7 +2,7 @@ const { User, Exam, Copy } = require("./database/models");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
-function saveCopy(copy, data, examId, req, error=null){
+function saveCopy(copy, data, examId, req){
     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(user=>{
         Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}}).then(dbCopy=>{
             // var answers
@@ -99,7 +99,7 @@ function correctAll(exam, scanResultString, req){
                 saveCopy(copy,data,exam.id, req)
             })
             .catch(err=>{
-                saveCopy(copy,{result:[0,0],version:copy.qrcode.version},exam.id,req,err)
+                saveCopy(copy,{result:[0,0],version:copy.qrcode.version,newResponse:err},exam.id,req)
             })
         }
     })
@@ -127,7 +127,7 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
         // Take the correction of the selected version
         correction = corrections[version]
 
-        if(correction.length != response.length) reject({error:'Detection error'})
+        if(correction.length != response.length) reject({newResponse:JSON.stringify({error:'Detection error'}))
         
         // Declare points 'buffers'
         totalPoints = 0
