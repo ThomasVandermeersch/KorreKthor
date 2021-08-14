@@ -127,7 +127,7 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
         // Take the correction of the selected version
         correction = corrections[version]
 
-        if(correction.length != response.length) reject({newResponse:JSON.stringify({error:'Detection error'})})
+        if(correction.length != response.length) reject(JSON.stringify({error:'Detection error'}))
         
         // Declare points 'buffers'
         totalPoints = 0
