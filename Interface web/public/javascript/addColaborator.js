@@ -48,7 +48,7 @@ document.getElementById('submitUserButton').addEventListener('click', async ()=>
             console.log(liste)
         }
     }
-    request.open("GET", 'https://localhost:9898/correction/getUserName/'+ matricule);
+    request.open("GET", 'https://fluke.ecam.be:9898/correction/getUserName/'+ matricule);
     request.send();
         
     // if('error' in myJson) alert( myJson.error)
