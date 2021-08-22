@@ -76,16 +76,20 @@ router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
-router.get("/getUserName/:matricule", access.hasAccess, (req,res)=>{
-    console.log("I'm called")
-    getUser.getUser(matriculeConverter.matriculeToEmail(req.params.matricule),req,true,false).then(user=>{
-        res.setHeader('Content-Type', 'application/json');
-        console.log(user)
-        res.end(JSON.stringify({ name: user.fullName,matricule: user.matricule }));
+router.post("/getUserName", access.hasAccess, (req,res)=>{
+    matricule = req.body.matricule.toLowerCase()
+    getUser.getUser(matriculeConverter.matriculeToEmail(matricule),req,true,false).then(user=>{
+        //res.setHeader('Content-Type', 'application/json');
+        req.flash('newUserName', user.fullName)
+        req.flash('newUserMatricule', user.matricule)
+
+        res.redirect('/see/collaborators/' + req.body.examId)
+        //res.end(JSON.stringify({ name: user.fullName,matricule: user.matricule }));
     })
     .catch(err=>{
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error : "L'utilisateur n'existe pas"}));
+        //res.setHeader('Content-Type', 'application/json');
+        req.flash('userNoExist', "L'utilisateur n'existe pas ! ")
+        res.redirect('/see/collaborators/' + req.body.examId)
     })
 })
 
@@ -226,6 +230,7 @@ router.post('/sendComplainEmail', access.hasAccess,(req,res)=>{
 })
 
 router.post("/updateUser/:copyid", access.hasAccess, async (req, res) => {
+    console.log(req.body.newMatricule)
     const userEmail = matriculeConverter.matriculeToEmail(req.body.newMatricule)
     getUser.getUser(userEmail,req)
         .then(user=>{

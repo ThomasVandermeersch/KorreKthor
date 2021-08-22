@@ -17,13 +17,22 @@ div(class="container page")
     br
     br
 
-    form(class="form")
-        input(type="hidden" name="examId" value=exam.id id="examId")
+    if messages.newUserName
+        div(class="alert alert-success my-2" role="alert")
+            p= "Voulez-vous ajouter " + messages.newUserName + " comme collaborateur ?"
+            form(class="form", action="/see/collaborators/"+ exam.id, method="POST")
+                input(type='hidden' name="newCollaborator" value=messages.newUserMatricule)
+                button(class="btn btn-success" type="submit") OUI
+            a(href="/see/collaborators/"+exam.id)
+                button(class="btn btn-danger") NON
+    
+    if messages.userNoExist
+        div(class="alert alert-danger my-2" role="alert")= messages.userNoExist
 
+
+    form(class="form" action="/correction/getUserName/" method="POST")
+        input(type="hidden" name="examId" value=exam.id id="examId")
         h2 Ajouter un collaborateur
-        input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Entrez le trigramme/matricule du collaborateur")
+        input(type="input" class="form-control bouton" name="matricule" id="newMatricule" placeholder="Entrez le trigramme/matricule du collaborateur")
         div(class="") 
             button(id='submitUserButton' class="btn btn-sm btn-success bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Ajouter
-
-
-script(src='/javascript/addColaborator.js')

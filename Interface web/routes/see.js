@@ -116,10 +116,10 @@ router.get("/collaborators/:examid",access.hasAccess,async (req,res)=>{
 })
 
 router.post("/collaborators/:examid",access.hasAccess,async (req,res)=>{
-    console.log("I'm called")
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
         var collaborators = JSON.parse(exam.collaborators)
-        collaborators.push(req.body.newCollaborator)
+        newCollab = JSON.parse(req.body.newCollaborator)[0]
+        collaborators.push(newCollab)
         exam.collaborators = JSON.stringify(collaborators)
         exam.save().then(exam=>{
             return res.redirect('/see/collaborators/'+ req.params.examid)
