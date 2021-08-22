@@ -77,8 +77,10 @@ router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
 })
 
 router.get("/getUserName/:matricule", access.hasAccess, (req,res)=>{
+    console.log("I'm called")
     getUser.getUser(matriculeConverter.matriculeToEmail(req.params.matricule),req,true,false).then(user=>{
         res.setHeader('Content-Type', 'application/json');
+        console.log(user)
         res.end(JSON.stringify({ name: user.fullName,matricule: user.matricule }));
     })
     .catch(err=>{
