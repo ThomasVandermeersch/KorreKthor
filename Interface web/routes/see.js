@@ -116,6 +116,7 @@ router.get("/collaborators/:examid",access.hasAccess,async (req,res)=>{
 })
 
 router.post("/collaborators/:examid",access.hasAccess,async (req,res)=>{
+    console.log("I'm called")
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
         var collaborators = JSON.parse(exam.collaborators)
         collaborators.push(req.body.newCollaborator)
