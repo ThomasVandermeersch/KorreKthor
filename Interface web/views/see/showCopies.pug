@@ -29,7 +29,7 @@ div(class="container page")
                 th Matricule
                 th Cote (pts)
         tbody
-            each copy in exam.copies 
+            each copy in copies 
                 //- - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
                 - var answers = JSON.parse(copy.answers)
 

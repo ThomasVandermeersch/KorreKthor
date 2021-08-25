@@ -28,7 +28,13 @@ router.get("/copies/:examid", access.hasAccess, async (req, res) => {
     Exam.findOne({where:{id:req.params.examid}, include:[{model:Copy, as:"copies", include:[{model:User, as:"user"}]}]}).then(exam=>{
         var mean = computeMean(exam.copies)
         stats = {"mean": mean, "var":computeVariance(exam.copies, mean), "participants":computeParticipants(exam.copies), "blancs":computeZero(exam.copies), "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
-        return res.render("see/showCopies", {exam:exam, stats:stats})
+        Copy.findAll({where:{examId:req.params.examid},include:[{model:User, as:"user"}],order:[['userMatricule', 'ASC']]}).then(copies=>{
+            return res.render("see/showCopies", {copies:copies,exam:exam, stats:stats})
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- SEE/copies ---\n " + err)
+            req.flash('errormsg', 'Database error, error : 1020')
+            return res.redirect('/error')
+        })
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- SEE/copies ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1020')

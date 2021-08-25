@@ -143,6 +143,7 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
                 } 
                 else{
                     correction = corrections[versionObject.version]
+                    version = versionObject.version
                     newResponses.push({list:response[questionIndex],version:versionObject.version})
                 }
             }
@@ -168,8 +169,12 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
                 }
             }
         }
-        finalResponse = {version:version,result:[totalPoints,maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})}
-        resolve(finalResponse)
+        if(propError){
+            resolve({version:versionObject.version,result:["?",maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
+        }
+        else{
+            resolve({version:versionObject.version,result:[totalPoints,maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
+        }
     });
 }
 
