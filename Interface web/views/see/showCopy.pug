@@ -98,6 +98,16 @@ div(class="container page")
                         a(href=`/correction/sendEmail/${copy.id}` class="btn btn-danger bouton float-end") Faire une réclamation
                     else 
                         button(id='submitAnswersButton' class="btn btn-sm btn-danger col-12 col-xl-4 bouton float-end") Enregistrer les modifications de réponses
+                        //- a(href=`/see/copies/${copy.exam.id}`)
+                        //-     button( class="btn btn-sm btn-warning col-12 col-xl-4 bouton float-end") Voir l'ensemble des copies
+                        if nextCopyId
+                            a(href=`/see/copy/${nextCopyId}`)
+                                button(class="btn btn-sm btn-warning col-12 col-xl-4 bouton float-end") Copie suivante
+                        if prevCopyId
+                            a(href=`/see/copy/${prevCopyId}`)
+                                button( class="btn btn-sm btn-warning col-12 col-xl-4 bouton float-end") Copie précédente
+                        
+                       
         
                 img(class="border rounded mx-auto d-block col-11 col-sm-6 mt-4 mt-md-0" src=`/see/copy/${copy.id}/download`)
                 

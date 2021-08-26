@@ -166,7 +166,20 @@ router.get("/copy/:copyid", access.hasAccess, async (req, res) => {
     Copy.findOne({where:{id:req.params.copyid}, include:[{model:User, as:"user"}, {model:Exam, as:"exam", include:[{model:User, as:"user"}]}]}).then(copy=>{        
         var user = req.session.userObject
         var disableChanges = !(copy.exam.userMatricule == user.matricule || user.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule))
-        return res.render("see/showCopy", {copy:copy,disableChanges:disableChanges})
+        Copy.findAll({where:{examId:copy.exam.id},order:[['userMatricule', 'ASC']]}).then(copies=>{
+            nbCopies = copies.length
+            copies.forEach((item, index)=>{
+                if(item.id == req.params.copyid){
+                    if(nbCopies - 1 == index) return res.render("see/showCopy", {prevCopyId:copies[index-1].id,copy:copy,disableChanges:disableChanges}) // Il n'y a pas de copie suivante
+                    else if(index == 0) return res.render("see/showCopy", {nextCopyId:copies[index+1].id,copy:copy,disableChanges:disableChanges})
+                    else return res.render("see/showCopy", {nextCopyId:copies[index+1].id,prevCopyId:copies[index-1].id,copy:copy,disableChanges:disableChanges})
+                }
+            })
+        }).catch(err=>{
+            console.log(" --- DATABASE ERROR -- SEE/copy ---\n " + err)
+            req.flash('errormsg', 'Database error, error : 1023')
+            return res.redirect('/error')
+        })
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- SEE/copy ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1023')
