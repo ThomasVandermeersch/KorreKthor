@@ -171,10 +171,10 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
             }
         }
         if(propError){
-            resolve({version:versionObject.version,result:["?",maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
+            resolve({version:version,result:["?",maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
         }
         else{
-            resolve({version:versionObject.version,result:[totalPoints,maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
+            resolve({version:version,result:[totalPoints,maxPoints],newResponse:JSON.stringify({response:newResponses,propError:propError})})
         }
     });
 }
