@@ -8,7 +8,8 @@ function saveCopy(copy, data, examId, req){
             // var answers
             // if(error) answers = JSON.stringify({"error":error})
             // else answers = JSON.stringify(data.newResponse)
-            
+            console.log(data.newResponse)
+            console.log(typeof(data.newResponse))
             if(dbCopy){
                 dbCopy.version = data.version, 
                 dbCopy.result = data.result, 
