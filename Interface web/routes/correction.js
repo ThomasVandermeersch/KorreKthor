@@ -18,6 +18,16 @@ router.get("/modifyCriteria/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
+router.get("/details/:examid", access.hasAccess, (req,res)=>{
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
+        return res.render('correction/details.pug',{exam:exam})
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- correction/modifyCriteria/examid ---\n " + err)
+        req.flash('errormsg', 'Database error, error : 1034')
+        return res.redirect('/error')
+    })
+})
+
 router.get("/questionWeighting/:examid", access.hasAccess, (req,res)=>{
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
         return res.render('correction/questionWeighting', {questionWeights:JSON.parse(exam.corrections), exam:exam})
@@ -206,7 +216,7 @@ router.get('/sendEmail/:copyid', access.hasAccess, (req,res)=>{
             examName:copy.exam.name,
             email: copy.exam.user.email,
             object: `[ERREUR DE CORRECTION] ${copy.exam.name}`,
-            url:`https://${process.env.ENDPOINT}/see/copy/${copy.id}`,
+            url:`https://${process.env.ENDPOINT}:9898/see/copy/${copy.id}`,
             copyId:copy.id
         })
     }).catch(err=>{

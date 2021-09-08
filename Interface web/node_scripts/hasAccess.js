@@ -69,15 +69,17 @@ function hasAccess(req,res,next){
             if(copy){
                 const examOwner = copy.exam.user.matricule
                 const copyOwner = copy.userMatricule
-                if ((examOwner == user.matricule || copyOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)) && req.method == "GET"){
-                    req.session.accesses.copyIds.push(req.params.copyid)
-                    return next()
+                if(copy.exam.copyViewAvailable == 2){                
+                    if ((examOwner == user.matricule || copyOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)) && req.method == "GET"){
+                        req.session.accesses.copyIds.push(req.params.copyid)
+                        return next()
+                    }
+                    else if(examOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)){
+                        req.session.accesses.copyIds.push(req.params.copyid)
+                        return next() 
+                    }
                 }
-                else if(examOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)){
-                    req.session.accesses.copyIds.push(req.params.copyid)
-                    return next() 
-                }
-                else return res.redirect("/noAccess")
+                return res.redirect("/noAccess")
             }
             else{
                 console.log(" --- COPY DOES NOT EXIST ERROR ---\n ")

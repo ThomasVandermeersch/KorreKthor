@@ -21,12 +21,13 @@ div(class="container page")
             
             - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
             - var questions = JSON.parse(copy.answers)
-            if "error" in questions
-                h4(class="text-danger") Cote : #[strong Error]
-            else if questions.propError
-                h4(class="text-danger") Cote : #[strong Error]
-            else
-                h4= copy.result[0] + '/' + copy.result[1]
+            if disableChanges == false
+                if "error" in questions
+                    h4(class="text-danger") Cote : #[strong Error]
+                else if questions.propError
+                    h4(class="text-danger") Cote : #[strong Error]
+                else
+                    h4= copy.result[0] + '/' + copy.result[1]
 
             div(class="photo my-3 row")
                 div(class="tab col-10 col-sm-5 form-check p-0 m-auto")
@@ -63,14 +64,14 @@ div(class="container page")
                                                     input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
                                                 else
                                                     input(class="form-check-input checkboxClass p-2 m-1", checked=questions.response[index].list[rep],disabled=(disableChanges), type="checkbox", name=response value="yes" )
-                                    
-                                    td(class="hide-sm")
-                                        if "error" in questions
-                                            strong(class="text-danger") ERROR
-                                        else if "error" in questions.response[index]
-                                            strong(class="text-danger") ERROR
-                                        else
-                                            strong= questions.response[index].totalPoint + '/' + questions.response[index].maxPoint
+                                    if disableChanges == false
+                                        td(class="hide-sm")
+                                            if "error" in questions
+                                                strong(class="text-danger") ERROR
+                                            else if "error" in questions.response[index]
+                                                strong(class="text-danger") ERROR
+                                            else
+                                                strong= questions.response[index].totalPoint + '/' + questions.response[index].maxPoint
 
                                 if(val.type == 'version')
                                     td(class="hide-sm")

@@ -11,19 +11,22 @@ div(class="container page create")
         div(class="form-group row")
             label(class="col-sm-2 col-md-3 col-form-label") Destinataire :
             div(class="col-sm-10 col-md-9")
-                input(type='email' class="form-control" value=email name='email' disabled)
+                input(type='hidden' class="form-control" value=email name='email')
+                input(type='email' class="form-control" value=email disabled)
         
         div(class="form-group my-2 row")
             label(class="col-sm-2 col-md-3 col-form-label") Objet :
             div(class="col-sm-10 col-md-9")
-                input(type=text  class="form-control" value=object size="20" name='object' disabled)
+                input(type='hidden'  class="form-control" value=object size="20" name='object')
+                input(type=text  class="form-control" value=object size="20" disabled)
 
         div
             textarea(name="message" class="form-control" rows="12" cols="100")
-                ='Bonjour Monsieur ' + destinationName + ',\n\n'
+                ='Bonjour Madame/Monsieur ' + destinationName + ',\n\n\n\n\n'
                 ="Cordialement,\n"
                 = name
-                = "\n\n\nLien vers l'examen :  " + url
+                = "\n\nLien vers l'examen :  " + url
+                = "\nEnvoyé depuis Korrekthor"
         
         input(id="copyId" type="hidden" name="copyId" value=copyId)
 

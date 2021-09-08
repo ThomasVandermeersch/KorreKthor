@@ -13,7 +13,7 @@ router.get("/", access.hasAccess, async (req, res) => {
             if(exam.userMatricule == matricule || req.session.userObject.authorizations == 0 || JSON.parse(exam.collaborators).includes(matricule)) returnedExams.push(exam)
         });
         // query.include = [{model:Exam, as:'exam', attributes:["name"]}]
-        Copy.findAll({where:{userMatricule:matricule},include:[{model:Exam, as:'exam', attributes:["name"]}]}).then(copies=>{
+        Copy.findAll({where:{userMatricule:matricule},include:[{model:Exam, as:'exam', attributes:["name","copyViewAvailable"]}]}).then(copies=>{
             return res.render("see/showExams", {exams:returnedExams, copies:copies})
         })
 
