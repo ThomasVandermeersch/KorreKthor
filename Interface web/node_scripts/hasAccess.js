@@ -69,7 +69,7 @@ function hasAccess(req,res,next){
             if(copy){
                 const examOwner = copy.exam.user.matricule
                 const copyOwner = copy.userMatricule
-                if(copy.exam.copyViewAvailable == 2){                
+                if(examOwner == user.matricule || copy.exam.copyViewAvailable == 2 || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule) ){                
                     if ((examOwner == user.matricule || copyOwner == user.matricule || req.session.userObject.authorizations == 0 || JSON.parse(copy.exam.collaborators).includes(user.matricule)) && req.method == "GET"){
                         req.session.accesses.copyIds.push(req.params.copyid)
                         return next()
