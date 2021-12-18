@@ -60,6 +60,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    historic:{
+      type: DataTypes.STRING(4096),
+    },
   }, {
     sequelize,
     tableName: "exams",

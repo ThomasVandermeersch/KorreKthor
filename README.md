@@ -18,6 +18,7 @@
     - [Updating the models table](#updating-the-models-table)
       - [With force](#with-force)
       - [With migrations](#with-migrations)
+      - [Specific migration](#specific-migration)
   - [How to use the app](#how-to-use-the-app)
   - [Student list format](#student-list-format)
 - [Python image processing](#python-image-processing)
@@ -200,6 +201,21 @@ $ sequelize db:migrate:undo // To undo the migration
 $ sequelize db:migrate // To apply the new migration
 ```
 > Note: if an error occurred try `export NODE_ENV=development` before running the migation(s)
+
+##### Specific migration
+For more specific migration, create a migration template with the command :
+```
+$ sequelize migration:generate --name MIGRATION_NAME
+```
+
+Then, ensure the generated file is located in the *migrations/* folder
+
+Finally, run the migration :
+```
+$ sequelize db:migrate
+```
+
+> Note once the transaction finishes you can move the migration file to the *update_migrations* folder to ensure to not re-execute that migration. 
 
 ### How to use the app
 First, open your favorite browser and enter this url : http://localhost:9898/.

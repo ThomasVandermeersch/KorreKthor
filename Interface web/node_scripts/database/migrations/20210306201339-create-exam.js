@@ -57,6 +57,9 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false
       },
+      historic:{
+        type: DataTypes.STRING(4096),
+      },
     });
   },
   down: async (queryInterface, DataTypes) => {
