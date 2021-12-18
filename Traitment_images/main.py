@@ -24,33 +24,19 @@ def compute(pdfFileLocation, examId):
             if len(listPages) == 0 :
                 jsonToSend.append({"error" : f"No image in {pdfFileLocation}"})
             else:
-                # i = 0
-                # firstQRCode = None
-                # while firstQRCode == None:
-                #     if i > 10 or i >= len(listPages):
-                #         jsonToSend.append({"error" : f"No QRCode available in {pdfFileLocation}"})
-                #         print(jsonToSend)
-                #         break
-
-                #     firstQRCode = process_img.decodeQRCode(listPages[i])
-                #     i+=1
-
-                # if not firstQRCode or len(firstQRCode) <= 0:
-                #     return jsonToSend[0]
-                
                 for img in listPages :
                     answers = process_img.process(img)
 
                     if answers == None:
-                        jsonToSend.append({"error" : f"{img} is not a QCM file"})
+                        jsonToSend.append({"error" : f"{img} is not a QCM file", "filename":img})
                     elif answers == False :
-                        jsonToSend.append({"error" : f"No answers scanned in {img}"})
+                        jsonToSend.append({"error" : f"No answers scanned in {img}", "filename":img})
                     else:
 
                         qrcode = process_img.decodeQRCode(img)
 
                         if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
-                            jsonToSend.append({"error" : f"{img} has no correct QR Code"})
+                            jsonToSend.append({"error" : f"{img} has no correct QR Code", "filename":img})
                             
                         else:
                             if examId != qrcode["lessonId"]:

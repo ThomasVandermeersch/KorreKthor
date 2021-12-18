@@ -239,6 +239,7 @@ $ pip install -r requirements.txt
 
 Finally, run :
 ```cmd
+export PYTHON_SERVER_PORT=8081
 $ python server.py
 ```
 
