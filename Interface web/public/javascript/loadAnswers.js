@@ -104,7 +104,8 @@ function removeQuestion(table){
 
 document.querySelectorAll(".nbPropDefault").forEach(item=>{
     item.addEventListener('change',function(event){
-        var table = item.parentNode.parentNode.childNodes[1]
+        console.log("change nbPropDefault")
+        var table = item.parentNode.parentNode.parentNode.childNodes[1]
         var nbRows = table.rows.length
         if(this.value > 10)  this.value = 10
         else if(this.value < 1) this.value =1
@@ -124,7 +125,7 @@ document.querySelectorAll(".nbPropDefault").forEach(item=>{
 
 document.querySelectorAll(".nbQuestions").forEach(item=>{
     item.addEventListener('change',function(event){
-        var table = item.parentNode.parentNode.childNodes[1]
+        var table = item.parentNode.parentNode.parentNode.childNodes[1]
         var nbRows = table.rows.length
         if(this.value > 30)  this.value = 30
         else if(this.value < 1) this.value =1

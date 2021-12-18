@@ -51,11 +51,13 @@ div(class="container page create")
                             td(class="px-0 mx-0")
                                 button(class="btn btn-secondary btn-sm addChoice" type="button") +
 
-                div(class="btn-group mb-5" role="group")
-                    p Nombre de questions : 
-                    input(type='number' class="nbQuestions" min=1,max=30, value=3)
-                    p Nombre de proposition par défaut : 
-                    input(type='number' class="nbPropDefault" min=1,max=10, value=3)
+                div(class="mb-5 row" role="group")
+                    div(class="col-6")
+                        div(class="col-auto") Nombre questions : 
+                        input(type='number' class="nbQuestions form-control col-auto" min=1,max=30, value=3)
+                    div(class="col-6")
+                        div(class="col") Nombre de proposition : 
+                        input(type='number' class="nbPropDefault form-control col-2" min=1,max=10, value=3)
                    
 
     div(class="row mb-4")
