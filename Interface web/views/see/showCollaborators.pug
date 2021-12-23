@@ -1,21 +1,16 @@
 include ../header.pug
 
-div(class="container page")
-    h1= "Collaborateurs de l'examen de : " + exam.name
-
-    br
-    br
+div(class="container page create")
+    h2(class="mb-3") Collaborateurs de l'examen #[strong #{exam.name}]
     
-    h2 Liste des collaborateurs
+    h4 Liste des collaborateurs
+    
     ul
-    each user in users
-        if(exam.userMatricule == user.matricule) 
-            li= '[' + user.matricule + ']  ' + user.fullName + ' (Propriétaire)'
-        else
-            li= '[' + user.matricule + ']  ' + user.fullName 
-
-    br
-    br
+        each user in users
+            if(exam.userMatricule == user.matricule) 
+                li= '[' + user.matricule + ']  ' + user.fullName + ' (Propriétaire)'
+            else
+                li= '[' + user.matricule + ']  ' + user.fullName 
 
     if messages.newUserName
         div(class="alert alert-success my-2" role="alert")
@@ -25,14 +20,13 @@ div(class="container page")
                 button(class="btn btn-success" type="submit") OUI
             a(href="/see/collaborators/"+exam.id)
                 button(class="btn btn-danger") NON
-    
-    if messages.userNoExist
-        div(class="alert alert-danger my-2" role="alert")= messages.userNoExist
 
-
-    form(class="form" action="/correction/getUserName/" method="POST")
+    form(class="form mt-5 row" action="/correction/getUserName/" method="POST")
+        if messages.userNoExist
+            div(class="alert alert-danger my-2" role="alert")= messages.userNoExist
+        
         input(type="hidden" name="examId" value=exam.id id="examId")
-        h2 Ajouter un collaborateur
-        input(type="input" class="form-control bouton" name="matricule" id="newMatricule" placeholder="Entrez le trigramme/matricule du collaborateur")
-        div(class="") 
-            button(id='submitUserButton' class="btn btn-sm btn-success bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Ajouter
+        h4(class="col-12") Ajouter un collaborateur
+        div(class="col-10")
+            input(type="input" class="form-control input bouton" name="matricule" id="newMatricule" placeholder="Trigramme/matricule du collaborateur...")
+        button(id='submitUserButton' class="btn btn-success bouton col-2" type="submit") Ajouter

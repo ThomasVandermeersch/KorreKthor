@@ -15,13 +15,13 @@ div(class="container page create")
                         i(class="fa fa-question-circle" style="font-size:20px;color:grey")
 
                 div(class="col p-0" id="lesson")
-                    input(class="form-control" type="text", name="lesson", value=lesson, required, min=4 max=65)
+                    input(class="form-control" type="text" name="lesson" value=lesson required min=4 max=65)
             
             div(class="row row-cols-auto my-2") 
                 div(class="col") Date de l'examen :
             
-                div(class="col p-0" id="lesson")
-                    input(type="date" required name="date")
+                div(class="col p-0" id="date")
+                    input(class="form-control" type="date" required name="date")
 
             if(version== false)
                 div(class="row row-cols-auto my-2") 
@@ -33,10 +33,10 @@ div(class="container page create")
         
         div(class="row row-cols-auto my-2") 
 
-            <div class="container">
-                <div class="col-md-12 text-center">
-                    <button type="submit" name="singleGrid"class="btn btn-success"> Générer uniquement des grilles de réponses</button>
-                    if(version != false)
-                        button(type="submit" name="merge" class="btn btn-success") Joindre les questionnaires aux grilles de réponses </button>
+                <div class="col-md-6">
+                    <button type="submit" name="singleGrid"class="btn btn-success"> Générer uniquement des grilles de réponses
                 </div>
-
+                if(version != false)
+                    <div class="col-md-6">
+                        button(type="submit" name="merge" class="btn btn-success float-end") Joindre les questionnaires aux grilles de réponses
+                    </div>

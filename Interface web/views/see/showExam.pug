@@ -72,11 +72,11 @@ div(class="container page create")
                                         th Reponses fausses (pts)
                                         td -#{correction.ptsWrong}
                         
-                        div(class="float-end mt-1")
-                            a(href=`/see/collaborators/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Collaborateurs
-                            a(href=`/correction/questionWeighting/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Pondération des questions
-                            a(href=`/correction/modifyCriteria/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Modifier critères cotation
-                            a(href=`/correction/modifyAnswers/${exam.id}` class="bouton btn btn-warning btn-sm me-2") Modifier les réponses
+                    div(class="mt-1 row w-sm-75 float-end")
+                        a(href=`/see/collaborators/${exam.id}` class="col bouton btn btn-warning btn-sm mx-1") Collaborateurs
+                        a(href=`/correction/questionWeighting/${exam.id}` class="col bouton btn btn-warning btn-sm mx-1") Pondération des questions
+                        a(href=`/correction/modifyCriteria/${exam.id}` class="col bouton btn btn-warning btn-sm mx-1") Modifier critères cotation
+                        a(href=`/correction/modifyAnswers/${exam.id}` class="col bouton btn btn-warning btn-sm mx-1") Modifier les réponses
 
 
                 else 
@@ -86,7 +86,7 @@ div(class="container page create")
 
             if exam.correctionFile && exam.examFile
                 br
-                div(class="files")
+                div(class="files mt-2")
                     a(href=`/see/exam/${exam.id}/downloadresult` class="bouton") Fichier d'examen
                     br
                     a(href=`/see/exam/${exam.id}/downloadcorrection` class="bouton") Fichier de correction

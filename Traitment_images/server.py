@@ -13,16 +13,21 @@ def resp():
 
 @post('/run')
 def index():
-    pdf_file = request.files.get("my_file")
-    Path("./saves/").mkdir(parents=True, exist_ok=True)
-    
-    now = datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
-    file = f"./saves/{now}_{pdf_file.filename}"
-    pdf_file.save(file)
-    print("Got file in:", file) 
-    a = main.compute(file)
-    print(a)
-    return a
+    examId = request.forms.get("exam_id")
+    pdfFile = request.files.get("file")
+
+    if pdfFile and examId:
+        Path("./saves/").mkdir(parents=True, exist_ok=True)
+        now = datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
+        fileLocation = f"./saves/{now}_{pdfFile.filename}"
+        pdfFile.save(fileLocation)
+
+        print("Got file in:", fileLocation) 
+        computation = main.compute(fileLocation, examId)
+        print(computation)
+        return computation
+    else:
+        return {"error":"Expected fields : file, exam_id"}
 
 @route('/static/<filename:path>')
 def send_static(filename):

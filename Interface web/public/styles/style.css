@@ -52,10 +52,10 @@ body {
     .container {
        max-width: none;
    }
-   .userTableClass, .examsTable, .copiesTable{
+    .userTableClass, .examsTable, .copiesTable{
        font-size: 13px;
    }
-   .userTableClass .email, .userTableClass .authorizations, .hide-sm{
+    .userTableClass .email, .userTableClass .authorizations, .hide-sm{
         display: none;
    }
 }

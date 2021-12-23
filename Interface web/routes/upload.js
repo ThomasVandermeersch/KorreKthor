@@ -24,10 +24,9 @@ const url = `http://${process.env.PYTHON_SERVER_HOST}:${process.env.PYTHON_SERVE
 // Call the python server (for correction)
 function callCorrection(filename, exam, req){
     const formData = {
-		my_field: "file",
-		my_file: fs.createReadStream(`uploads/${filename}`),
+        exam_id: exam.id,
+		file: fs.createReadStream(`uploads/${filename}`),
 	}
-    
     request.post({url:`${url}/run`, formData:formData}, function (err, httpResponse, body) {
         if (err || !body ||JSON.parse(body).error){
             exam.status = 3 // 3 = correction error
@@ -46,7 +45,7 @@ function callCorrection(filename, exam, req){
                 fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' }));
             })
 
-            if (exam.id == zipFile.split('.')[0]){
+            if (typeof zipFile !== 'undefined' && exam.id == zipFile.split('.')[0]){
                 correction.correctAll(exam, body, req)
             }
             else{
