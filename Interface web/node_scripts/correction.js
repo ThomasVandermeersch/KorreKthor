@@ -13,7 +13,7 @@ function saveCopy(copy, data, examId, req){
             if(dbCopy){
                 dbCopy.version = data.version, 
                 dbCopy.result = data.result, 
-                dbCopy.file = copy.file.split('\\')[1],
+                dbCopy.file = copy.file.split('/')[1],
                 dbCopy.answers = data.newResponse
                 dbCopy.save().catch(err=>{
                     console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
