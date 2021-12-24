@@ -21,7 +21,7 @@ div(class="container page create")
             a(href="/see/collaborators/"+exam.id)
                 button(class="btn btn-danger") NON
 
-    form(class="form mt-5 row" action="/correction/getUserName/" method="POST")
+    form(class="form mt-5 row" action="/correction/getUserName/colab" method="POST")
         if messages.userNoExist
             div(class="alert alert-danger my-2" role="alert")= messages.userNoExist
         

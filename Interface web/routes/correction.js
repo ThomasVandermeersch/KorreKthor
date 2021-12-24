@@ -86,14 +86,16 @@ router.get("/modifyAnswers/:examid", access.hasAccess, (req,res)=>{
     })
 })
 
-router.post("/getUserName", access.hasAccess, (req,res)=>{
+router.post("/getUserName/:redirection", access.hasAccess, (req,res)=>{
     matricule = req.body.matricule.toLowerCase()
     getUser.getUser(matriculeConverter.matriculeToEmail(matricule),req,true,false).then(user=>{
         //res.setHeader('Content-Type', 'application/json');
         req.flash('newUserName', user.fullName)
         req.flash('newUserMatricule', user.matricule)
 
-        res.redirect('/see/collaborators/' + req.body.examId)
+        if(req.params.redirection == 'colab') res.redirect('/see/collaborators/' + req.body.examId)
+        else res.redirect('/see/copy/' + req.body.copyId)
+
         //res.end(JSON.stringify({ name: user.fullName,matricule: user.matricule }));
     })
     .catch(err=>{

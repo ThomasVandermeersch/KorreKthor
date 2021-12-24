@@ -34,18 +34,38 @@ div(class="container page")
                     h4(style="text-align:center") Aperçu de la détection
                     if copy.user.fullName == "" && (session.userObject.authorizations == 0 || session.userObject.role == 1)
                         div
-                            form(class="form")
+                            if messages.newUserName
+                                div(class="alert alert-success my-2" role="alert")
+                                    p= "Voulez-vous assigner " + messages.newUserName + " à la copie ?"
+                                    form(class="form", action="/correction/updateUser/"+ copy.id, method="POST")
+                                        input(type='hidden' name="newMatricule" value=messages.newUserMatricule[0])
+                                        input(type='hidden' name="examId" value=copy.exam.id)
+                                        button(class="btn btn-success" type="submit") OUI
+                                    a(href="/see/copy/"+ copy.id)
+                                        button(class="btn btn-danger") NON
 
-                                input(type="hidden" name="examId" value=copy.exam.id id="examId")
-                                input(type="hidden" name="copyId" value=copy.id id='copyID')
-
-                                label(for="newMatricule" class="form-label") Entrer le matricule de l'étudiant
-                                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.")
-                                        i(class="fa fa-question-circle" style="font-size:24px;color:red")
-                                input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Ex: 17076")
+                            form(class="form mt-5 row" action="/correction/getUserName/modifyStudent" method="POST")
+                                if messages.userNoExist
+                                    div(class="alert alert-danger my-2" role="alert")= messages.userNoExist
                                 
-                                div(class="") 
-                                    button(id='submitUserButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
+                                input(type="hidden" name="copyId" value=copy.id id="examId")
+                                h4(class="col-12") Modifier l'étudiant
+                                div(class="col-10")
+                                    input(type="input" class="form-control input bouton" name="matricule" id="newMatricule" placeholder="Matricule étudiant")
+                                button(id='submitUserButton' class="btn btn-success bouton col-2" type="submit") Ajouter                            
+                        br
+                            //- form(class="form")
+
+                            //-     input(type="hidden" name="examId" value=copy.exam.id id="examId")
+                            //-     input(type="hidden" name="copyId" value=copy.id id='copyID')
+
+                            //-     label(for="newMatricule" class="form-label") Entrer le matricule de l'étudiant
+                            //-         button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.")
+                            //-             i(class="fa fa-question-circle" style="font-size:24px;color:red")
+                            //-     input(type="input" class="form-control bouton" name="newMatricule" id="newMatricule" placeholder="Ex: 17076")
+                                
+                            //-     div(class="") 
+                            //-         button(id='submitUserButton' class="btn btn-sm btn-danger bouton mt-2 mb-2 col-12 col-xl-4 float-end" type="submit") Modifier l'etudiant
 
                     
                     table(id='tableId' class="table table-sm tableClass mt-0 p-0")                        
