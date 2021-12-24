@@ -1,4 +1,4 @@
-const { User, Exam, Copy } = require("./database/models");
+const {  Exam, Copy } = require("./database/models");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
@@ -13,7 +13,7 @@ function saveCopy(copy, data, examId, req){
             if(dbCopy){
                 dbCopy.version = data.version, 
                 dbCopy.result = data.result, 
-                dbCopy.file = copy.file,
+                dbCopy.file = copy.file.split('\\')[1],
                 dbCopy.answers = data.newResponse
                 dbCopy.save().catch(err=>{
                     console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
@@ -89,7 +89,9 @@ function correctAll(exam, scanResultString, req){
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
 
     // Correct all copies
-    scanResult.data.forEach( copy =>{
+ 
+    pagesError = []
+    scanResult.data.forEach( (copy) =>{
         if (copy.error == "None"){
             correctionCopy( 
                     corrections,
@@ -103,10 +105,25 @@ function correctAll(exam, scanResultString, req){
                 saveCopy(copy,{result:[0,0],version:copy.qrcode.version,newResponse:err},exam.id,req)
             })
         }
+        else{
+            originalFileName = copy.filename
+            pageNumber = (originalFileName.split(`\\`)[1]).split('.')[0]
+            pagesError.push(pageNumber)
+        }
     })
     
     // Modify exam status
     exam.status = 2
+    historic = JSON.parse(exam.historic)
+    newHistory = {
+        date : Date(),
+        user : req.session.userObject.matricule,
+        fileName : req.file.filename,
+        pagesError : pagesError
+    }
+    historic.push(newHistory)
+    exam.historic = JSON.stringify(historic)
+    
     exam.save().then(exam=>{
         // nothing to do
     }).catch( err=>{

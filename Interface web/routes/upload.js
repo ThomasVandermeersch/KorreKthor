@@ -7,20 +7,22 @@ const fs = require("fs");
 const correction = require("../node_scripts/correction")
 const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
+const { v4: uuidv4 } = require('uuid');
+
 
 var multer  = require('multer'); // Specific import for files 
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',
         filename: function(req, file, cb){
-            cb(null, file.originalname)
+            uid = uuidv4()
+            cb(null, uid + '_' + path.extname(file.originalname))
         }
     }
 )
 var upload = multer({ storage: storage})
 
 const url = `http://${process.env.PYTHON_SERVER_HOST}:${process.env.PYTHON_SERVER_PORT}`
-
 // Call the python server (for correction)
 function callCorrection(filename, exam, req){
     const formData = {
@@ -58,7 +60,7 @@ function callCorrection(filename, exam, req){
 
 router.get("/copies/:examid", access.hasAccess, async(req, res) => {
     Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
-        if (req.session.userObject.matricule == exam.userMatricule || req.session.userObject.authorizations == 0) res.render("upload/uploadScans", {exam:exam})
+        if (req.session.userObject.matricule == exam.userMatricule || req.session.userObject.authorizations == 0) res.render("upload/uploadScans", {exam:exam,historic:JSON.parse(exam.historic)})
         else res.redirect('/noAccess')
         
     }).catch(err=>{
@@ -69,7 +71,7 @@ router.get("/copies/:examid", access.hasAccess, async(req, res) => {
 })
 
 router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req, res) => {
-    if (path.extname(req.file.originalname) != ".pdf"){
+    if (path.extname(req.file.filename) != ".pdf"){
         req.flash("errormsg", "Veuillez uploader un fichier pdf")
         return res.render("upload/uploadScans", {exam:exam})
     }
@@ -88,7 +90,7 @@ router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req,
             res.redirect("/see")
 
             try{
-                callCorrection(req.file.originalname, exam, req)
+                callCorrection(req.file.filename, exam, req)
             }
             catch(err){
                 console.log(" --- Call correction ERROR -- UPLOAD/scan/manual ---\n " + err)
@@ -105,5 +107,16 @@ router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req,
         return res.redirect('/error')
     })
 })
+
+router.get("/downloadUploadedFile/:examid/:filename", access.hasAccess, async (req, res) => {
+    return res.download(
+        path.resolve('uploads/' + req.params.filename),
+        (err) => {
+            if (err){
+                console.log(" --- DOWNLOAD ERROR -- SEE/exam/downloadresult ---\n " + err)
+            } 
+        }
+    );
+});
 
 module.exports = router;

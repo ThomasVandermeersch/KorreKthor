@@ -133,7 +133,8 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
         "corrections":JSON.stringify(answers),
         "collaborators":JSON.stringify([]), 
         "excelFile":excelFile,
-        "correctionCriterias": JSON.stringify({type:'normal', ptsRight:1, ptsWrong:0, ptsAbs:0, allGood:1, oneWrong:0.75, twoWrong:0.50, threeWrong:0.25,threeMoreWrong:0,isLastExclusive : 'on',lastExclusiveTrue:1, lastExclusiveFalse:0 })
+        "correctionCriterias": JSON.stringify({type:'normal', ptsRight:1, ptsWrong:0, ptsAbs:0, allGood:1, oneWrong:0.75, twoWrong:0.50, threeWrong:0.25,threeMoreWrong:0,isLastExclusive : 'on',lastExclusiveTrue:1, lastExclusiveFalse:0 }),
+        "historic" : '[]'
     }).then(exam => {
         var lesson = { name: lessonName, id: exam.id, versions: JSON.parse(req.session.excelFile.versions)}
 

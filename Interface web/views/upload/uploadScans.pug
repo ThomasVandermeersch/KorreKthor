@@ -15,6 +15,21 @@ div(class="container page create")
                 input(class="btn btn-warning float-end" type="submit", value="Envoyer")
     
     if messages.errormsg
-        div(class="alert alert-danger mt-2" role="alert")= messages.errormsg  
+        div(class="alert alert-danger mt-2" role="alert")= messages.errormsg
+
+    br
+    br
+    h2(class="mb-4") Historique des uploads
+
+    each hist in historic 
+        p= hist.date
+        ul
+            li= 'Uploadé par : ' + hist.user
+            li 
+                a(href=`/upload/downloadUploadedFile/${exam.id}/${hist.fileName}` class="bouton") Voir le fichier uploadé
+
+            li= 'Numéro des pages non analysées : ' + hist.pagesError
+        
+
 
 include ../footer.pug
