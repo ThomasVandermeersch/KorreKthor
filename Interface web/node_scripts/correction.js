@@ -107,7 +107,7 @@ function correctAll(exam, scanResultString, req){
         }
         else{
             originalFileName = copy.filename
-            pageNumber = (originalFileName.split(`\\`)[1]).split('.')[0]
+            pageNumber = (originalFileName.split(`/`)[1]).split('.')[0]
             pagesError.push(pageNumber)
         }
     })
