@@ -154,11 +154,10 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
                     res.redirect("/create/Step4")
                 })
             })
-            .catch((ret) => {
+            .catch((err) => {
                 exam.destroy()
-                console.log(ret)
-                req.flash('errormsg', ret.error);
-                res.redirect("/create/Step2")
+                req.flash('errormsg', err);
+                res.redirect("/create/Step1")
             })
         }).catch(err=>{
             console.log(" --- DATABASE ERROR -- CREATE/quest ---\n " + err)
@@ -175,7 +174,7 @@ router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), asyn
     req.session["extraCopies"] = req.body.extraCopies
 
     if(ext == ".xlsx"){  
-        functions.getExcelInfo(pathTofile).then((response)=>{
+        functions.getExcelInfo(pathTofile).then( async(response)=>{
             var excelFile = null
 
             if(!response.versions)
@@ -185,19 +184,28 @@ router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), asyn
                     versions: false,
                     lesson: response.lesson
                 }  
+                console.log('coucou')
             }
             else{
                 excelFile = {
                     filename: pathTofile,
                     versions: JSON.stringify(response.versions),
                     lesson: response.lesson
-                }  
+                }
+                // Verify that all students have a name, a version and a matricule
+                students = await functions.importStudents(pathTofile)
+                for (const student in students){
+                    if(!student.matricule || !student.version || !student.name){
+                        req.flash('errormsg', 'Au moins un étudiant n\'a pas de matricule et/ou nom et/ou version')
+                        return res.redirect("/create/Step1")
+                    }
+                }
             }
 
             req.session["excelFile"] = excelFile
             res.redirect("/create/Step21")
         }).catch(err=>{
-            req.flash('errormsg', 'Problem with Excel file');
+            req.flash('errormsg', err);
             res.redirect("/create/Step1")
         })
     }

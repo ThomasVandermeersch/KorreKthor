@@ -63,19 +63,25 @@ async function getExcelInfo(path){
       var versions = []
       var version = 0
 
-      worksheet.eachRow(function(row, rowNumber) {
-        var indexVersion = row.values.indexOf("version")
-        if (indexVersion >= 0){
-          target = rowNumber
-          version = indexVersion
+      if(worksheet.getRow(2).values.includes('cote') && worksheet.getRow(2).values.includes('etudiant')){
+          worksheet.eachRow(function(row, rowNumber) {
+            var indexVersion = row.values.indexOf("version")
+            if (indexVersion >= 0){
+              target = rowNumber
+              version = indexVersion
+            }
+
+            if (target < rowNumber){
+              if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
+                versions.push(row.values[version])
+              }
+            }
+          })
         }
 
-        if (target < rowNumber){
-          if (!versions.includes(row.values[version]) && row.values[version] !== undefined){
-            versions.push(row.values[version])
-          }
+        else{
+          reject("Le fichier ne contient pas de colonne 'etudiant' et/ou 'cote' à la ligne 2")
         }
-      })
 
       lesson = worksheet.getCell("A1").value
 
