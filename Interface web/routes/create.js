@@ -194,9 +194,10 @@ router.post("/sendList", access.hasAccess, uploadxls.single("studentList"), asyn
                 }
                 // Verify that all students have a name, a version and a matricule
                 students = await functions.importStudents(pathTofile)
-                for (const student in students){
+                for (const studentIndex in students){
+                    student = students[studentIndex]
                     if(!student.matricule || !student.version || !student.name){
-                        req.flash('errormsg', 'Au moins un étudiant n\'a pas de matricule et/ou nom et/ou version')
+                        req.flash('errormsg', `Au moins un étudiant n\'a pas de matricule et/ou nom et/ou version. L'étudiant ayant généré l'erreur est : ${JSON.stringify(student)}`)
                         return res.redirect("/create/Step1")
                     }
                 }
