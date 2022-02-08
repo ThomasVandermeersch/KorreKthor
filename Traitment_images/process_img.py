@@ -17,7 +17,7 @@ def process(imgPath):
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
     ratio = img.shape[1] / 1191
     img = cv2.resize(img, (1191, round(img.shape[0] / ratio)), interpolation=cv2.INTER_LINEAR)
-    print("img shape :", img.shape)
+    print(f"img shape: {img.shape}")
     # img[img > 130 ] = 255
     # img[img < 100 ] = 0
 
@@ -81,7 +81,7 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
     if len(points) >= 3:
         return points
 
-    print("Not a good page")
+    print(f"Not a good page: {img}")
     return False
 
 

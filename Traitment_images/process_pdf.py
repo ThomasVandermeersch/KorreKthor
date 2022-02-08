@@ -14,13 +14,13 @@ def extractTextAndImg(path):
 
     file = fitz.open(path)
 
-    print("Nbr of pages:", file.page_count)
+    print(f"Nbr of pages: {file.page_count}")
     if file.page_count == 0:
         return None
 
     for pageNumber, page in enumerate(file.pages(), start=1):
         fromPath = "From_PDF/" + str(pageNumber) + ".png"
-        print(" Extracting", fromPath)
+        print(f"Extracting: {fromPath}")
 
         pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
         pix.writeImage(fromPath)

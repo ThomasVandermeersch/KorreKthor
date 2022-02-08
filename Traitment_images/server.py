@@ -25,7 +25,7 @@ def index():
         fileLocation = f"./saves/{now}_{pdfFile.filename}"
         pdfFile.save(fileLocation)
 
-        print("Got file in:", fileLocation)
+        print(f"Got file in: {fileLocation}")
         computation = main.compute(fileLocation, examId)
         print(computation)
         return computation

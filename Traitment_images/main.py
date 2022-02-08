@@ -19,7 +19,7 @@ def compute(pdfFileLocation, examId):
             jsonToSend.append({"error": f"{pdfFileLocation} is not a PDF file"})
             return
 
-        print("\nGetting answers...")
+        print(f"Getting answers... from {pdfFileLocation}")
         listPages = glob.glob("From_PDF/*.png")
         if len(listPages) == 0:
             jsonToSend.append({"error": f"No image in {pdfFileLocation}"})
@@ -53,8 +53,8 @@ def compute(pdfFileLocation, examId):
         try:
             shutil.make_archive(zipPath, "zip", "From_PDF")
             response = {"zipFile": f"{examId}.zip", "data": jsonToSend}
-            print(f"\nTransaction done, file in : {zipPath}.zip !\n")
-            print("response:", response)
+            print(f"Transaction done, file in : {zipPath}.zip !")
+            print(f"response: {response}")
         except:
             print(f"Error while zipping to {zipPath}")
             response = {"error": f"Zipping to {zipPath} failed"}
