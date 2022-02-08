@@ -7,27 +7,27 @@ from pyzbar.pyzbar import decode
 import json
 import os
 
+
 def process(imgPath):
     """
-    This function takes an image path and return the equivalent answers boolean array is the image is conform else None. 
+    This function takes an image path and return the equivalent answers boolean array is the image is conform else None.
     The image is conform if there are 3 squares on each bottom left, top left and top right corners.
     """
     img_rgb = cv2.imread(imgPath)
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-    ratio  = img.shape[1]/1191
-    img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
+    ratio = img.shape[1] / 1191
+    img = cv2.resize(img, (1191, round(img.shape[0] / ratio)), interpolation=cv2.INTER_LINEAR)
     print("img shape :", img.shape)
-    #img[img > 130 ] = 255
-    #img[img < 100 ] = 0
-        	
+    # img[img > 130 ] = 255
+    # img[img < 100 ] = 0
 
     goodPage = isGoodPage(img)
     print(f" {imgPath}")
     if True:
-    # if goodPage: # Check the 3 sheet corners 
-    #     if not getGoodOrientation(img, goodPage):
-    #         print("Make a rotation of 180 degrees...")
-    #         img = cv2.rotate(img, cv2.ROTATE_180)
+        # if goodPage: # Check the 3 sheet corners
+        #     if not getGoodOrientation(img, goodPage):
+        #         print("Make a rotation of 180 degrees...")
+        #         img = cv2.rotate(img, cv2.ROTATE_180)
 
         resp = getImageResponses(img)
 
@@ -44,14 +44,14 @@ def process(imgPath):
 
 def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8):
     """
-    This function checks is the povided image can be analysed (this means it has 3 templates: TL, TR, BL). 
-    If yes returns the squares points list else None. 
+    This function checks is the povided image can be analysed (this means it has 3 templates: TL, TR, BL).
+    If yes returns the squares points list else None.
     - The img is the image you want to check
     - The squaresTemplatePath param is the locaiton to the squares template
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    #template = cv2.resize(template, (60, 60), interpolation=cv2.INTER_LINEAR)
+    # template = cv2.resize(template, (60, 60), interpolation=cv2.INTER_LINEAR)
 
     # cv2.imshow("img", template)
     # cv2.waitKey(delay=5000)
@@ -68,21 +68,22 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
 
     # This loop returns a list with 3 points that matches the squares
     points = []
-    prev = (0,0)
+    prev = (0, 0)
     for pt in zip(*loc[::-1]):
-        #cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,0), 5)
-        distance = math.sqrt(((pt[0]-prev[0])**2)+((pt[1]-prev[1])**2))
-        
-        if distance > minDistance : 
+        # cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,0), 5)
+        distance = math.sqrt(((pt[0] - prev[0]) ** 2) + ((pt[1] - prev[1]) ** 2))
+
+        if distance > minDistance:
             points.append(pt)
 
         prev = pt
 
-    if(len(points) >= 3 ) :
+    if len(points) >= 3:
         return points
 
     print("Not a good page")
     return False
+
 
 def getGoodOrientation(img, squaresLocations, margin=0.8):
     """
@@ -93,12 +94,19 @@ def getGoodOrientation(img, squaresLocations, margin=0.8):
     """
     h, w = img.shape[::-1]
     for point in squaresLocations:
-        if point[0] > h*margin and point[1] > w*margin:
+        if point[0] > h * margin and point[1] > w * margin:
             return False
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.5):
+
+def getImageResponses(
+    img,
+    fullTemplatePath="source_pdf/rempli.PNG",
+    fullThreshold=0.6,
+    emptyTemplatePath="source_pdf/vide.PNG",
+    emptyThreshold=0.5,
+):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -130,23 +138,24 @@ def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThresho
     w, h = fullTemplate.shape[::-1]
 
     for i in fullListe:
-        i = (i[0]+200, i[1]+290) # replace the matched points in the area
-        cv2.circle(img, (round(i[0]+w/2), round(i[1]+h/2)), round(w/2), (0,255,0), 1)
-    
+        i = (i[0] + 200, i[1] + 290)  # replace the matched points in the area
+        cv2.circle(img, (round(i[0] + w / 2), round(i[1] + h / 2)), round(w / 2), (0, 255, 0), 1)
+
     for i in emptyListe:
-        i = (i[0]+200, i[1]+290) # replace the matched points in the area
-        cv2.rectangle(img, i, (round(i[0] + (w*(2/3))), round(i[1] + (h*(2/3)))), (0,100,0), 1)
+        i = (i[0] + 200, i[1] + 290)  # replace the matched points in the area
+        cv2.rectangle(img, i, (round(i[0] + (w * (2 / 3))), round(i[1] + (h * (2 / 3)))), (0, 100, 0), 1)
 
     # cv2.rectangle(img, (120, 200), (1000, 1550), (0,100,0), 1) # Display the matching area
 
     boolArray = getBoolArray(emptyListe, fullListe, 25)
     return boolArray
 
+
 def getPatternList(img, template, threshold, minDistance):
     """
     This function returns a list where the templates are detected in pixels.
     - The thresold param is the resemblance ratio
-    - The minDistance param is the minimal distance between 2 "same" point 
+    - The minDistance param is the minimal distance between 2 "same" point
     """
 
     # img[120:1550, 200:1000] : define the matching area
@@ -168,7 +177,7 @@ def getPatternList(img, template, threshold, minDistance):
                 xdiff = abs(i[0] - pt[0])
                 ydiff = abs(i[1] - pt[1])
 
-                # If the pt is near a point in the all liste -> don't add the point 
+                # If the pt is near a point in the all liste -> don't add the point
                 if (xdiff < minDistance) and (ydiff < minDistance):
                     same += 1
 
@@ -176,6 +185,7 @@ def getPatternList(img, template, threshold, minDistance):
                 liste.append(pt)
 
     return liste
+
 
 def getBoolArray(emptyListe, fullListe, minDistance):
     """
@@ -189,7 +199,6 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     if len(emptyListe) == 0 and len(fullListe) == 0:
         return None
 
-    
     xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else [(), ()]
     xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else [(), ()]
 
@@ -198,10 +207,10 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     yMin = min(yEmptyListe + yFullListe)
     yMax = max(yEmptyListe + yFullListe)
 
-    sortedListe = emptyListe+fullListe
+    sortedListe = emptyListe + fullListe
     sortedListe.sort()
 
-    ySortedListe = list(yEmptyListe+yFullListe)
+    ySortedListe = list(yEmptyListe + yFullListe)
     ySortedListe.sort()
 
     # This ugly part creates the boolArray liste and fills in with False
@@ -209,7 +218,7 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     y = 0
     c = 0
     for i in ySortedListe:
-        if abs(y-i) > minDistance:
+        if abs(y - i) > minDistance:
             y = i
             sub = []
             if c:
@@ -222,10 +231,10 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     sub = []
     for i in range(c):
         sub.append(False)
-    boolArray.append(sub)  
+    boolArray.append(sub)
 
     # get the size of the biggest liste in the boolArray
-    maxVal = len(max(boolArray, key = lambda i: len(i)))
+    maxVal = len(max(boolArray, key=lambda i: len(i)))
 
     for i in sortedListe:
         # x is interpolated between xMin and xMax -> estimation where the point i[0] is on the question line
@@ -233,36 +242,35 @@ def getBoolArray(emptyListe, fullListe, minDistance):
         x = round(vx) - 1
         # y is interpolated between yMin and yMax -> estimation where the question line is
         vy = np.interp(i[1], [yMin, yMax], [1, len(boolArray)])
-        y = round(vy) - 1 
+        y = round(vy) - 1
 
         if i in fullListe:
             x = len(boolArray[y]) - 1 if x >= len(boolArray[y]) - 1 else x
             boolArray[y][x] = True
-            
+
     return boolArray
-    
+
+
 def decodeQRCode(imagePath):
     img = cv2.imread(imagePath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ratio  = img.shape[1]/1191
-    img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
+    ratio = img.shape[1] / 1191
+    img = cv2.resize(img, (1191, round(img.shape[0] / ratio)), interpolation=cv2.INTER_LINEAR)
     preQRCode = decode(img)
 
-    if len(preQRCode) == 0: # One more chance to get the QRCode 
-            img = img[0:500, 0:500]
-            preQRCode = decode(img)
-            
-            if len(preQRCode) == 0:
-                return None
-    
+    if len(preQRCode) == 0:  # One more chance to get the QRCode
+        img = img[0:500, 0:500]
+        preQRCode = decode(img)
+
+        if len(preQRCode) == 0:
+            return None
+
     try:
         qrcode = json.loads(preQRCode[0].data)
     except:
         return None
 
-    if qrcode :
+    if qrcode:
         return qrcode
-    else :
+    else:
         return None
-
-

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from process_img import decodeQRCode
 
+
 def extractTextAndImg(path):
     """
     Extract each page of the pdf provided by path param to a .png file.
@@ -15,8 +16,8 @@ def extractTextAndImg(path):
 
     print("Nbr of pages:", file.page_count)
 
-    if file.page_count != 0 :
-        for pageNumber, page in enumerate(file.pages(), start = 1):
+    if file.page_count != 0:
+        for pageNumber, page in enumerate(file.pages(), start=1):
             fromPath = "From_PDF/" + str(pageNumber) + ".png"
             print(" Extracting", fromPath)
 
@@ -30,7 +31,5 @@ def extractTextAndImg(path):
                 os.rename(fromPath, toPath)
 
         return True
-    else :
+    else:
         return None
-
-

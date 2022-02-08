@@ -7,11 +7,13 @@ from fdsend import send_file
 import io
 import sys
 
+
 @get("/")
 def resp():
     return "Hello"
 
-@post('/run')
+
+@post("/run")
 def index():
     examId = request.forms.get("exam_id")
     pdfFile = request.files.get("file")
@@ -22,18 +24,18 @@ def index():
         fileLocation = f"./saves/{now}_{pdfFile.filename}"
         pdfFile.save(fileLocation)
 
-        print("Got file in:", fileLocation) 
+        print("Got file in:", fileLocation)
         computation = main.compute(fileLocation, examId)
         print(computation)
         return computation
     else:
-        return {"error":"Expected fields : file, exam_id"}
+        return {"error": "Expected fields : file, exam_id"}
 
-@route('/static/<filename:path>')
+
+@route("/static/<filename:path>")
 def send_static(filename):
-    return static_file(filename, root='./zips')
+    return static_file(filename, root="./zips")
 
 
 # print(main.compute("./saves/out.pdf"))
-run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
-
+run(host="0.0.0.0", port=int(os.environ.get("PYTHON_SERVER_PORT")))
