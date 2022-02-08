@@ -1,11 +1,8 @@
-from bottle import run, get, post, request, BaseRequest, route, static_file
+from bottle import run, get, post, request, route, static_file
 import main
 import os
 from pathlib import Path
 from datetime import datetime
-from fdsend import send_file
-import io
-import sys
 
 @get("/")
 def resp():
@@ -34,6 +31,5 @@ def send_static(filename):
     return static_file(filename, root='./zips')
 
 
-# print(main.compute("./saves/out.pdf"))
 run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
 

@@ -1,8 +1,6 @@
 import glob
-import json
 
 from process_pdf import extractTextAndImg
-import make_pdf
 import process_img
 import shutil
 

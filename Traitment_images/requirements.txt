@@ -1,9 +1,0 @@
-opencv-python
-matplotlib
-fpdf
-Pillow
-PyMuPDF
-PyPDF2
-pyzbar
-bottle
-bottle-fdsend
