@@ -10,17 +10,18 @@ def makePdf(pdfFileName, dir=""):
 
     listPages = glob.glob(dir + "/*.JPG")
 
-    if len(listPages) != 0:
-        cover = Image.open(str(listPages[0]))
-        width, height = cover.size
-
-        pdf = FPDF(orientation="L", unit="pt", format=[height, width])
-
-        for page in listPages:
-            pdf.add_page()
-            pdf.image(page, 0, 0)
-
-        pdf.output(dir + "_" + pdfFileName + ".pdf", "F")
-        return True
-    else:
+    if len(listPages) == 0:
         return None
+
+    cover = Image.open(str(listPages[0]))
+    width, height = cover.size
+
+    pdf = FPDF(orientation="L", unit="pt", format=[height, width])
+
+    for page in listPages:
+        pdf.add_page()
+        pdf.image(page, 0, 0)
+
+    pdf.output(dir + "_" + pdfFileName + ".pdf", "F")
+
+    return True

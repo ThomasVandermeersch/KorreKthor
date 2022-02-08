@@ -3,9 +3,10 @@ import main
 import os
 from pathlib import Path
 from datetime import datetime
-from fdsend import send_file
-import io
-import sys
+
+# from fdsend import send_file
+# import io
+# import sys
 
 
 @get("/")

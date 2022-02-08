@@ -21,23 +21,23 @@ def process(imgPath):
     # img[img > 130 ] = 255
     # img[img < 100 ] = 0
 
-    goodPage = isGoodPage(img)
+    # goodPage = isGoodPage(img)
     print(f" {imgPath}")
-    if True:
-        # if goodPage: # Check the 3 sheet corners
-        #     if not getGoodOrientation(img, goodPage):
-        #         print("Make a rotation of 180 degrees...")
-        #         img = cv2.rotate(img, cv2.ROTATE_180)
 
-        resp = getImageResponses(img)
+    # if goodPage: # Check the 3 sheet corners
+    #     if not getGoodOrientation(img, goodPage):
+    #         print("Make a rotation of 180 degrees...")
+    #         img = cv2.rotate(img, cv2.ROTATE_180)
 
-        # cv2.imshow("img", img)
-        # cv2.waitKey(delay=5000)
-        # cv2.destroyAllWindows()
+    resp = getImageResponses(img)
 
-        if resp:
-            cv2.imwrite(imgPath, img)
-            return resp
+    # cv2.imshow("img", img)
+    # cv2.waitKey(delay=5000)
+    # cv2.destroyAllWindows()
+
+    if resp:
+        cv2.imwrite(imgPath, img)
+        return resp
 
     return None
 
@@ -187,37 +187,37 @@ def getPatternList(img, template, threshold, minDistance):
     return liste
 
 
-def getBoolArray(emptyListe, fullListe, minDistance):
+def getBoolArray(emptyList, fullList, minDistance):
     """
     This function returns the boolean list with True where there is a full circle else False.
-    - The emptyListe param is a list with empty cicle coordinates
-    - The fullListe param is a list with full cicle coordinates
+    - The emptyList param is a list with empty cicle coordinates
+    - The fullList param is a list with full cicle coordinates
     - The minDistance param is the minimal distance between 2 same point
 
     This function returns None if th emptyListe and fullListe are empty.
     """
-    if len(emptyListe) == 0 and len(fullListe) == 0:
+    if len(emptyList) == 0 and len(fullList) == 0:
         return None
 
-    xEmptyListe, yEmptyListe = zip(*emptyListe) if len(emptyListe) > 0 else [(), ()]
-    xFullListe, yFullListe = zip(*fullListe) if len(fullListe) > 0 else [(), ()]
+    xEmptyList, yEmptyList = zip(*emptyList) if len(emptyList) > 0 else [(), ()]
+    xFullList, yFullList = zip(*fullList) if len(fullList) > 0 else [(), ()]
 
-    xMin = min(xEmptyListe + xFullListe)
-    xMax = max(xEmptyListe + xFullListe)
-    yMin = min(yEmptyListe + yFullListe)
-    yMax = max(yEmptyListe + yFullListe)
+    xMin = min(xEmptyList + xFullList)
+    xMax = max(xEmptyList + xFullList)
+    yMin = min(yEmptyList + yFullList)
+    yMax = max(yEmptyList + yFullList)
 
-    sortedListe = emptyListe + fullListe
-    sortedListe.sort()
+    sortedList = emptyList + fullList
+    sortedList.sort()
 
-    ySortedListe = list(yEmptyListe + yFullListe)
-    ySortedListe.sort()
+    ySortedList = list(yEmptyList + yFullList)
+    ySortedList.sort()
 
     # This ugly part creates the boolArray liste and fills in with False
     boolArray = []
     y = 0
     c = 0
-    for i in ySortedListe:
+    for i in ySortedList:
         if abs(y - i) > minDistance:
             y = i
             sub = []
@@ -236,7 +236,7 @@ def getBoolArray(emptyListe, fullListe, minDistance):
     # get the size of the biggest liste in the boolArray
     maxVal = len(max(boolArray, key=lambda i: len(i)))
 
-    for i in sortedListe:
+    for i in sortedList:
         # x is interpolated between xMin and xMax -> estimation where the point i[0] is on the question line
         vx = np.interp(i[0], [xMin, xMax], [1, maxVal])
         x = round(vx) - 1
@@ -244,7 +244,7 @@ def getBoolArray(emptyListe, fullListe, minDistance):
         vy = np.interp(i[1], [yMin, yMax], [1, len(boolArray)])
         y = round(vy) - 1
 
-        if i in fullListe:
+        if i in fullList:
             x = len(boolArray[y]) - 1 if x >= len(boolArray[y]) - 1 else x
             boolArray[y][x] = True
 
@@ -270,7 +270,4 @@ def decodeQRCode(imagePath):
     except:
         return None
 
-    if qrcode:
-        return qrcode
-    else:
-        return None
+    return qrcode if qrcode else None
