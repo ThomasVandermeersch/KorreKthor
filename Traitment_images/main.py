@@ -15,36 +15,39 @@ def compute(pdfFileLocation, examId):
             jsonToSend.append({"error": "No scanned QCM"})
             return  # Note: return in a try..finally statement triggers the finally statement and uses the return from there
 
-        if extractTextAndImg(pdfFileLocation) == None:
+        listPages = extractTextAndImg(pdfFileLocation)
+        if listPages == None:
             jsonToSend.append({"error": f"{pdfFileLocation} is not a PDF file"})
             return
 
-        print(f"Getting answers... from {pdfFileLocation}")
-        listPages = glob.glob("From_PDF/*.png")
-        if len(listPages) == 0:
-            jsonToSend.append({"error": f"No image in {pdfFileLocation}"})
-            return
+        # print(f"Getting answers... from {pdfFileLocation}")
+        # listPages = glob.glob("From_PDF/*.png")
+        # if len(listPages) == 0:
+        # jsonToSend.append({"error": f"No image in {pdfFileLocation}"})
+        # return
 
-        for img in listPages:
-            answers = process_img.process(img)
+        for img_nb_path in listPages:
+            answers = process_img.process(img_nb_path)
             if answers == None:
-                jsonToSend.append({"error": "is not a QCM file", "filename": img})
+                jsonToSend.append({"error": "is not a QCM file", "filename": img_nb_path})
                 continue
             elif answers == False:
-                jsonToSend.append({"error": "No answers scanned", "filename": img})
+                jsonToSend.append({"error": "No answers scanned", "filename": img_nb_path})
                 continue
 
-            qrcode = process_img.decodeQRCode(img)
+            qrcode = process_img.decodeQRCode(img_nb_path)
             if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
-                jsonToSend.append({"error": "has no correct QR Code", "filename": img})
+                jsonToSend.append({"error": f"has no correct QR Code: {qrcode}", "filename": img_nb_path})
                 continue
 
             if examId != qrcode["lessonId"]:
-                jsonToSend.append({"error": f"does not belong to the lesson : {examId}", "filename": img})
+                jsonToSend.append(
+                    {"error": f"{qrcode} does not belong to the lesson: {examId}", "filename": img_nb_path}
+                )
                 continue
 
             jsonToSend.append(
-                {"qrcode": qrcode, "answers": answers, "file": img.split("/")[-1], "error": "None"}
+                {"qrcode": qrcode, "answers": answers, "file": img_nb_path.split("/")[-1], "error": "None"}
             )
 
     finally:
@@ -59,5 +62,5 @@ def compute(pdfFileLocation, examId):
             print(f"Error while zipping to {zipPath}")
             response = {"error": f"Zipping to {zipPath} failed"}
 
-        shutil.rmtree("From_PDF/")
+        # shutil.rmtree("From_PDF/")  # Maybe not do that ?
         return response
