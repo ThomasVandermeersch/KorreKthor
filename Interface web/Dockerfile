@@ -1,9 +1,10 @@
 FROM node:14
 WORKDIR /usr/src/korrekthor_backend/
 COPY package*.json ./
-RUN npm install
-RUN npm install -g pm2
-RUN npm install -g sequelize-cli
+RUN npm install \
+    && npm install -g pm2 \
+    && npm install -g sequelize-cli \
+    && npm cache clean --force
 COPY . .
 #RUN sequelize db:migrate
 EXPOSE 9898
