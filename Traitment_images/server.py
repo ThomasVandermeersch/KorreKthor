@@ -1,8 +1,10 @@
 from bottle import run, get, post, request, route, static_file
-from image_processing import main
 import os
 from pathlib import Path
 from datetime import datetime
+
+print(os.getcwd())
+import main
 
 @get("/")
 def resp():

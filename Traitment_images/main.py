@@ -1,7 +1,7 @@
 import glob
 
-from image_processing.process_pdf import extractTextAndImg
-from image_processing import process_img, utils
+from process_pdf import extractTextAndImg
+import process_img, utils
 import shutil
 
 def compute(pdfFileLocation, examId):

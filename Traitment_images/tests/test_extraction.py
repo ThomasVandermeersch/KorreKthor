@@ -1,4 +1,4 @@
-from image_processing import process_pdf
+from Traitment_images import process_pdf
 import os
 from os import listdir
 

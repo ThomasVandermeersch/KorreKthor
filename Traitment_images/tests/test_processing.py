@@ -1,5 +1,5 @@
 import cv2
-from image_processing import process_img
+from Traitment_images import process_img
 import os
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
