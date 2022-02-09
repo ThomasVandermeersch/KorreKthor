@@ -1,4 +1,4 @@
-from .. import utils
+from image_processing import utils
 import os
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))

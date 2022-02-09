@@ -1,5 +1,5 @@
 from bottle import run, get, post, request, route, static_file
-import main
+from image_processing import main
 import os
 from pathlib import Path
 from datetime import datetime
@@ -30,6 +30,6 @@ def index():
 def send_static(filename):
     return static_file(filename, root='./zips')
 
-
-run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT")))
+if __name__ == '__main__':
+    app = run(host='0.0.0.0', port=int(os.environ.get("PYTHON_SERVER_PORT", 8081)))
 

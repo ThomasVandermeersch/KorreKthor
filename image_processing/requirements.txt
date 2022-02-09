@@ -1,4 +1,6 @@
 attrs==21.4.0
+beautifulsoup4==4.10.0
+boddle==0.2.9
 bottle==0.12.19
 bottle-fdsend==0.1.1
 cycler==0.11.0
@@ -20,4 +22,8 @@ pytest==7.0.0
 python-dateutil==2.8.2
 pyzbar==0.1.8
 six==1.16.0
+soupsieve==2.3.1
 tomli==2.0.1
+waitress==2.0.0
+WebOb==1.8.7
+WebTest==3.0.0

@@ -256,7 +256,7 @@ $ pip install -r requirements.txt
 
 Finally, run :
 ```cmd
-export PYTHON_SERVER_PORT=8081
+export PYTHON_SERVER_PORT=8081 (optionnal)
 $ python server.py
 ```
 
@@ -300,7 +300,7 @@ The zip file is available on the python server you've configured in the `.env` f
 
 ### Test 
 
-For running tests run the following command : 
+For running tests run the following command in the *./image_processiong/* folder : 
 ```
 $ python -m pytest tests
 ```

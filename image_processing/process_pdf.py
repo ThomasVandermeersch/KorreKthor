@@ -2,7 +2,7 @@ import fitz
 import os
 from pathlib import Path
 
-from .utils import decodeQRCode
+from image_processing.utils import decodeQRCode
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 

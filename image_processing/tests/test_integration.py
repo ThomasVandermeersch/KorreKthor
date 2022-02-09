@@ -1,10 +1,14 @@
-# class TestClass:
-#     def test_one(self):
-#         x = "this"
-#         assert "h" in x
+from image_processing import main
+import os
 
-#     def test_two(self):
-#         x = "hello"
-#         assert hasattr(x, "check")
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-        
+class TestMain:
+    def test_badPDF(self):
+        assert main.compute(f"{DIR_PATH}/files/empty.pdf", "2173ab1a-e409-4a84-b0b7-af389c5a865e") == {'zipFile': '2173ab1a-e409-4a84-b0b7-af389c5a865e.zip', 'data': [{'error': f'{DIR_PATH}/files/empty.pdf is not a PDF file'}]}
+    
+    def test_wrongExamID(self):
+        assert main.compute(f"{DIR_PATH}/files/qcm.pdf", "aaaa") == {'zipFile': 'aaaa.zip', 'data': [{'error': 'does not belong to the lesson : aaaa', 'filename': 'From_PDF/2173ab1a-e409-4a84-b0b7-af389c5a865e_B_17076.png'}, {'error': 'does not belong to the lesson : aaaa', 'filename': 'From_PDF/2173ab1a-e409-4a84-b0b7-af389c5a865e_A_17036.png'}, {'error': 'does not belong to the lesson : aaaa', 'filename': 'From_PDF/2173ab1a-e409-4a84-b0b7-af389c5a865e_A_19371.png'}]}
+
+    def test_goodPDF(self):
+        assert main.compute(f"{DIR_PATH}/files/qcm.pdf", "2173ab1a-e409-4a84-b0b7-af389c5a865e") == {'zipFile': '2173ab1a-e409-4a84-b0b7-af389c5a865e.zip', 'data': [{'qrcode': {'matricule': 17076, 'version': 'B', 'lessonId': '2173ab1a-e409-4a84-b0b7-af389c5a865e'}, 'answers': [[False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False]], 'file': '2173ab1a-e409-4a84-b0b7-af389c5a865e_B_17076.png', 'error': 'None'}, {'qrcode': {'matricule': 17036, 'version': 'A', 'lessonId': '2173ab1a-e409-4a84-b0b7-af389c5a865e'}, 'answers': [[False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False]], 'file': '2173ab1a-e409-4a84-b0b7-af389c5a865e_A_17036.png', 'error': 'None'}, {'qrcode': {'matricule': 19371, 'version': 'A', 'lessonId': '2173ab1a-e409-4a84-b0b7-af389c5a865e'}, 'answers': [[False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False], [False, False, False, False]], 'file': '2173ab1a-e409-4a84-b0b7-af389c5a865e_A_19371.png', 'error': 'None'}]}  
