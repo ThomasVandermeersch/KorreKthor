@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 
 from boddle import boddle
-from Traitment_images import server 
+from .. import server 
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 

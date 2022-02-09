@@ -1,4 +1,4 @@
-from Traitment_images import main
+from .. import main
 import os
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
