@@ -1,8 +1,10 @@
 virtualenv/
+venv/
 
 __pycache__/
 *.pyc
 *.cpython-39.pyc
+.pytest_cache/
 
 saves/
 From_PDF/

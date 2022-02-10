@@ -1,5 +1,7 @@
 # KorreKthor <!-- omit in TOC -->
 
+[![Python application](https://github.com/ThomasVandermeersch/KorreKthor/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/ThomasVandermeersch/KorreKthor/actions/workflows/python-app.yml)
+
 - [Usage](#usage)
 - [Run for production](#run-for-production)
   - [Setting up](#setting-up)
@@ -25,6 +27,7 @@
   - [Setup](#setup)
   - [Run the pdf processing method](#run-the-pdf-processing-method)
   - [Accessing the zip file](#accessing-the-zip-file)
+  - [Test](#test)
 - [Code structure](#code-structure)
   - [Web Interface](#web-interface-1)
   - [Image Processing](#image-processing)
@@ -247,7 +250,7 @@ Here is an example of student list :
 ## Python image processing
 
 ### Setup
-To setup the python server you need to be in the `/KorreKthor/Traitement_images/` folder and then run:
+To setup the python server you need to be in the `/KorreKthor/image_processing/` folder and then run:
 ```cmd
 $ pip install -r requirements.txt
 ```
@@ -255,7 +258,7 @@ $ pip install -r requirements.txt
 
 Finally, run :
 ```cmd
-export PYTHON_SERVER_PORT=8081
+export PYTHON_SERVER_PORT=8081 (optionnal)
 $ python server.py
 ```
 
@@ -296,6 +299,13 @@ The response is the form :
 ### Accessing the zip file 
 
 The zip file is available on the python server you've configured in the `.env` file on the request route `http://your-ip:you-port/static/78c170ae-8a10-4b1c-9d7f-d3e038141e68.zip`
+
+### Test 
+
+For running tests run the following command in the *./image_processiong/* folder : 
+```
+$ python -m pytest tests
+```
 ## Code structure
 
 The code is splitted in 3 parts : the Web Interface, the Image Processing, and the Hardware. 
@@ -311,7 +321,7 @@ Files are located in `/KorreKthor/Interface Web/`
 
 ### Image Processing
 
-Files are located in `/KorreKthor/Traitement_images/`
+Files are located in `/KorreKthor/image_processing/`
 
 - The server file is `server.py` (Note: You need to specify PYTHON_SERVER_HOST and PYTHON_SERVER_PORT in order to run this file outside a docker container)
 - The `main.py` file calls all the python scripts and make the request response

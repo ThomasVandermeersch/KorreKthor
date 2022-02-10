@@ -1,9 +1,7 @@
 import glob
-import json
 
 from process_pdf import extractTextAndImg
-import make_pdf
-import process_img
+import process_img, utils
 import shutil
 
 def compute(pdfFileLocation, examId):
@@ -33,7 +31,7 @@ def compute(pdfFileLocation, examId):
                         jsonToSend.append({"error" : "No answers scanned", "filename":img})
                     else:
 
-                        qrcode = process_img.decodeQRCode(img)
+                        qrcode = utils.decodeQRCode(img)
 
                         if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
                             jsonToSend.append({"error" : "has no correct QR Code", "filename":img})

@@ -1,11 +1,9 @@
 import numpy as np
 import cv2
-import glob
-import matplotlib.pyplot as plt
 import math
-from pyzbar.pyzbar import decode
-import json
 import os
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def process(imgPath):
     """
@@ -21,8 +19,7 @@ def process(imgPath):
     #img[img < 100 ] = 0
         	
 
-    goodPage = isGoodPage(img)
-    print(f" {imgPath}")
+    # goodPage = isGoodPage(img)
     if True:
     # if goodPage: # Check the 3 sheet corners 
     #     if not getGoodOrientation(img, goodPage):
@@ -30,11 +27,6 @@ def process(imgPath):
     #         img = cv2.rotate(img, cv2.ROTATE_180)
 
         resp = getImageResponses(img)
-
-        # cv2.imshow("img", img)
-        # cv2.waitKey(delay=5000)
-        # cv2.destroyAllWindows()
-
         if resp:
             cv2.imwrite(imgPath, img)
             return resp
@@ -42,23 +34,15 @@ def process(imgPath):
     return None
 
 
-def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8):
+def isGoodPage(img, squaresTemplatePath=f"{DIR_PATH}/source_pdf/squares.PNG", threshold=0.8):
     """
-    This function checks is the povided image can be analysed (this means it has 3 templates: TL, TR, BL). 
+    This function checks is the povided image can be analysed (this means it has 3 at least templates images). 
     If yes returns the squares points list else None. 
     - The img is the image you want to check
     - The squaresTemplatePath param is the locaiton to the squares template
     - The threshold param is the resemblance ratio between the squares template and a block in the image
     """
     template = cv2.imread(squaresTemplatePath, 0)
-    #template = cv2.resize(template, (60, 60), interpolation=cv2.INTER_LINEAR)
-
-    # cv2.imshow("img", template)
-    # cv2.waitKey(delay=5000)
-    # cv2.destroyAllWindows()
-    # cv2.imshow("img", img)
-    # cv2.waitKey(delay=5000)
-    # cv2.destroyAllWindows()
 
     res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
     loc = np.where(res >= threshold)
@@ -81,24 +65,24 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
     if(len(points) >= 3 ) :
         return points
 
-    print("Not a good page")
     return False
 
 def getGoodOrientation(img, squaresLocations, margin=0.8):
     """
-    Function that returns True if the image is vertial else False.
+    Function that returns True if the image is vertical else False. 
+    Vertical means when there is no square in the top left corner
     - The img param is the image to get the orientation
     - The squaresLocations param is the locations of the squares
     - The margin param is the limit ratio for the squares positions on bottom right
     """
     h, w = img.shape[::-1]
     for point in squaresLocations:
-        if point[0] > h*margin and point[1] > w*margin:
+        if point[0] < h-(h*margin) and point[1] < w-(w*margin):
             return False
 
     return True
 
-def getImageResponses(img, fullTemplatePath="source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath="source_pdf/vide.PNG", emptyThreshold=0.5):
+def getImageResponses(img, fullTemplatePath=f"{DIR_PATH}/source_pdf/rempli.PNG", fullThreshold=0.6, emptyTemplatePath=f"{DIR_PATH}/source_pdf/vide.PNG", emptyThreshold=0.5):
     """
     Function that returns a boolean list of selected response in the provided image. True is selected else False.
     - The img param is the image you want to get the answers
@@ -240,29 +224,3 @@ def getBoolArray(emptyListe, fullListe, minDistance):
             boolArray[y][x] = True
             
     return boolArray
-    
-def decodeQRCode(imagePath):
-    img = cv2.imread(imagePath)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ratio  = img.shape[1]/1191
-    img = cv2.resize(img, (1191, round(img.shape[0]/ratio)), interpolation=cv2.INTER_LINEAR)
-    preQRCode = decode(img)
-
-    if len(preQRCode) == 0: # One more chance to get the QRCode 
-            img = img[0:500, 0:500]
-            preQRCode = decode(img)
-            
-            if len(preQRCode) == 0:
-                return None
-    
-    try:
-        qrcode = json.loads(preQRCode[0].data)
-    except:
-        return None
-
-    if qrcode :
-        return qrcode
-    else :
-        return None
-
-
