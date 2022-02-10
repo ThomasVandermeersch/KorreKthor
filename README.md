@@ -1,5 +1,7 @@
 # KorreKthor <!-- omit in TOC -->
 
+[![Python application](https://github.com/ThomasVandermeersch/KorreKthor/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/ThomasVandermeersch/KorreKthor/actions/workflows/python-app.yml)
+
 - [Usage](#usage)
 - [Run for production](#run-for-production)
   - [Setting up](#setting-up)
