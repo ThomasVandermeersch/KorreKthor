@@ -29,7 +29,7 @@ jobs:
         sudo apt-get update && sudo apt-get install libzbar0
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        pip install -r requirements.txtµ
+        pip install -r requirements.txt
     - name: Lint with flake8
       working-directory: ./Traitment_images
       run: |
