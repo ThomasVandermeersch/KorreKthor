@@ -24,7 +24,7 @@ def extractTextAndImg(path):
         print(f"Extracting: {fromPath}")
 
         pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-        pix.writeImage(fromPath)
+        pix.save(fromPath)
 
         fileList.append(fromPath)
 
