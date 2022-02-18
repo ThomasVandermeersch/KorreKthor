@@ -18,7 +18,7 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
   extraStudents = []
   for (var i=0; i<extraCopies; i++){
     // User.create({"fullName":"", "matricule": `${lesson.id}_${i}`, "email": "", "authorizations":3, "role":2})
-    student = {"extra": true, "name":"", "matricule":`${lesson.id}_${i}`, "version":lesson.versions[i%lesson.versions.length]}
+    student = {"extra": true, "name":"", "matricule": 99500 + i, "version":lesson.versions[i%lesson.versions.length]}
     extraStudents.push(student)
   }
 
@@ -146,17 +146,17 @@ function generateHeader(doc, student, lesson, writeStream,examDate,versionHeader
    date = new Date(examDate);
    doc.fontSize(10)
    doc.text(`Nom et prénom: ${student.name}`, 140, 75);
-   doc.text(`Matricule: ${student.matricule}`, 140, 90);
+   if(student.matricule >= 99000) doc.text(`Matricule:`, 140, 90);
+   else doc.text(`Matricule: ${student.matricule}`, 140, 90);
    doc.text(`Date: ${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()}`, 140, 105);
    doc.text(`Cours: ${lesson.name}`, 140, 120);
    if(versionHeader) doc.text(`Version: ${student.version}`, 140, 135);
 
    // QRCode generator
-   var studentJson
-   if(versionHeader) studentJson = {"matricule": student.matricule, "version": student.version, "lessonId": lesson.id }
-   else studentJson = {"matricule": student.matricule, "version": 'noVersion', "lessonId": lesson.id }
-   QRCode.toFile('pre_pdf/' + student.matricule + ".png", JSON.stringify(studentJson), function (err) {
-     doc.image('pre_pdf/' + student.matricule + ".png", 55, 70, { scale: 0.40 });
+   if(versionHeader) studentString = `${student.matricule};${student.version};${lesson.id}`
+   else studentString = `${student.matricule};X;${lesson.id}`
+   QRCode.toFile('pre_pdf/' + student.matricule + ".png", studentString, function (err) {
+     doc.image('pre_pdf/' + student.matricule + ".png", 55, 70, { scale: 0.51 });
      doc.pipe(writeStream);
      doc.end();
    })
