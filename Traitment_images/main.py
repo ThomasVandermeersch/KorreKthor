@@ -12,18 +12,12 @@ def compute(pdfFileLocation, examId):
     try:
         if pdfFileLocation == None:
             jsonToSend.append({"error": "No scanned QCM"})
-            return  # Note: return in a try..finally statement triggers the finally statement and uses the return from there
+            return zip_and_send(examId, jsonToSend)
 
         listPages = extractTextAndImg(pdfFileLocation)
         if listPages == None:
             jsonToSend.append({"error": f"{pdfFileLocation} is not a PDF file"})
-            return
-
-        # print(f"Getting answers... from {pdfFileLocation}")
-        # listPages = glob.glob("From_PDF/*.png")
-        # if len(listPages) == 0:
-        # jsonToSend.append({"error": f"No image in {pdfFileLocation}"})
-        # return
+            return zip_and_send(examId, jsonToSend)
 
         for img_nb_path in listPages:
             qrcode = process_img.decodeQRCode(img_nb_path)
@@ -48,23 +42,26 @@ def compute(pdfFileLocation, examId):
             jsonToSend.append(
                 {"qrcode": qrcode, "answers": answers, "file": img_nb_path.split("/")[-1], "error": "None"}
             )
+        return zip_and_send(examId, jsonToSend)
     except Exception as e:
         print("Except:", e)
-        # raise
-    finally:
-        # Zip folder in order to send it
-        zipPath = f"zips/{examId}"
-        try:
-            shutil.make_archive(zipPath, "zip", "From_PDF")
-            response = {"zipFile": f"{examId}.zip", "data": jsonToSend}
-            print(f"Transaction done, file in : {zipPath}.zip !")
-            # print(f"response: {response}")
-        except Exception as e:
-            print(f"Error while zipping to {zipPath} {e}")
-            response = {"error": f"Zipping to {zipPath} failed"}
+        raise
 
-        # shutil.rmtree("From_PDF/")  # Maybe not do that ?
-        return response
+
+def zip_and_send(examId, jsonToSend):
+    # Zip folder in order to send it
+    zipPath = f"zips/{examId}"
+    try:
+        shutil.make_archive(zipPath, "zip", "From_PDF")
+        response = {"zipFile": f"{examId}.zip", "data": jsonToSend}
+        print(f"Transaction done, file in : {zipPath}.zip !")
+        # print(f"response: {response}")
+    except Exception as e:
+        print(f"Error while zipping to {zipPath} {e}")
+        response = {"error": f"Zipping to {zipPath} failed"}
+
+    # shutil.rmtree("From_PDF/")  # Maybe not do that ?
+    return response
 
 
 if __name__ == "__main__":
