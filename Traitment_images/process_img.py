@@ -31,11 +31,8 @@ def process(imgPath):
 
     if goodPage:  # Check the 3 sheet corners
         img = getGoodOrientation(img, goodPage)
-        # cv2.imshow("img", imgReg)
+        # cv2.imshow("img", img)
         # cv2.waitKey(delay=0)
-        # if not getGoodOrientation(img, goodPage):
-        # pass
-        # print("Make a rotation of 180 degrees...")
         # img = cv2.rotate(img, cv2.ROTATE_180)
 
     resp = []
@@ -44,14 +41,13 @@ def process(imgPath):
         for c in list_c:
             bl = getBlackIntensity(img, c, (25, 25))
             # print(bl)
-            if bl > 0.4:
-                resp[-1].append(True)
+            if bl >= 0.4:  # Box clearly ticked
+                resp[-1].append(1)
                 cv2.circle(img, (round(c[0] + 25 / 2), round(c[1] + 25 / 2)), round(30 / 2), (0, 100, 0), 1)
-                # print("Ticked!")
-            elif bl < 0.4 and bl > 0.3:
-                resp[-1].append(False)
-            else:
-                resp[-1].append(False)
+            elif bl < 0.4 and bl > 0.3:  # box not clearly ticked -> uncertain
+                resp[-1].append(2)
+            else:  # bl <= 0.3
+                resp[-1].append(0)  # box clearly unticked
                 cv2.rectangle(img, c, (round(c[0] + 25), round(c[1] + 25)), (0, 100, 0), 1)
             # cv2.imshow("img", img)
             # cv2.waitKey(delay=500)
@@ -72,8 +68,6 @@ def process(imgPath):
 def getBlackIntensity(img, pos, size):
     part = img[pos[1] : pos[1] + size[1], pos[0] : pos[0] + size[0]]
     # pprint.pprint(part)
-    # print("mean: ", np.mean(part))
-    # print("mean255: ", np.mean(part) / 255)
     return 1 - (np.mean(part) / 255)
 
 
