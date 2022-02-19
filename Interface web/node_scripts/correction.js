@@ -139,13 +139,12 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
 
         // Set up the version
         var version
-        if(recivedVersion == 'noVersion') version = 'A'
+        if(recivedVersion == 'X') version = 'A'
         else version = recivedVersion
         
         // Take the correction of the selected version
         correction = corrections[version]
 
-        if(correction.length != response.length) reject(JSON.stringify({error:'Detection error'}))
         
         // Declare points 'buffers'
         totalPoints = 0
@@ -154,7 +153,7 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
         for(var questionIndex = 0; questionIndex < correction.length; questionIndex++ ){
             
             if(correction[questionIndex].type == 'version'){
-                versionObject = changeVersion(response[questionIndex],correction[questionIndex].nbVersion)
+                versionObject = changeVersion(response[questionIndex])
                 if('error' in versionObject){
                    propError = true
                    newResponses.push({list:response[questionIndex],error:versionObject.error})
@@ -196,32 +195,32 @@ function correctionCopy( corrections, response, correctionCriterias,recivedVersi
     });
 }
 
-function changeVersion(list,nbVersion){
-    if(nbVersion != list.length) return {error:'Error, please select a version'}
+function changeVersion(list){
+    if(list.includes(2)) return {error:'Error, uncertain version selection'}
     const alphabet = 'ABCDEFGH'
-    i = list.indexOf(true)
+    i = list.indexOf(1)
     if(i==-1) return {error:'No selected version'}
-    if(list.indexOf(true,i + 1) != -1) return {error:'Two versions selected'}
+    if(list.indexOf(1,i + 1) != -1) return {error:'Two versions selected'}
     version = alphabet[i]
     return {version:version}
 }
 
 function correctNormal(responseList,correctionCriterias,correction){
-    if(responseList.length != correction.response.length) return {error: 'Detection error'}
-    const equals = (a, b) => JSON.stringify(a) == JSON.stringify(b); // Comparaison de deux listes
+    if(responseList.includes(2)) return {error: 'Detection error'}
     const positif = parseFloat(correctionCriterias.ptsRight,10)
     const negatif =  parseFloat(correctionCriterias.ptsWrong,10)
     const abstention = parseFloat(correctionCriterias.ptsAbs,10)
+    
     const maxPoint = positif * correction.weight
-    var totalPoint = 0
 
     // Check if any proposition is checked to detect absentention
-    if(responseList.some(elem => elem == true)){            
-        if(equals(correction.response,responseList)) totalPoint += positif * correction.weight
-        else totalPoint -= negatif * correction.weight
+    if(responseList.some(elem => elem == 1)){
+        for(var propIndex = 0; propIndex < correction.response.length; propIndex++ ){
+            if(correction.response[propIndex] != responseList[propIndex]) return {totalPoint:-negatif * correction.weight,maxPoint:maxPoint,list:responseList}
+        }
+        return {totalPoint:maxPoint,maxPoint:maxPoint,list:responseList}            
     }
-    else totalPoint = abstention * correction.weight
-    return {totalPoint:totalPoint,maxPoint:maxPoint,list:responseList}
+    else return {totalPoint: abstention * correction.weight,maxPoint:maxPoint,list:responseList}
 }
 
 function correctAdvanced(){
