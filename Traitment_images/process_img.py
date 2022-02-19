@@ -138,7 +138,7 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
 
 def getGoodOrientation(img, squaresLocations, margin=1.0):
     """
-    Function that returns True if the image is vertial else False.
+    Function that returns the warped image based on the trasnformation with the detected squares
     - The img param is the image to get the orientation
     - The squaresLocations param is the locations of the squares
     - The margin param is the limit ratio for the squares positions on bottom right
@@ -377,18 +377,18 @@ def getBoolArray(emptyList, fullList, minDistance):
 def display(im, bbox):
     n = len(bbox)
     for j in range(n):
-        cv2.line(im, tuple(bbox[j][0]), tuple(bbox[ (j+1) % n][0]), (255,0,0), 3)
+        cv2.line(im, tuple(bbox[j][0]), tuple(bbox[(j + 1) % n][0]), (255, 0, 0), 3)
 
     # Display results
     cv2.imshow("Results", im)
+
 
 def decodeQRCode(imagePath):
     img = cv2.imread(imagePath)
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # ratio = img.shape[1] / 1191
     # img = cv2.resize(img, (1191, round(img.shape[0] / ratio)), interpolation=cv2.INTER_LINEAR)
-    img[img < 100] = 0
-
+    qrcode = None
     preQRCode = decode(img)
 
     if len(preQRCode) == 0:  # One more chance to get the QRCode
@@ -399,9 +399,11 @@ def decodeQRCode(imagePath):
             return None
 
     try:
-        qrcode = json.loads(preQRCode[0].data)
+        # qrcode = json.loads(preQRCode[0].data)
+        data = preQRCode[0].data.split(";")
+        qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
     except Exception as e:
         print(e)
         return None
 
-    return qrcode if qrcode else None
+    return qrcode
