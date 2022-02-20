@@ -58,6 +58,7 @@ function callCorrection(filename, exam, req){
     })
 }
 
+// This function render the upload page with the historic
 router.get("/copies/:examid", access.hasAccess, async(req, res) => {
     Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
         res.render("upload/uploadScans", {exam:exam,historic:JSON.parse(exam.historic)})
@@ -68,37 +69,27 @@ router.get("/copies/:examid", access.hasAccess, async(req, res) => {
     })
 })
 
-router.post("/scans/manual", access.hasAccess, upload.single("file"), async(req, res) => {
+router.post("/scans/manual/:examid", access.hasAccess, upload.single("file"), async(req, res) => {
     if (path.extname(req.file.filename) != ".pdf"){
         req.flash("errormsg", "Veuillez uploader un fichier pdf")
         return res.render("upload/uploadScans", {exam:exam})
     }
     
     Exam.findOne({where:{id:req.body.examid}}).then(exam =>{
-        if (!exam){
-            req.flash("errormsg", "Exam not found, error : 1007")
+        exam.status = 1 // Process correction
+        exam.save()
+
+        req.flash("successmsg", "Début de la correction, ce processus peut prendre jusqu'a 2 minutes. Actualisez pour voir l'état.")
+        res.redirect("/see")
+
+        try{
+            callCorrection(req.file.filename, exam, req)
+        }
+        catch(err){
+            console.log(" --- Call correction ERROR -- UPLOAD/scan/manual ---\n " + err)
+            req.flash("errormsg", "Error while making the correction, error : 1007")
             return res.redirect('/error')
-        }
-
-        if (req.session.userObject.matricule == exam.userMatricule || req.session.userObject.authorizations == 0){
-            exam.status = 1 // Process correction
-            exam.save()
-
-            req.flash("successmsg", "Début de la correction, ce processus peut prendre jusqu'a 2 minutes. Actualisez pour voir l'état.")
-            res.redirect("/see")
-
-            try{
-                callCorrection(req.file.filename, exam, req)
-            }
-            catch(err){
-                console.log(" --- Call correction ERROR -- UPLOAD/scan/manual ---\n " + err)
-                req.flash("errormsg", "Error while making the correction, error : 1007")
-                return res.redirect('/error')
-            }
-        }
-
-        else res.redirect('/noAccess')
-        
+        }        
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- UPLOAD/scan/manual ---\n " + err)
         req.flash('errormsg', 'Internal error, error : 1016')
