@@ -60,9 +60,7 @@ function callCorrection(filename, exam, req){
 
 router.get("/copies/:examid", access.hasAccess, async(req, res) => {
     Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
-        if (req.session.userObject.matricule == exam.userMatricule || req.session.userObject.authorizations == 0) res.render("upload/uploadScans", {exam:exam,historic:JSON.parse(exam.historic)})
-        else res.redirect('/noAccess')
-        
+        res.render("upload/uploadScans", {exam:exam,historic:JSON.parse(exam.historic)})
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- UPLOAD/copies ---\n " + err)
         req.flash('errormsg', 'Internal error, error : 1015')
