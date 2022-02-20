@@ -75,7 +75,7 @@ router.post("/scans/manual/:examid", access.hasAccess, upload.single("file"), as
         return res.render("upload/uploadScans", {exam:exam})
     }
     
-    Exam.findOne({where:{id:req.body.examid}}).then(exam =>{
+    Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
         exam.status = 1 // Process correction
         exam.save()
 
