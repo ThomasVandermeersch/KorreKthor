@@ -8,6 +8,7 @@ const correction = require("../node_scripts/correction")
 const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
 const { v4: uuidv4 } = require('uuid');
+const copyLayout = require('../node_scripts/copyLayout')
 
 
 var multer  = require('multer'); // Specific import for files 
@@ -25,21 +26,10 @@ var upload = multer({ storage: storage})
 const url = `http://${process.env.PYTHON_SERVER_HOST}:${process.env.PYTHON_SERVER_PORT}`
 // Call the python server (for correction)
 function callCorrection(filename, exam, req){
-    gridLayouts = {}
-    for (var [key, value] of Object.entries( JSON.parse(exam.corrections))) {
-        gridLayout = []
-        value.forEach(question =>{
-            if(question.type == 'qcm') gridLayout.push(question.response.length)
-            else if(question.type == 'version'){
-                key = 'X'
-                gridLayout.push(question.nbVersion)
-            } 
-        })
-        gridLayouts[key] = gridLayout
-      }
+    copyL = copyLayout.getCopyLayout(JSON.parse(exam.corrections))
     const formData = {
         exam_id: exam.id,
-        gridLayouts : gridLayouts,
+        copyLayout : copyL,
 		file: fs.createReadStream(`uploads/${filename}`),
 	}
     request.post({url:`${url}/run`, formData:formData}, function (err, httpResponse, body) {
