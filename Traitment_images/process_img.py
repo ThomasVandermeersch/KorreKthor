@@ -9,10 +9,10 @@ import json
 
 import pprint
 
-from coords import coords
+# from coords import coords
 
 
-def process(imgPath):
+def process(imgPath, copylayout):
     """
     This function takes an image path and return the equivalent answers boolean array is the image is conform else None.
     The image is conform if there are 3 squares on each bottom left, top left and top right corners.
@@ -30,25 +30,67 @@ def process(imgPath):
     print("goodpage", goodPage)
 
     if goodPage:  # Check the 3 sheet corners
-        img = getGoodOrientation(img, goodPage)
+        img, new_markers_pos = getGoodOrientation(
+            img,
+            goodPage,
+        )
         # cv2.imshow("img", img)
         # cv2.waitKey(delay=0)
         # img = cv2.rotate(img, cv2.ROTATE_180)
+    markers = [[x +25 , y+25 ] for x, y in copylayout["markers"]]
+    markers = np.float32(sorted(markers))
+    # markers have to be shifted because the coordinates are the top left
+    # corner, but we detect the center of the marker in the orientation func
 
+    new_markers_pos = np.float32(sorted(new_markers_pos))
+    print("markers:", new_markers_pos, markers)
+
+    transform_matrix = cv2.getAffineTransform(markers, new_markers_pos)
+    print(" mat:", transform_matrix)
+
+    coords = copylayout["versions"]["X"]
+    # cv2.transform(np.float32(copylayout["versions"]["X"][1]), coords, transform_matrix)
+    # print("coor", coords)
+    c = (
+        round(transform_matrix[0, 0] * 140 + transform_matrix[0, 1] * 75 + transform_matrix[0, 2]),
+        round(transform_matrix[1, 0] * 140 + transform_matrix[1, 1] * 75 + transform_matrix[1, 2]),
+    )
+    cv2.rectangle(img, c, (round(c[0] + 50), round(c[1] + 50)), (0, 100, 0), 1)
+    # c = (0,0)
+    # cv2.rectangle(img, c, (round(c[0] + 50), round(c[1] + 50)), (0, 100, 0), 1)
+
+    circle_size = copylayout["circle_size"]
     resp = []
     for list_c in coords:
         resp.append([])
         for c in list_c:
-            bl = getBlackIntensity(img, c, (25, 25))
+            # print("cord:", c)
+            c = (
+                round(
+                    transform_matrix[0, 0] * c[0] + transform_matrix[0, 1] * c[1] + transform_matrix[0, 2] 
+                ),
+                round(
+                    transform_matrix[1, 0] * c[0] + transform_matrix[1, 1] * c[1] + transform_matrix[1, 2]
+                ),
+            )
+            # print("transform cord:", c)
+
+            bl = getBlackIntensity(img, c, (circle_size, circle_size))
             # print(bl)
-            if bl >= 0.4:  # Box clearly ticked
+            if bl >= 0.2:  # Box clearly ticked
                 resp[-1].append(1)
-                cv2.circle(img, (round(c[0] + 25 / 2), round(c[1] + 25 / 2)), round(30 / 2), (0, 100, 0), 1)
-            elif bl < 0.4 and bl > 0.3:  # box not clearly ticked -> uncertain
+                cv2.circle(
+                    img,
+                    (round(c[0] + circle_size / 2), round(c[1] + circle_size / 2)),
+                    round(40 / 2),
+                    (0, 100, 0),
+                    1,
+                )
+            elif bl < 0.2 and bl > 0.15:  # box not clearly ticked -> uncertain
                 resp[-1].append(2)
-            else:  # bl <= 0.3
+            else:  # bl <= 0.1
                 resp[-1].append(0)  # box clearly unticked
-                cv2.rectangle(img, c, (round(c[0] + 25), round(c[1] + 25)), (0, 100, 0), 1)
+                cv2.rectangle(img, c, (round(c[0] + circle_size), round(c[1] + circle_size)), (0, 100, 0), 1)
             # cv2.imshow("img", img)
             # cv2.waitKey(delay=500)
 
@@ -114,33 +156,32 @@ def isGoodPage(img, squaresTemplatePath="source_pdf/squares.PNG", threshold=0.8)
 
     mean_points = []
     for points in point_groups:
-        mean_points.append((round(np.mean([x[0] for x in points])), round(np.mean([x[1] for x in points]))))
+        mean_points.append((round(np.mean([x[0] for x in points])+25), round(np.mean([x[1] for x in points])+25)))
+        # 25 offset becaseu it is half of marker_template shape to get center of
+        # marker as ref
 
     # print(mean_points)
 
-    for pt in mean_points:
-        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 5)
+    # for pt in mean_points:
+        # cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 5)
     # cv2.imshow("img", img)
     # cv2.waitKey()
     # cv2.destroyAllWindows()
     if len(mean_points) == 3:
         return mean_points
 
-    print(f"Not a good page: {points}")
+    print(f"Not a good page: {point_groups}")
     return False
 
 
-def getGoodOrientation(img, squaresLocations, margin=1.0):
+def getGoodOrientation(img, squaresLocations):
     """
     Function that returns the warped image based on the trasnformation with the detected squares
     - The img param is the image to get the orientation
     - The squaresLocations param is the locations of the squares
     - The margin param is the limit ratio for the squares positions on bottom right
     """
-    # h, w = img.shape[::-1]
-    # for point in squaresLocations:
-    #     if point[0] > h * margin and point[1] > w * margin:
-    #         return False
+
     points1 = squaresLocations
     points2 = []
     # the 2 further points are the diagonal
@@ -148,7 +189,6 @@ def getGoodOrientation(img, squaresLocations, margin=1.0):
     pair_max = (0, 0)
     for i, pt1 in enumerate(points1):
         for j, pt2 in enumerate(points1):
-            # dist_n = np.sum(np.square(pt1 - pt2))
             dist_n = math.sqrt(((pt1[0] - pt2[0]) ** 2) + ((pt1[1] - pt2[1]) ** 2))
             if dist_n > dist:
                 dist = dist_n
@@ -161,30 +201,33 @@ def getGoodOrientation(img, squaresLocations, margin=1.0):
         dist_n = math.sqrt(
             ((points1[pt][0] - points1[rest_point][0]) ** 2) + ((points1[pt][1] - points1[rest_point][1]) ** 2)
         )
-        # dist_n = np.sum(np.square(points1[pt] - points1[rest_point]))
         if dist_n > dist2:
             dist2 = dist_n
             diag_down = pt
 
+    img_size = img.shape[::-1]
     for i, pt1 in enumerate(points1):
         if i == rest_point:
-            points2.append((1000, 1500))
-        elif i == diag_down:
-            points2.append((1000, 0))
-        else:
-            points2.append((0, 1500))
+            # points2.append((1000, 1500))
+            points2.append((img_size))
 
-    # points2 = np.float32([(1000, 0), (1000, 1500), (0, 1500)])
-    points2 = np.float32(points2)
-    points1 = np.float32(points1)
+        elif i == diag_down:
+            # points2.append((1000, 0))
+            points2.append((img_size[0], 0))
+        else:
+            # points2.append((0, 1500))
+            points2.append((0, img_size[1]))
+
+    nppoints1 = np.float32(points1)
+    nppoints2 = np.float32(points2)
     # print("p1: ", points1, " p2: ", points2)
 
-    h = cv2.getAffineTransform(points1, points2)
+    h = cv2.getAffineTransform(nppoints1, nppoints2)
     # Use homography
-    imgReg = cv2.warpAffine(img, h, (1000, 1500))
-    return imgReg
+    # imgReg = cv2.warpAffine(img, h, (1000, 1500))
+    imgReg = cv2.warpAffine(img, h, img_size)
 
-    # return True
+    return imgReg, points2
 
 
 def getImageResponses(
@@ -393,11 +436,13 @@ def decodeQRCode(imagePath):
             return None
 
     try:
-        # qrcode = json.loads(preQRCode[0].data)
-        data = preQRCode[0].data.split(";")
-        qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
+        qrcode = json.loads(preQRCode[0].data)
+        # print(preQRCode)
+        # data = preQRCode[0].data.split(";")
+        # qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
     except Exception as e:
         print(e)
-        return None
+        raise
+        # return None
 
     return qrcode

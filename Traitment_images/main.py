@@ -7,7 +7,7 @@ import pprint
 # import make_pdf
 
 
-def compute(pdfFileLocation, examId):
+def compute(pdfFileLocation, examId, copylayout):
     jsonToSend = []
     try:
         if pdfFileLocation == None:
@@ -31,7 +31,7 @@ def compute(pdfFileLocation, examId):
                 )
                 continue
 
-            answers = process_img.process(img_nb_path)
+            answers = process_img.process(img_nb_path, copylayout)
             if answers == None:
                 jsonToSend.append({"error": "is not a QCM file", "filename": img_nb_path})
                 continue
@@ -43,6 +43,7 @@ def compute(pdfFileLocation, examId):
                 {"qrcode": qrcode, "answers": answers, "file": img_nb_path.split("/")[-1], "error": "None"}
             )
         return zip_and_send(examId, jsonToSend)
+
     except Exception as e:
         print("Except:", e)
         raise
@@ -65,9 +66,15 @@ def zip_and_send(examId, jsonToSend):
 
 
 if __name__ == "__main__":
-    res = compute("tests/82318c24-3f36-424f-9b29-c1e7e05acfe5.pdf", "82318c24-3f36-424f-9b29-c1e7e05acfe5")
-    print(res)
-    print("----")
+    from coords import copylayout
+
+    # res = compute(
+    # "tests/82318c24-3f36-424f-9b29-c1e7e05acfe5.pdf", "82318c24-3f36-424f-9b29-c1e7e05acfe5", copylayout
+    # )
+    # print(res)
+    # print("----")
     # res = compute("tests/a1ec4c74-f576-477d-9432-ad9a8a629b49_.pdf", "66af46b7-22f2-434e-a3ef-2bf547cab961")
-    res = compute("tests/cfc8eaf2-17c8-48c1-9b16-ecb0d6d030f1_.pdf", "66af46b7-22f2-434e-a3ef-2bf547cab961")
+    res = compute(
+        "tests/cfc8eaf2-17c8-48c1-9b16-ecb0d6d030f1_.pdf", "66af46b7-22f2-434e-a3ef-2bf547cab961", copylayout
+    )
     pprint.pprint(res)

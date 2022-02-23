@@ -17,6 +17,7 @@ def resp():
 @post("/run")
 def index():
     examId = request.forms.get("exam_id")
+    gridLayout = request.forms.get("gridLayouts")
     pdfFile = request.files.get("file")
 
     if pdfFile and examId:
@@ -26,7 +27,7 @@ def index():
         pdfFile.save(fileLocation)
 
         print(f"Got file in: {fileLocation}")
-        computation = main.compute(fileLocation, examId)
+        computation = main.compute(fileLocation, examId, gridLayout)
         print(computation)
         return computation
     else:
