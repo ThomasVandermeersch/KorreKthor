@@ -436,10 +436,10 @@ def decodeQRCode(imagePath):
             return None
 
     try:
-        qrcode = json.loads(preQRCode[0].data)
-        # print(preQRCode)
-        # data = preQRCode[0].data.split(";")
-        # qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
+        # qrcode = json.loads(preQRCode[0].data)
+        qr = preQRCode[0].data.decode("utf-8") 
+        data = qr.split(";")
+        qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
     except Exception as e:
         print(e)
         raise

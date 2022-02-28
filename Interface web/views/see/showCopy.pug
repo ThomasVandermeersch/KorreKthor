@@ -83,7 +83,14 @@ div(class="container page")
                                                 else if "error" in questions.response[index]
                                                     input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
                                                 else
-                                                    input(class="form-check-input checkboxClass p-2 m-1", checked=questions.response[index].list[rep],disabled=(disableChanges), type="checkbox", name=response value="yes" )
+                                                    if questions.response[index].list[rep] == 0
+                                                        input(class="form-check-input checkboxClass p-2 m-1", checked=false,disabled=(disableChanges), type="checkbox", name=response value="yes" )
+
+                                                    else if questions.response[index].list[rep] == 1 
+                                                        input(class="form-check-input checkboxClass p-2 m-1", checked=true,disabled=(disableChanges), type="checkbox", name=response value="yes" )
+
+                                                    //- input(class="form-check-input checkboxClass p-2 m-1", checked=questions.response[index].list[rep],disabled=(disableChanges), type="checkbox", name=response value="yes" )
+
                                     if disableChanges == false
                                         td(class="hide-sm")
                                             if "error" in questions
@@ -103,8 +110,12 @@ div(class="container page")
                                                 else if "error" in questions.response[index]
                                                     input(class="form-check-input checkboxClass p-2 m-1", disabled=(disableChanges), type="checkbox", name=response value="yes")
                                                 else
-                                                    input(class="form-check-input checkboxClass p-2 m-1" checked=questions.response[index].list[i] disabled=(disableChanges) type="checkbox" name=response value="yes" )
-                                    
+                                                    if questions.response[index].list[i] == 0
+                                                        input(class="form-check-input checkboxClass p-2 m-1" disabled=(disableChanges) type="checkbox" name=response value="yes" )
+                                                    else 
+                                                        input(class="form-check-input checkboxClass p-2 m-1" checked disabled=(disableChanges) type="checkbox" name=response value="yes" )
+
+
                                     td(class="hide-sm")
                                         if "error" in questions
                                             strong(class="text-danger") ERROR

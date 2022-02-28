@@ -29,7 +29,7 @@ function callCorrection(filename, exam, req){
     copyL = copyLayout.getCopyLayout(JSON.parse(exam.corrections))
     const formData = {
         exam_id: exam.id,
-        copyLayout : copyL,
+        gridLayouts : copyL,
 		file: fs.createReadStream(`uploads/${filename}`),
 	}
     request.post({url:`${url}/run`, formData:formData}, function (err, httpResponse, body) {

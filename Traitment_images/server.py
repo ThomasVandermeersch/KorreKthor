@@ -3,6 +3,7 @@ import main
 import os
 from pathlib import Path
 from datetime import datetime
+import json
 
 # from fdsend import send_file
 # import io
@@ -17,9 +18,9 @@ def resp():
 @post("/run")
 def index():
     examId = request.forms.get("exam_id")
-    gridLayout = request.forms.get("gridLayouts")
+    gridLayout = json.loads(request.forms.get("gridLayouts"))
     pdfFile = request.files.get("file")
-
+    
     if pdfFile and examId:
         Path("./saves/").mkdir(parents=True, exist_ok=True)
         now = datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
