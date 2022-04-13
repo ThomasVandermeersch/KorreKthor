@@ -26,6 +26,13 @@ var upload = multer({ storage: storage})
 const url = `http://${process.env.PYTHON_SERVER_HOST}:${process.env.PYTHON_SERVER_PORT}`
 // Call the python server (for correction)
 function callCorrection(filename, exam, req){
+    // Create a folder for the following copies
+    uid = uuidv4()
+    if (!fs.existsSync('copies')) {
+        fs.mkdirSync('copies')
+      }
+    fs.mkdirSync('copies/' + uid)
+
     copyL = copyLayout.getCopyLayout(JSON.parse(exam.corrections))
     const formData = {
         exam_id: exam.id,
@@ -47,11 +54,11 @@ function callCorrection(filename, exam, req){
             });
             
             file.on("finish", function(){
-                fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' }));
+                fs.createReadStream(`zips/${zipFile}`).pipe(unzipper.Extract({ path: 'copies/' +uid }));
             })
 
             if (typeof zipFile !== 'undefined' && exam.id == zipFile.split('.')[0]){
-                correction.correctAll(exam, body, req)
+                correction.correctAll(exam, body, req,uid)
             }
             else{
                 exam.status = 3
