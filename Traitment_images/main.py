@@ -1,61 +1,80 @@
-import glob
-import json
-
 from process_pdf import extractTextAndImg
-import make_pdf
 import process_img
 import shutil
+import pprint
 
-def compute(pdfFileLocation, examId):
+# import json
+# import make_pdf
+
+
+def compute(pdfFileLocation, examId, copylayout):
     jsonToSend = []
+    try:
+        if pdfFileLocation == None:
+            jsonToSend.append({"error": "No scanned QCM"})
+            return zip_and_send(examId, jsonToSend)
 
-    if pdfFileLocation == None :
-        jsonToSend.append({"error" : "No scanned QCM"})
-    else :
-        ImgDone = extractTextAndImg(pdfFileLocation)
+        listPages = extractTextAndImg(pdfFileLocation)
+        if listPages == None:
+            jsonToSend.append({"error": f"{pdfFileLocation} is not a PDF file"})
+            return zip_and_send(examId, jsonToSend)
 
-        if ImgDone == None :
-            jsonToSend.append({"error" : f"{pdfFileLocation} is not a PDF file"})
+        for img_nb_path in listPages:
+            qrcode = process_img.decodeQRCode(img_nb_path)
+            if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
+                jsonToSend.append({"error": f"has no correct QR Code: {qrcode}", "filename": img_nb_path})
+                continue
 
-        else :
-            print("\nGetting answers...")
-            listPages = glob.glob('From_PDF/*.png')
+            if examId != qrcode["lessonId"]:
+                jsonToSend.append(
+                    {"error": f"{qrcode} does not belong to the lesson: {examId}", "filename": img_nb_path}
+                )
+                continue
 
-            if len(listPages) == 0 :
-                jsonToSend.append({"error" : f"No image in {pdfFileLocation}"})
-            else:
-                for img in listPages :
-                    answers = process_img.process(img)
-                    
-                    if answers == None:
-                        jsonToSend.append({"error" : "is not a QCM file", "filename":img})
-                    elif answers == False :
-                        jsonToSend.append({"error" : "No answers scanned", "filename":img})
-                    else:
+            answers = process_img.process(img_nb_path, copylayout, qrcode['version'])
+            if answers == None:
+                jsonToSend.append({"error": "is not a QCM file", "filename": img_nb_path})
+                continue
+            elif answers == False:
+                jsonToSend.append({"error": "No answers scanned", "filename": img_nb_path})
+                continue
 
-                        qrcode = process_img.decodeQRCode(img)
+            jsonToSend.append(
+                {"qrcode": qrcode, "answers": answers, "file": img_nb_path.split("/")[-1], "error": "None"}
+            )
+        return zip_and_send(examId, jsonToSend)
 
-                        if not qrcode or "version" not in qrcode or "matricule" not in qrcode or "lessonId" not in qrcode:
-                            jsonToSend.append({"error" : "has no correct QR Code", "filename":img})
-                            
-                        else:
-                            if examId != qrcode["lessonId"]:
-                                jsonToSend.append({"error" : f"does not belong to the lesson : {examId}", "filename":img})
-                            
-                            else:
-                                jsonToSend.append({"qrcode":qrcode, "answers":answers, "file":img.split("/")[-1], "error" : "None"})
-                        
+    except Exception as e:
+        print("Except:", e)
+        raise
 
+
+def zip_and_send(examId, jsonToSend):
     # Zip folder in order to send it
-    zipPath = f'zips/{examId}'
+    zipPath = f"zips/{examId}"
     try:
         shutil.make_archive(zipPath, "zip", "From_PDF")
-        response = {"zipFile":f"{examId}.zip", "data":jsonToSend}
-        print(f"\nTransaction done, file in : {zipPath}.zip !\n")
-        print("response:", response)
-    except:
-        print(f"Error while zipping to {zipPath}")
-        response = {"error":f"Zipping to {zipPath} failed"}
+        response = {"zipFile": f"{examId}.zip", "data": jsonToSend}
+        print(f"Transaction done, file in : {zipPath}.zip !")
+        # print(f"response: {response}")
+    except Exception as e:
+        print(f"Error while zipping to {zipPath} {e}")
+        response = {"error": f"Zipping to {zipPath} failed"}
 
-    shutil.rmtree("From_PDF/")
+    # shutil.rmtree("From_PDF/")  # Maybe not do that ?
     return response
+
+
+if __name__ == "__main__":
+    from coords import copylayout
+
+    # res = compute(
+    # "tests/82318c24-3f36-424f-9b29-c1e7e05acfe5.pdf", "82318c24-3f36-424f-9b29-c1e7e05acfe5", copylayout
+    # )
+    # print(res)
+    # print("----")
+    # res = compute("tests/a1ec4c74-f576-477d-9432-ad9a8a629b49_.pdf", "66af46b7-22f2-434e-a3ef-2bf547cab961")
+    res = compute(
+        "tests/cfc8eaf2-17c8-48c1-9b16-ecb0d6d030f1_.pdf", "66af46b7-22f2-434e-a3ef-2bf547cab961", copylayout
+    )
+    pprint.pprint(res)

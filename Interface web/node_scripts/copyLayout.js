@@ -2,7 +2,7 @@
 function getCopyLayout(corrections) {
     copyLayout = {}
     copyLayout["markers"] = [[530, 10], [530, 765], [10, 765]] //[Bottom-left, Bottom-right, Top-right]  
-    copyLayout["circle_size"] = 25
+    copyLayout["circle_size"] = 40
 
     // Grid Layout
 

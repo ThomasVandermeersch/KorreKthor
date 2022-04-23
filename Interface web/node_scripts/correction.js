@@ -2,7 +2,7 @@ const {  Exam, Copy } = require("./database/models");
 const getUser = require("./getUser")
 const convertMatricule = require("./convertMatricule")
 
-function saveCopy(copy, data, examId, req){
+function saveCopy(copy, data, examId, req, uid){
     getUser.getUser(convertMatricule.matriculeToEmail(String(copy.qrcode.matricule)), req).then(user=>{
         Copy.findOne({where:{"examId":examId,"userMatricule": user.matricule}}).then(dbCopy=>{
             // var answers
@@ -13,7 +13,7 @@ function saveCopy(copy, data, examId, req){
             if(dbCopy){
                 dbCopy.version = data.version, 
                 dbCopy.result = data.result, 
-                dbCopy.file = copy.file.split('/')[1],
+                dbCopy.file = uid + '/' + copy.file,
                 dbCopy.answers = data.newResponse
                 dbCopy.save().catch(err=>{
                     console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
@@ -24,7 +24,7 @@ function saveCopy(copy, data, examId, req){
                             "examId": examId, 
                             "version": data.version, 
                             "result": data.result, 
-                            "file": copy.file,
+                            "file": uid + '/' + copy.file,
                             "answers": data.newResponse
                         }).catch(err=>{
                             console.log(" --- DATABASE ERROR -- Function correction/saveCopy --\n " + err)
@@ -83,11 +83,11 @@ function reCorrect(examId){
     })
 }
 
-function correctAll(exam, scanResultString, req){
+function correctAll(exam, scanResultString, req,uid){
     const scanResult = JSON.parse(scanResultString)
     const corrections = JSON.parse(exam.dataValues.corrections)
     const correctionCriterias = JSON.parse(exam.dataValues.correctionCriterias)
-
+    
     // Correct all copies
  
     pagesError = []
@@ -99,10 +99,10 @@ function correctAll(exam, scanResultString, req){
                     correctionCriterias,
                     copy.qrcode.version
             ).then( data =>{
-                saveCopy(copy,data,exam.id, req)
+                saveCopy(copy,data,exam.id, req,uid)
             })
             .catch(err=>{
-                saveCopy(copy,{result:[0,0],version:copy.qrcode.version,newResponse:err},exam.id,req)
+                saveCopy(copy,{result:[0,0],version:copy.qrcode.version,newResponse:err},exam.id,req,uid)
             })
         }
         else{
