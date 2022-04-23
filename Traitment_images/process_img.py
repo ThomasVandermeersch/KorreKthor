@@ -12,7 +12,7 @@ import pprint
 # from coords import coords
 
 
-def process(imgPath, copylayout):
+def process(imgPath, copylayout,versionID):
     """
     This function takes an image path and return the equivalent answers boolean array is the image is conform else None.
     The image is conform if there are 3 squares on each bottom left, top left and top right corners.
@@ -48,7 +48,7 @@ def process(imgPath, copylayout):
     transform_matrix = cv2.getAffineTransform(markers, new_markers_pos)
     print(" mat:", transform_matrix)
 
-    coords = copylayout["versions"]["X"]
+    coords = copylayout["versions"][versionID]
     # cv2.transform(np.float32(copylayout["versions"]["X"][1]), coords, transform_matrix)
     # print("coor", coords)
     c = (
@@ -436,10 +436,12 @@ def decodeQRCode(imagePath):
             return None
 
     try:
-        # qrcode = json.loads(preQRCode[0].data)
-        qr = preQRCode[0].data.decode("utf-8") 
-        data = qr.split(";")
-        qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
+        try:
+            qrcode = json.loads(preQRCode[0].data)
+        except:
+            qr = preQRCode[0].data.decode("utf-8") 
+            data = qr.split(";")
+            qrcode = {"matricule": data[0], "version": data[1], "lessonId": data[2]}
     except Exception as e:
         print(e)
         raise

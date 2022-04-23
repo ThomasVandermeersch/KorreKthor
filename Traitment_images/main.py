@@ -31,7 +31,7 @@ def compute(pdfFileLocation, examId, copylayout):
                 )
                 continue
 
-            answers = process_img.process(img_nb_path, copylayout)
+            answers = process_img.process(img_nb_path, copylayout, qrcode['version'])
             if answers == None:
                 jsonToSend.append({"error": "is not a QCM file", "filename": img_nb_path})
                 continue
