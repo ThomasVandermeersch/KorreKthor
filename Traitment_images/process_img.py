@@ -438,6 +438,8 @@ def decodeQRCode(imagePath):
     try:
         try:
             qrcode = json.loads(preQRCode[0].data)
+            if qrcode['version'] == 'noVersion':
+                qrcode['version'] = 'X'
         except:
             qr = preQRCode[0].data.decode("utf-8") 
             data = qr.split(";")
