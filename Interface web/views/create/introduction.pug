@@ -7,28 +7,44 @@ div(class="container page create")
     ol
         li Préparer le fichier Excel.
             ul
-                li Prendre le fichier Excel (<b>.xlsx</b>) fournit par l'administration. 
-                li Ajouter une collone "version".
-                li Dans la colonne "version", indiquer la version correspondant à l'étudiant (A, B, C...).
+                li Prendre le fichier Excel (<b>.xlsx</b>) fournit par l'administration et l'adapter au format adéquat si nécessaire.
+                ul
+                    li La case A1 de ce fichier doit contenir l'intitulé du cours.
+                    li La ligne 2 doit contenir au minimum les collones matricule/etudiant/cote ce fichier doit contenir
+
+                li Gestion des versions
+                ul
+                    li Cas 1 : Je connais la version de l'étudiant. -- Ajouter une collone nommée "version" à la ligne 2. 
+                    li Cas 2 : Je ne connais pas la version de l'étudiant. -- Ne pas avoir de collonne intitulée "version" à la ligne 2.
+
+                br
                 li Les questionnaires de chaque étudiants apparaîtront dans l'ordre des lignes du fichier Excel.
-                li Le fichier Excel doit être au format ci-dessous.
+                li L'image ci-dessous résume le format du fichier Excel.
                     img(src="/img/excelExample.jpg" height="150" class="mt-2")
                 
         br
-        li Préparer les questionnaires PDF 
+        li Préparer les questionnaires PDF (Facultatif)
             ul
-                li Le fichier PDF contient les intitulés des questions et les intitulés des propositions avec une mise en page de votre choix.
-                li Ce pdf ne doit <b> PAS </b> contenir de grille de réponse. Cette grille sera automatiquement générée par Korrekthor.
-                li Il faut autant de fichiers PDF qu'il y a de version (Korrekthor ne mélange <b> PAS </b> les questions).
+                li Il est possible de joindre des grilles de réponses en fin des questionnaires PDF. Dans ce cas :
+                ul
+                    li Le fichier PDF contient les intitulés des questions et les intitulés des propositions avec une mise en page de votre choix.
+                    li Ce pdf ne doit <b> PAS </b> contenir de grille de réponse. Cette grille sera automatiquement générée par Korrekthor.
+                    li Il faut autant de fichiers PDF qu'il y a de version (Korrekthor ne mélange <b> PAS </b> les questions).
 
         br
-        li Préparer le correctif des différentes versions.
+        li Préparer la grille de réponse
             ul
-                li Korrekthor ne peut deviner les réponses aux différentes questions. Préparer donc les réponses sur un support de votre choix afin de les entrer dans le système lorsque ce sera demandé.
-                li Pour chaque version, il faudra entrer manuellement la grille des réponses.
+                li Préparer le nombre de questions ainsi que le nombre de propositions par question.
+                li Les questionnaires sont limités à 29 questions si la version n'est pas définie et à 30 questions si la version est définie.
+        
+        li Préparer les réponses aux questions (Facultatif)
+            ul
+                li Les réponses aux questions pourront être apportées après la création de l'examen.
+
 
     p Vous êtes maintenant prêt à suivre les différentes étapes pour créer votre QCM.
-    p À la fin des différentes étapes de création, vous obtiendrez <b> UN </b> fichier PDF contenant pour chaque étudiant le questionnaire suivi d'une grille de réponses.  
+    p À la fin des différentes étapes de création, vous obtiendrez <b> UN </b> fichier PDF contenant les grilles de réponses individuelles (+ questionnaire, si appliquable).  
+    
     a(href="/create/Step1")
         button(type="button" class="btn btn-secondary mb-3") Commencer à créer mon questionnaire
 
