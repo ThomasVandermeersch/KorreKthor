@@ -41,29 +41,17 @@ router.get("/questionWeighting/:examid", access.hasAccess, (req,res)=>{
 router.get("/downloadExcel/:examid", access.hasAccess, async (req,res)=>{
     Exam.findOne({where:{id:req.params.examid}, include:[{model:Copy, as:"copies", include:[{model:User, as:"user"}]}]}).then(exam=>{
         if (exam && exam.copies){
-            data = {}
-            exam.copies.forEach((copy) => {
-                data[copy.user.matricule] = copy
-            })
-
-            return functions.exportStudents({"name":exam.name, "excelFile":exam.excelFile, "id":exam.id}, data)
-            .then(()=>{
-                return res.download(
-                    path.resolve(exam.excelFile),
-                    (err) => {
-                        if (err) {
-                            console.log(" --- DOWNLOAD ERROR -- correction/downloadExcel/:examid ---\n " + err)
-                            //req.flash('errormsg', 'Error while downloading the file, error : 1041')
-                            //return res.redirect('/error')
-                        }
-                    }
-                );
-            })
-            .catch(err=>{
-                console.log(" --- FILE EXPORT ERROR -- correction/downloadExcel/:examid ---\n ", err)
-                req.flash('errormsg', 'File exportation error, error : 1042')
-                return res.redirect("/error")
-            })
+            return functions.exportStudents(exam)
+                .then(()=>{
+                    return res.download( path.resolve(exam.excelFile), (err) => {
+                        if (err) console.log(" --- DOWNLOAD ERROR -- correction/downloadExcel/:examid ---\n " + err)
+                    });
+                })
+                .catch(err=>{
+                    console.log(" --- FILE EXPORT ERROR -- correction/downloadExcel/:examid ---\n ", err)
+                    req.flash('errormsg', 'File exportation error, error : 1042')
+                    return res.redirect("/error")
+                })
         }
 
         console.log(" --- EXAM DOES NOT EXIST ERROR -- correction/downloadExcel/:examid ---\n ")

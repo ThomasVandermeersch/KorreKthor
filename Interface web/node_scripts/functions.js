@@ -95,10 +95,9 @@ async function getExcelInfo(path){
   })
 }
 
-async function exportStudents(exam, data){
+async function exportStudents(exam){
   /**
    * Function that fills the initial excel file with the student results
-   * Return true if something went wrong
    */
 
   return new Promise(async(resolve, reject)=>{
@@ -107,54 +106,37 @@ async function exportStudents(exam, data){
       await workbook.xlsx.readFile(exam.excelFile);
       const worksheet = workbook.worksheets[0];
 
-      var target = 100000
-      var matriculeInd = 0
-      var coteInd = 0
-      var versionInd = 0
+      // First Step : find col indexes and number of rows
+      coteColIndex = worksheet.getRow(2).values.indexOf('cote')
+      matriculeColIndex = worksheet.getRow(2).values.indexOf('matricule')
+      etudiantColIndex = worksheet.getRow(2).values.indexOf('etudiant')
+      
+      nbRows = worksheet.getColumn(matriculeColIndex).values.length
+      console.log(nbRows)
 
-      var errors = []
-      var maxRows = 0
+      exam.copies.forEach(copy => {
+        // Check if copy has a user
+        if(copy.user.fullName != ""){
+          // Find row of copyMatricule
+          excelCopyRowIndex = worksheet.getColumn(matriculeColIndex).values.indexOf(parseInt(copy.user.matricule))
+          
+          // The copy matricule is already in the Excel file
+          if(excelCopyRowIndex > 0){
+            worksheet.getRow(excelCopyRowIndex).getCell(coteColIndex).value = copy.result[0]
+          }
 
-      worksheet.eachRow(function(row, rowNumber) {
-        var indexMatr = row.values.indexOf("matricule")
-        var indexCote = row.values.indexOf("cote")
-        var indexName = row.values.indexOf("etudiant")
-        var indexVersion = row.values.indexOf("version")
-        maxRows += 1
-
-        if (indexMatr > 0 && indexCote > 0){
-          target = rowNumber
-          matriculeInd = indexMatr
-          coteInd = indexCote
-          nameInd = indexName
-          versionInd = indexVersion
-        }
-
-        if (target < rowNumber){
-          matricule = row.values[matriculeInd]
-
-          if (matricule in data){
-            // row.getCell(coteInd).value = Math.round(((data[matricule].result[0]/data[matricule].result[1])*20)*100)/100
-            row.getCell(coteInd).value = data[matricule].result[0]
-            delete data[matricule]
+          // THe copy matricule is not yet in the Excel file
+          else{
+            nbRows = nbRows + 1
+            worksheet.getRow(nbRows).getCell(coteColIndex).value = copy.result[0]
+            worksheet.getRow(nbRows).getCell(matriculeColIndex).value = parseInt(copy.user.matricule)
+            worksheet.getRow(nbRows).getCell(etudiantColIndex).value = copy.user.fullName
           }
         }
-      })
+      });
 
-      var i = 0
-      for ([matricule, error] of Object.entries(data)){
-        if (error.user.role != 2){
-          i += 1
-          worksheet.getRow(maxRows+i).getCell(matriculeInd).value = parseInt(error.user.matricule)
-          worksheet.getRow(maxRows+i).getCell(coteInd).value = Math.round(((error.result[0]/error.result[1])*20)*100)/100
-          worksheet.getRow(maxRows+i).getCell(nameInd).value = error.user.fullName
-          worksheet.getRow(maxRows+i).getCell(versionInd).value = error.version
-        }
-      }
 
-      if (errors.length > 0){
-        throw "One or more copy.user.matricule don't match the matricules in excel";
-      }
+      produceStatistics(exam, workbook)
 
       await workbook.xlsx.writeFile(exam.excelFile)
       resolve()
@@ -166,6 +148,110 @@ async function exportStudents(exam, data){
   })
 }
 
+function produceStatistics(exam, workbook){
+  
+  // Step 1 : Create the working object
+  statistics = {}
+  for (const [key, value] of Object.entries(JSON.parse(exam.corrections))) {
+    resultList = []
+    
+    // maxProps, nbQuestions and noVersion information are extract to know the size of the statistics table
+    maxProps = 0
+    nbQuestions = value.length
+    statistics[key] = {'noVersion':false}
+
+    
+    
+    value.forEach((prop,index) =>{
+      if(prop.type == 'version'){
+        statistics[key].noVersion = true
+        if(prop.nbVersion > maxProps) maxProps = prop.nbVersion
+        propsArray = new Array(prop.nbVersion).fill(0)
+        propsArray.unshift('Version')
+        resultList.push(propsArray)
+      } 
+      if(prop.type == 'qcm'){
+        if(prop.response.length > maxProps) maxProps = prop.response.length
+        propsArray = new Array(prop.response.length).fill(0)
+        propsArray.unshift('Q'+index)
+        resultList.push(propsArray)
+      } 
+    })
+
+    
+    statistics[key].result = resultList
+    statistics[key].nbQuestions = nbQuestions
+    statistics[key].nbMaxProps = maxProps
+  }
+
+
+  // Step 2 : Browse all copies and count responses.
+
+
+  exam.copies.forEach(copy =>{
+    response = JSON.parse(copy.answers).response
+    if(copy.version != 'X'){
+      // browse through questions
+      for(i=0;i < response.length;i++){
+        // browse through propositions
+        questionProps = response[i].list        
+        for(j=0;j < questionProps.length;j++){
+          if(questionProps[j] == 1){
+            statistics[copy.version]['result'][i][j+1] = statistics[copy.version]['result'][i][j+1] + 1
+          }
+        }
+      }
+    }
+  })
+
+  // Step 3 : Export statistics into Excel file
+  for (const [key, value] of Object.entries(statistics)){
+    sheetName = 'Statistiques_v' + key
+    if(workbook.getWorksheet(sheetName)) workbook.removeWorksheet(workbook.getWorksheet(sheetName).id)    
+    sheet = workbook.addWorksheet(sheetName, {properties:{tabColor:{argb:'FFC0000'}}});
+
+    //Header creation
+    sheet.getCell('A1').value = 'Statistiques -- Version ' + key;
+    sheet.getCell('A2').value = "Nombre d'étudiants ayant noirci la case"
+    alphabet = 'ABCDEFGHIJ'
+
+    header = [{name: 'Question n°'}]
+    for (let i = 0; i < value.nbMaxProps; i++) {
+        header.push({name:alphabet[i]})
+    }
+
+    // add a table to a sheet
+    sheet.addTable({
+        name: 'Table' + key,
+        displayName	: 'Table' + key,
+        ref: 'B4',
+        headerRow: true,
+        totalsRow: false,
+        style: {
+            theme: 'TableStyleDark1',
+            showRowStripes: true,
+        },
+        columns: header,
+        rows: value.result
+    });
+
+
+    // Step 4 : Color correct responses in green
+    correction = JSON.parse(exam.corrections)[key]
+    correction.forEach((question,indexQuestion) =>{
+      if(question.type == 'qcm'){
+        question.response.forEach((proposition, propIndex) =>{
+          if(proposition) sheet.getRow(indexQuestion + 5).getCell(propIndex + 3).font = {color: {argb: "0000ff00"}}
+        })
+      }
+    })
+
+    exam.corrections[key]
+  }
+}
+
 exports.importStudents = importStudents
 exports.getExcelInfo = getExcelInfo
 exports.exportStudents = exportStudents
+
+
