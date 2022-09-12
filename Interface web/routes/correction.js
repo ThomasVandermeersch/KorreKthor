@@ -7,6 +7,23 @@ const path = require("path")
 const functions = require("../node_scripts/functions")
 const matriculeConverter = require("../node_scripts/convertMatricule")
 const getUser = require("../node_scripts/getUser");
+const excelCorrection = require("../node_scripts/excelCorrection")
+
+const fs = require("fs");
+const { v4: uuidv4 } = require('uuid');
+var multer  = require('multer'); // Specific import for files 
+var storage = multer.diskStorage(
+    {
+        destination: 'uploads/',
+        filename: function(req, file, cb){
+            uid = uuidv4()
+            cb(null, uid + '_' + path.extname(file.originalname))
+        }
+    }
+)
+var upload = multer({ storage: storage})
+
+
 
 router.get("/modifyCriteria/:examid", access.hasAccess, (req,res)=>{
     Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
@@ -302,6 +319,55 @@ router.post("/sendCotationCriteria/:redirection/:examid", access.hasAccess, asyn
         req.flash('errormsg', 'Database error, error : 1015')
         res.redirect('/error')
     })
+})
+
+router.post("/uploadAnswersExcel/:examid", access.hasAccess, upload.single("file"), async(req, res) => {
+
+    if (path.extname(req.file.filename) != ".xlsx"){
+        req.flash("errormsg", "Veuillez uploader un fichier Excel")
+        return res.redirect('/correction/modifyAnswers/'+req.params.examid)
+    }
+
+    Exam.findOne({where:{id:req.params.examid}}).then(exam=>{
+        console.log(exam.corrections)
+        pathToExcel = './uploads/' + req.file.filename
+        console.log(pathToExcel)
+        excelCorrection.updateCorrectionByExcel(pathToExcel,exam.corrections).then(newCorrection=>{
+            console.log(newCorrection)
+            
+
+            exam.corrections = JSON.stringify(newCorrection)
+            exam.save().then(exam=>{
+                corrector.reCorrect(req.params.examid).then(suc=>{
+                    req.flash('recorrectmsg', 'Les réponses aux questions ont été enregistrées et les copies recorrigées')
+                    return res.redirect('/correction/modifyAnswers/'+ req.params.examid)
+                })
+                .catch(err=>{
+                    console.log(" ---  ERROR WHILE RECORECT EXAM -- POST correction/modifyWeighting/examId ---\n " +err)
+                    req.flash('errormsg', 'Error while re-correct exam, error : 1044')
+                    return res.redirect("/error")
+                })
+            }).catch(err=>{
+                console.log(" ---  ERROR WHILE SAVING EXAM -- POST correction/modifyWeighting/examId ---\n " + err)
+                req.flash('errormsg', 'Error while saving exam, error : 1045')
+                return res.redirect("/error")
+            })
+
+        }).catch(err=>{
+            req.flash('errormsg', err)
+            console.log(err)
+            return res.redirect('/correction/modifyAnswers/'+req.params.examid)
+        })
+    }).catch(err=>{
+        console.log(" --- DATABASE ERROR -- CREATE/sendCotationCriteria ---\n " + err)
+        req.flash('errormsg', 'Database error, error : 1015')
+        res.redirect('/error')
+    })
+    
+
+    // First step : get the information of the Excel file.
+
+    //excelCorrection.updateCorrectionByExcel(path,correction)
 })
 
 module.exports = router
