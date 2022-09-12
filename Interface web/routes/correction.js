@@ -370,4 +370,8 @@ router.post("/uploadAnswersExcel/:examid", access.hasAccess, upload.single("file
     //excelCorrection.updateCorrectionByExcel(path,correction)
 })
 
+router.get("/tutorial",access.hasAccess,(req,res)=>{
+    res.render('correction/instructionsExcel')
+})
+
 module.exports = router

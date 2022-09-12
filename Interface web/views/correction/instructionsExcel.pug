@@ -1,0 +1,73 @@
+include ../header.pug
+
+div(class="container page create")
+
+    h2 Uploader les réponses par fichier Excel : Format du fichier
+    br
+    h3 Format du fichier
+
+    ol
+        li Créer un fichier .xlsx (nom de fichier au choix)
+
+        li Pour chaque version, créer une feuille/classeur. Chaque feuille/classeur doit être nommée avec la lettre de la version en MAJUSCULE. (Un examen à deux versions aura donc deux feuilles nommées "A" et "B")
+
+        li Indication des réponses :
+        ul 
+            li Les réponses de chaque versions se trouveront dans la collone A. La réponse à la première question se trouvera dans la case A1, la réponse à la deuxième question dans la case A2, ...
+            li Les réponses aux questions doivent être écrites en MAJUSCULE.
+            li La lettre ne peux dépasser le nombre de propositions. Par exemple, si la question comprend trois propositions, les seules valeurs que peuvent prendre la case sont "A", "B", "C"
+
+        li Une fois le fichier créé, importer sur la plate-forme.
+
+        li L'image ci-dessous résume le format du fichier Excel pour un examen à 3 versions. Dont la version "B" à 3 questions.
+
+
+            img(src="/img/exampleUploadAnswers.jpg" height="330" class="mt-2")
+
+
+    //-     li Préparer le fichier Excel.
+    //-         ul
+    //-             li Prendre le fichier Excel (<b>.xlsx</b>) fournit par l'administration et l'adapter au format adéquat si nécessaire.
+    //-             ul
+    //-                 li La case A1 de ce fichier doit contenir l'intitulé du cours.
+    //-                 li La ligne 2 doit contenir au minimum les collones matricule/etudiant/cote. (L'emplacement des collones n'a pas d'importance).
+
+    //-             li Gestion des versions
+    //-             ul
+    //-                 li Cas 1 : Je connais la version de l'étudiant. -- Ajouter une collone nommée "version" à la ligne 2. 
+    //-                 li Cas 2 : Je ne connais pas la version de l'étudiant. -- Ne pas avoir de collonne intitulée "version" à la ligne 2.
+
+    //-             br
+    //-             li Les questionnaires de chaque étudiant apparaîtront dans l'ordre des lignes du fichier Excel.
+    //-             li L'image ci-dessous résume le format du fichier Excel.
+    //-                 img(src="/img/exampleUploadAnswers.jpg" height="150" class="mt-2")
+                
+    //-     br
+    //-     li Préparer les questionnaires PDF (Facultatif)
+    //-         ul
+    //-             li Il est possible de joindre des grilles de réponses en fin des questionnaires PDF. Dans ce cas :
+    //-             ul
+    //-                 li Le fichier PDF contient les intitulés des questions et les intitulés des propositions avec une mise en page de votre choix.
+    //-                 li Ce pdf ne doit <b> PAS </b> contenir de grille de réponse. Cette grille sera automatiquement générée par Korrekthor.
+    //-                 li Il faut autant de fichiers PDF qu'il y a de version (Korrekthor ne mélange <b> PAS </b> les questions).
+
+    //-     br
+    //-     li Préparer la grille de réponse
+    //-         ul
+    //-             li Préparer le nombre de questions ainsi que le nombre de propositions par question.
+    //-             li Les questionnaires sont limités à 29 questions si la version n'est pas définie et à 30 questions si la version est définie.
+    //-             li Les questionnaires sont limités à 10 propositions par question.
+        
+    //-     li Préparer les réponses aux questions (Facultatif)
+    //-         ul
+    //-             li Les réponses aux questions pourront être apportées après la création de l'examen.
+
+
+    //- p Vous êtes maintenant prêt à suivre les différentes étapes pour créer votre QCM.
+    //- p À la fin des différentes étapes de création, vous obtiendrez <b> UN </b> fichier PDF contenant les grilles de réponses individuelles (+ questionnaire, si appliquable).  
+    
+    //- a(href="/create/Step1")
+    //-     button(type="button" class="btn btn-secondary mb-3") Commencer à créer mon questionnaire
+
+include ../footer.pug
+

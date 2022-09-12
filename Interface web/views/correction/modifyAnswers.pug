@@ -6,6 +6,9 @@ div(class="container page create")
     h2(class="mb-3") Modifier les réponses aux QCM
     
     h3 Méthode 1 : Uploader un fichier Excel
+    a(href="/correction/tutorial" target="_blank")
+        p Cliquez ici pour voir le tutoriel
+
     if messages.recorrectmsg
         div(class="alert alert-success my-2" role="alert")= messages.recorrectmsg
     p Uploadez un fichier excel contenant les réponses à vos questions.
