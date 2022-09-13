@@ -20,7 +20,7 @@ def process(imgPath, copylayout,versionID):
     print(imgPath)
     img_rgb = cv2.imread(imgPath)
     img = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-    img[img < 150] = 0
+    img[img < 170] = 0
     # ratio = img.shape[1] / 1191
     # img = cv2.resize(img, (1191, round(img.shape[0] / ratio)), interpolation=cv2.INTER_LINEAR)
     print(f"img shape: {img.shape}")
@@ -77,7 +77,7 @@ def process(imgPath, copylayout,versionID):
 
             bl = getBlackIntensity(img, c, (circle_size, circle_size))
             # print(bl)
-            if bl >= 0.2:  # Box clearly ticked
+            if bl >= 0.17:  # Box clearly ticked
                 resp[-1].append(1)
                 cv2.circle(
                     img,
@@ -86,9 +86,9 @@ def process(imgPath, copylayout,versionID):
                     (0, 100, 0),
                     1,
                 )
-            elif bl < 0.2 and bl > 0.15:  # box not clearly ticked -> uncertain
+            elif bl < 0.17 and bl > 0.15:  # box not clearly ticked -> uncertain
                 resp[-1].append(2)
-            else:  # bl <= 0.1
+            else:  # bl <= 0.145
                 resp[-1].append(0)  # box clearly unticked
                 cv2.rectangle(img, c, (round(c[0] + circle_size), round(c[1] + circle_size)), (0, 100, 0), 1)
             # cv2.imshow("img", img)
