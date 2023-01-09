@@ -6,12 +6,6 @@ div(class="container page create")
     h2 Etape 5 : La création du QCM est à présent terminée.
     p Vous pouvez télécharger les questionnaires ci-dessous.
         button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Vous aurez encore l'occasion de télécharger ces fichiers par la suite.\nPour cela, allez dans 'Voir mes QCM', sélectionnez votre QCM. Vous y trouverez un lien pour les téléchargements.")
-            i(class="fa fa-question-circle" style="font-size:24px;")   
-
-    div(class="download")
-        a(href="/see/exam/" + examId + "/downloadresult" class="bouton")
-            button(class="btn btn-success float-end me-2") Télécharger le fichier d'examen
-        a(href="/see/exam/" + examId + "/downloadcorrection" class="bouton")
-            button(class="btn btn-success float-end") Télécharger le fichier de correction
+            i(class="fa fa-question-circle" style="font-size:24px;")
 
 include ../footer.pug

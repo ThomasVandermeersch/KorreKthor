@@ -87,9 +87,7 @@ div(class="container page create")
             if exam.correctionFile && exam.examFile
                 br
                 div(class="files mt-2")
-                    a(href=`/see/exam/${exam.id}/downloadresult` class="bouton") Fichier d'examen
-                    br
-                    a(href=`/see/exam/${exam.id}/downloadcorrection` class="bouton") Fichier de correction
+                    a(href=`/see/exam/${exam.id}/downloadresult` class="bouton") Fichier d'examen (PDF)
             else 
                 br
                 div(class="float-end mt-3")
