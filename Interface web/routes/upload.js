@@ -5,10 +5,11 @@ const http = require('http');
 const access = require('../node_scripts/hasAccess')
 const fs = require("fs");
 const correction = require("../node_scripts/correction")
-const { Exam } = require("../node_scripts/database/models");
 const path = require("path")
 const { v4: uuidv4 } = require('uuid');
 const copyLayout = require('../node_scripts/copyLayout')
+
+const getExam = require('../node_scripts/database_calls/exam')
 
 
 var multer  = require('multer'); // Specific import for files 
@@ -69,42 +70,21 @@ function callCorrection(filename, exam, req){
 }
 
 // This function render the upload page with the historic
-router.get("/copies/:examid", access.hasAccess, async(req, res) => {
-    Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
-        res.render("upload/uploadScans", {exam:exam,historic:JSON.parse(exam.historic)})
-    }).catch(err=>{
-        console.log(" --- DATABASE ERROR -- UPLOAD/copies ---\n " + err)
-        req.flash('errormsg', 'Internal error, error : 1015')
-        res.redirect('/error')
-    })
+router.get("/copies/:examid", access.hasAccess, getExam.getExam(), async(req, res) => {
+        res.render("upload/uploadScans", {exam:res.locals.exam,historic:JSON.parse(res.locals.exam.historic)})
 })
 
-router.post("/scans/manual/:examid", access.hasAccess, upload.single("file"), async(req, res) => {
+router.post("/scans/manual/:examid", access.hasAccess, upload.single("file"), getExam.getExam(), async(req, res) => {
     if (path.extname(req.file.filename) != ".pdf"){
         req.flash("errormsg", "Veuillez uploader un fichier pdf")
         return res.render("upload/uploadScans", {exam:exam})
     }
     
-    Exam.findOne({where:{id:req.params.examid}}).then(exam =>{
-        exam.status = 1 // Process correction
-        exam.save()
+        res.locals.exam.status = 1 // Process correction
+        getExam.saveExam(res.locals.exam,req,res,"Début de la correction, ce processus peut prendre jusqu'a 2 minutes. Actualisez pour voir l'état.","/see" )
 
-        req.flash("successmsg", "Début de la correction, ce processus peut prendre jusqu'a 2 minutes. Actualisez pour voir l'état.")
-        res.redirect("/see")
-
-        try{
-            callCorrection(req.file.filename, exam, req)
-        }
-        catch(err){
-            console.log(" --- Call correction ERROR -- UPLOAD/scan/manual ---\n " + err)
-            req.flash("errormsg", "Error while making the correction, error : 1007")
-            return res.redirect('/error')
-        }        
-    }).catch(err=>{
-        console.log(" --- DATABASE ERROR -- UPLOAD/scan/manual ---\n " + err)
-        req.flash('errormsg', 'Internal error, error : 1016')
-        return res.redirect('/error')
-    })
+        try { callCorrection(req.file.filename, res.locals.exam, req) }
+        catch(err) { console.log( err) }
 })
 
 router.get("/downloadUploadedFile/:examid/:filename", access.hasAccess, async (req, res) => {

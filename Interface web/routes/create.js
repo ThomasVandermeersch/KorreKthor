@@ -8,7 +8,6 @@ const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
 
 var multer  = require('multer'); // Specific import for files 
-const { cpuUsage } = require('process');
 var storage = multer.diskStorage(
     {
         destination: 'uploads/',

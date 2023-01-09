@@ -1,6 +1,9 @@
 const router = require('express-promise-router')();
 const getUser = require('../node_scripts/getUser')
 
+const createLogger = require('logging')
+const logger = createLogger.default('Auth -- Routes');
+
 router.get("/login",function(req,res){
     if(!req.session.userId) res.render("auth/login")
     else res.redirect('/')
@@ -44,23 +47,20 @@ router.get('/callback',
       // Save the user's homeAccountId in their session
       req.session.userId = response.account.homeAccountId;
 
-      getUser.getUser(response.account.username,req).then(user=>{ 
+      getUser.getUser(response.account.username,req).then(user=>{
+        logger.info(`L'utilisateur ${user.fullName} s'est connecté !`) 
         req.session["userObject"] = user
         req.session["accesses"] = {examIds:[],copyIds:[]}
-        
-        //REDIRECTION
-        if(req.session["requestedURL"]) res.redirect(req.session["requestedURL"])
-        else res.redirect('/');
-
+        res.redirect('/');
       }).catch(err=>{
-        console.log(" --- INTERNAL ERROR -- auth/callback ---\n " + err)
+        logger.error(err)
         req.flash('errormsg', 'Internal error while logging in, error : 1018')
         return res.redirect('/unloggederror')
       })
     } catch(error) {
-      console.log(error)
+      logger.error(error)
       req.flash('error_msg', {
-        message: 'Error completing authentication HERE',
+        message: 'Error completing authentication',
         debug: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
     }
