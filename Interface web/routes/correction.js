@@ -165,10 +165,11 @@ router.post("/updateUser/:copyid", access.hasAccess, getCopy.getCopy(), async (r
         })
 })
 
-router.post('/changeCopyStatus/:examid',access.hasAccess, getExam.getExam, (req,res)=>{    
+router.post('/changeCopyStatus/:examid',access.hasAccess, getExam.getExam(), (req,res)=>{    
     if(req.body["copyViewAvailable"] !== undefined){
         console.log(" --- BODY ERROR ERROR -- POST correction/changeCopyStatus ---\n ")
-        req.flash('errormsg', 'The body does not contian the copyViewAvailable key, error : 1003d')
+        req.flash('errormsg', 'The body does not contain the copyViewAvailable key, error : 1003d')
+        res.redirect("/error")
     }
     res.locals.exam.copyViewAvailable = req.body.copyViewAvailable
     getExam.saveExam(res.locals.exam,req,res,"La visibilité des copies a été changé avec succès.")
