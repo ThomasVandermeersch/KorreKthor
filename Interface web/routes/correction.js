@@ -68,7 +68,7 @@ router.post('/modifyWeighting/:examid',access.hasAccess, getExam.getExam(), (req
     getExam.saveExam(res.locals.exam,req,res)
 })
 
-router.get("/downloadExcel/:examid", access.hasAccess, getExam.getExam(includeCopiesAndUsers=false), (req,res)=>{
+router.get("/downloadExcel/:examid", access.hasAccess, getExam.getExam(true), (req,res)=>{
     return functions.exportStudents(res.locals.exam)
         .then(()=>{
             return res.download( path.resolve(res.locals.exam.excelFile), (err) => {
