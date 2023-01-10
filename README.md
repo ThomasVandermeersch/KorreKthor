@@ -28,7 +28,6 @@
 - [Code structure](#code-structure)
   - [Web Interface](#web-interface-1)
   - [Image Processing](#image-processing)
-  - [Hardware](#hardware)
 
 ## Usage
 
@@ -318,13 +317,3 @@ Files are located in `/KorreKthor/Traitement_images/`
 - The `process_img.py` file makes all the images processing scripts in order to return the decoded answers list
 - The `process_pdf.py` file is used to extract all page to a .png file from the source pdf file
 - The `source_pdf` folder contians the original patten images
-
-### Hardware
-
-Files are located in `/KorreKthor/Hardware/`
-
-- The `Modèle_3D/` folder contains the 3D printing files: LEDS supports, camera support, raspberry case, … 
-- `PI_funct.py`: File including the functions of moving the arm, taking pictures, operating the valve and the motor. 
-- `selection.py`: Creating the movement sequence, taking pictures, and saving pictures 
-- `booting.py`: allows you to operate the interface, LED brightness and start buttons. This file is to be run on the Raspberry Pi boot, allowing the user to use the physical interface without the need of any screen (to be added in “/etc/rc.local”). 
-- The `PCB/` folder contains the pdf schemas and the Altium project
