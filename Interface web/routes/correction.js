@@ -171,13 +171,13 @@ router.post('/changeCopyStatus/:examid',access.hasAccess, getExam.getExam(), (re
     getExam.saveExam(res.locals.exam,req,res,"La visibilité des copies a été changé avec succès.")
 });
 
-router.post("/sendCotationCriteria/:redirection/:examid", access.hasAccess, getExam.getExam, (req, res)=>{
+router.post("/sendCotationCriteria/:redirection/:examid", access.hasAccess, getExam.getExam(), (req, res)=>{
     res.locals.exam.correctionCriterias = JSON.stringify(req.body)
     if(req.params.redirection == 'create') getExam.saveExam(res.locals.exam,req,res,"",'/create/Step5')
     else getExam.saveExam(res.locals.exam,req,res)
 })
 
-router.post("/uploadAnswersExcel/:examid", access.hasAccess, upload.single("file"), getExam.getExam, async(req, res) => {
+router.post("/uploadAnswersExcel/:examid", access.hasAccess, upload.single("file"), getExam.getExam(), async(req, res) => {
     if (path.extname(req.file.filename) != ".xlsx"){
         req.flash("errormsg", "Veuillez uploader un fichier Excel")
         return res.redirect('/correction/modifyAnswers/'+req.params.examid)
