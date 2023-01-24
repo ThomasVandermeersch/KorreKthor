@@ -8,7 +8,7 @@ div(class="container page create")
     form(action="/upload/scans/manual/" + exam.id, method="POST", enctype="multipart/form-data")
         div(class="row")
             div(class="col-6 col-md-9")
-                input(class="form-control" id="fileForm" type="file" name="file" required)
+                input(class="form-control" id="fileForm" type="file" accept='.pdf' name="file" required)
 
             div(class="col-5 col-md-3")
                 input(class="btn btn-warning float-end" type="submit", value="Envoyer")
