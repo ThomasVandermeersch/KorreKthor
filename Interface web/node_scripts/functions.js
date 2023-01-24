@@ -115,6 +115,7 @@ async function exportStudents(exam){
       console.log(nbRows)
 
       exam.copies.forEach(copy => {
+        if(copy.status == 'not_submitted') return
         // Check if copy has a user
         if(copy.user.fullName != ""){
           // Find row of copyMatricule
@@ -189,7 +190,8 @@ function produceStatistics(exam, workbook){
 
 
   exam.copies.forEach(copy =>{
-    response = JSON.parse(copy.answers).response
+    if(copy.status == 'not_submitted') return
+    response = JSON.parse(copy.answers)
     if(copy.version != 'X'){
       // browse through questions
       for(i=0;i < response.length;i++){

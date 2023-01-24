@@ -15,14 +15,15 @@ div(class="container page create")
 
     div(class="card mt-2")
         div(class="card-body")
-            if exam.status == 0
-                h4(class="card-title") Exam #[strong #{exam.name}] - Créé
-            else if exam.status == 1
-                h4(class="card-title text-warning") Exam #[strong #{exam.name}] - Correction en cours...
-            else if exam.status == 3
-                h4(class="card-title text-danger") Exam #[strong #{exam.name}] - Erreur, veuillez réessayer !
-            else
-                h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
+            h4(class="card-title") Exam #[strong #{exam.name}]
+            //- if exam.status == 0
+            //-     h4(class="card-title") Exam #[strong #{exam.name}] - Créé
+            //- else if exam.status == 1
+            //-     h4(class="card-title text-warning") Exam #[strong #{exam.name}] - Correction en cours...
+            //- else if exam.status == 3
+            //-     h4(class="card-title text-danger") Exam #[strong #{exam.name}] - Erreur, veuillez réessayer !
+            //- else
+            //-     h4(class="card-title text-success") Exam #[strong #{exam.name}] - Corrigé
 
             p(class="card-subtitle text-muted bouton")= exam.id
             p(class="card-subtitle mb-2 text-muted")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
@@ -95,10 +96,9 @@ div(class="container page create")
             
             a(href=`/upload/copies/${exam.id}` class="btn btn-success col-5 mt-4 bouton") Uploader et corriger des copies
             
-            if exam.status == 2
-                a(href=`/see/copies/${exam.id}` class="btn col-5 btn-secondary mt-4 float-end bouton") Afficher les copies des étudiants
+            a(href=`/see/copies/${exam.id}` class="btn col-5 btn-secondary mt-4 float-end bouton") Afficher les copies des étudiants
 
-            if exam.status == 2
+            if enableExcelDownload
                 a(href=`/correction/downloadExcel/${exam.id}` class="btn col-12 btn-success mt-4 bouton") Télécharger les résultats et les statistiques (fichier excel) 
 
             input(type='hidden' id='examId' value=exam.id)

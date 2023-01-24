@@ -137,7 +137,7 @@ router.post("/quest", upload.single("studentList"), async (req, res) => {
     }).then(exam => {
         var lesson = { name: lessonName, id: exam.id, versions: JSON.parse(req.session.excelFile.versions)}
 
-        QCM_automatisation.createInvoice(students, lesson, answers, req.session["pdffiles"], req.session.extraCopies, req.session.examDate,req.session.noVersion)
+        QCM_automatisation.createInvoice(students, lesson, answers, req.session["pdffiles"], req.session.extraCopies, req.session.examDate,req.session.noVersion,req)
             .then(async(ret) => {
                 // handle errors
                 if (ret.error){

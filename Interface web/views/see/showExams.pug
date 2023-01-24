@@ -10,7 +10,7 @@ div(class="container page")
             thead(class="thear-dark")
                 tr
                     th(scope="col")= "Nom"
-                    th(scope="col")= "Etat"
+                    //- th(scope="col")= "Etat"
                     th(scope="col" class="versions")= "# versions"
                     th(scope="col" class="date")= "Date"
 
@@ -20,14 +20,14 @@ div(class="container page")
 
                     tr(onClick=`getExam("${ exam.id }")` style="cursor: pointer;")
                         th= exam.name
-                        if exam.status == 0
-                            td(class="text-secondary") Créé
-                        else if exam.status == 1
-                            td(class="text-warning") Correction en cours...
-                        else if exam.status == 3
-                            td(class="text-danger") Error, retry
-                        else
-                            td(class="text-success") Corrigé
+                        //- if exam.status == 0
+                        //-     td(class="text-secondary") Créé
+                        //- else if exam.status == 1
+                        //-     td(class="text-warning") Correction en cours...
+                        //- else if exam.status == 3
+                        //-     td(class="text-danger") Error, retry
+                        //- else
+                        //-     td(class="text-success") Corrigé
                         td(class="versions")= exam.numberOfVersion
                         td(class="date")= `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth()+1)).slice(-2)}/${date.getFullYear()} - ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
 
@@ -43,8 +43,8 @@ div(class="container page")
             tbody
                 each copy in copies
                     - var date = new Date(Date.parse(copy.createdAt))
-                    - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
-                    - var answers = JSON.parse(copy.answers)
+                    //- - var point = Math.round(((copy.result[0]/copy.result[1])*20)*100)/100
+                    //- - var answers = JSON.parse(copy.answers)
 
                     if copy.exam.copyViewAvailable == 2
                         tr(onClick=`getCopy("${ copy.id }")` style="cursor: pointer;")

@@ -47,7 +47,7 @@ document.getElementById('submitAnswersButton').addEventListener("click",function
     const responseList = []
     for(var i=0;i< table_rows.length; i++){
         var propList = []
-        for(var j=1; j < table_rows[i].cells.length - 1; j++){
+        for(var j=1; j < table_rows[i].cells.length - 2; j++){
             if(table_rows[i].cells[j].children[0].checked) propList.push(1)
             else propList.push(0)
             //propList.push(table_rows[i].cells[j].children[0].checked)

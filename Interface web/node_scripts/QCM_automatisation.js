@@ -2,8 +2,10 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const PDFMerger = require('pdf-merger-js');
 var QRCode = require('qrcode')
+const copy = require('./database_calls/copy')
 
-async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate,noVersion) {
+
+async function createInvoice(students, lesson, answers, fileVersions, extraCopies,examDate,noVersion, req) {
   /**
    * Function that create a printable pdf for teachers
    * This function needs a student list, the course name, the answers array and a file list of the different question versions like {"A":"File1.pdf" ... }
@@ -30,16 +32,22 @@ async function createInvoice(students, lesson, answers, fileVersions, extraCopie
 
   return new Promise((resolve, reject) => {
     students.forEach(async (student) => {
+
+      
+
+
       let doc = new PDFDocument({size: 'A4'});
       let writeStream = fs.createWriteStream("pre_pdf/" + (student.matricule).toString() + ".pdf")
 
       generateTemplate(doc); //Mise des carés et d'un titre
       
       if(!noVersion){
+        copy.createCopy(student.matricule,student.version,"X",lesson.id,req)
         generateTable(doc, answers[student.version]); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
         generateHeader(doc, student, lesson, writeStream,examDate,true)
       }
       else{
+        copy.createCopy(student.matricule,"X",lesson.id,req)
         generateTable(doc, answers['A']); //Pour chaque étudiant, mise en place des cases à cocher + Question 1
         generateHeader(doc, student, lesson, writeStream,examDate)
       }

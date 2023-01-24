@@ -35,6 +35,12 @@ module.exports = (sequelize, DataTypes) => {
     answers:{
       type: DataTypes.STRING(4096),
     },
+    status:{
+      type: DataTypes.STRING(255),
+    },
+    display_level:{
+      type: DataTypes.STRING(255),
+    }
   }, {
     sequelize,
     tableName: "copies",

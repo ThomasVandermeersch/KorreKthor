@@ -5,7 +5,7 @@ const { Exam, Copy, User } = require("../node_scripts/database/models");
 const { computeMean, computeVariance, computeZero, computeParticipants } = require("../node_scripts/stats")
 
 const getExam = require('../node_scripts/database_calls/exam')
-const getCopy = require('../node_scripts/database_calls/copy')
+const getCopy = require('../node_scripts/database_calls/copy');
 
 router.get("/", access.hasAccess, async (req, res) => {
     const matricule = req.session.userObject.matricule
@@ -26,12 +26,24 @@ router.get("/", access.hasAccess, async (req, res) => {
 })
 
 router.get("/copies/:examid", access.hasAccess, getExam.getExam(true), (req, res) => {
-    stats = {"mean": computeMean(res.locals.exam.copies), "var":computeVariance(res.locals.exam.copies, computeMean(res.locals.exam.copies)), "participants":computeParticipants(res.locals.exam.copies), "blancs":computeZero(res.locals.exam.copies), "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
-    return res.render("see/showCopies", {copies:res.locals.exam.copies,exam:res.locals.exam, stats:stats})
+    return res.render("see/showCopies", {copies:res.locals.exam.copies,exam:res.locals.exam})
+    
+    // else{
+    //     stats = {"mean": computeMean(res.locals.exam.copies), "var":computeVariance(res.locals.exam.copies, computeMean(res.locals.exam.copies)), "participants":computeParticipants(res.locals.exam.copies), "blancs":computeZero(res.locals.exam.copies), "worstQuestionQtt":13, "worstQuestionNum":5, "bestQuestionQtt":16, "bestQuestionNum":2}
+    //     return res.render("see/showCopies", {copies:res.locals.exam.copies,exam:res.locals.exam, stats:stats})
+    // }
 })
 
-router.get("/exam/:examid", access.hasAccess, getExam.getExam(), async (req, res) => {
-    return res.render("see/showExam", {exam:res.locals.exam})
+router.get("/exam/:examid", access.hasAccess, getExam.getExam(true), async (req, res) => {
+    var copies = res.locals.exam.copies
+    var nbCopies = copies.length
+    var nbNotSubmitted = copies.filter(copy => copy.status == "not_submitted").length
+    var nbErrors = copies.filter(copy => copy.status == "errorVersion").length + copies.filter(copy => copy.status == "error").length
+    
+    var nbNoStudent = copies.filter(copy => copy.user.fullName == "" && copy.status != "not_submitted" ).length
+    enableExcelDownload = (nbErrors > 0 || nbCopies == nbNotSubmitted || nbNoStudent > 0) ? false : true
+    
+    return res.render("see/showExam", {exam:res.locals.exam,enableExcelDownload:enableExcelDownload})
 })
 
 router.get("/exam/:examid/downloadresult", access.hasAccess, getExam.getExam(), async (req, res) => {
@@ -86,12 +98,23 @@ router.get("/copy/:copyid", access.hasAccess, getCopy.getCopy(true), (req, res) 
             if(item.id == req.params.copyid){
                 if(nbCopies - 1 == index) return res.render("see/showCopy", {prevCopyId:copies[index-1].id,copy:res.locals.copy,disableChanges:disableChanges}) // Il n'y a pas de copie suivante
                 else if(index == 0) return res.render("see/showCopy", {nextCopyId:copies[index+1].id,copy:res.locals.copy,disableChanges:disableChanges})
-                else return res.render("see/showCopy", {nextCopyId:copies[index+1].id,prevCopyId:copies[index-1].id,copy:res.locals.copy,disableChanges:disableChanges})
+                else return res.render("see/showCopy", {nextCopyId:copies[index+1].id,prevCopyId:copies[index-1].id,copy:res.locals.copy,disableChanges:disableChanges})  
             }
         })
     }).catch(err=>{
         console.log(" --- DATABASE ERROR -- SEE/copy ---\n " + err)
         req.flash('errormsg', 'Database error, error : 1023')
+        // return res.redirect('/error')
+    })
+})
+
+router.get("/deleteExam/:examid/WARNING_NO_TURNING_BACK", access.hasAccess, (req,res)=>{
+    Copy.destroy({where:{examId:req.params.examid}}).then(()=>{
+        Exam.destroy({where:{id:req.params.examid}}).then(()=>{
+            res.redirect('/see')
+        })
+    }).catch(err=>{
+        console.log(err)
         return res.redirect('/error')
     })
 })

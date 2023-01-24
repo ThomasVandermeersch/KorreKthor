@@ -1,6 +1,7 @@
 const router = require('express-promise-router')();
 const access = require('../node_scripts/hasAccess')
-const corrector = require('../node_scripts/correction')
+const corrector = require('../node_scripts/correction_new')
+
 const sendEmail = require('../node_scripts/sendEmail');
 const path = require("path")
 const functions = require("../node_scripts/functions")
@@ -98,29 +99,18 @@ router.post("/getUserName/:redirection", access.hasAccess, (req,res)=>{
 })
 
 router.post('/modifyImageTreatment/:copyid', access.hasAccess, getCopy.getCopy(), (req,res)=>{
-    res.locals.copy.answers = req.body.response
-    const correction = JSON.parse(res.locals.copy.exam.corrections) //GET corrections
+    const response = JSON.parse(req.body.response)
+    const corrections = JSON.parse(res.locals.copy.exam.corrections) //GET corrections
     const correctionCriterias = JSON.parse(res.locals.copy.exam.correctionCriterias) //Get correction criterias
-    
-    corrector.correctionCopy( 
-        correction,JSON.parse(req.body.response),correctionCriterias,res.locals.copy.version           
-    ).then((newData) =>{
-        res.locals.copy.result = newData.result
-        res.locals.copy.version = newData.version
-        res.locals.copy.answers = newData.newResponse
-        res.locals.copy.save().then(copy=>{
-            req.flash('successCotationChange',"La note de l'étudiant a été modifiée correctement ! ");
-            res.redirect('/see/copies/'+copy.exam.id)
+
+    copy = corrector.correctionCopy( res.locals.copy, response, corrections, correctionCriterias, true)
+    copy.save().then(copy=>{
+        req.flash('successCotationChange',"La note de l'étudiant a été modifiée correctement ! ");
+        res.redirect('/see/copies/'+copy.exam.id)
         }).catch(err=>{
             console.log(" --- DATABASE ERROR -- correction/modifyImageTreatment/:copyid ---\n " + err)
             req.flash('errormsg', 'Error while saving the copy, error : 1047')
             return res.redirect('/error')
-        })
-    })
-    .catch(err=>{
-        console.log(' ---Not normal to have an error here because lists have to match ---\n '+ err)
-        req.flash('errorAnswerChange','Les listes ne correspondent pas, error : 1006');
-        res.redirect('/see/copy/'+copy.id)
     })
 })
 
