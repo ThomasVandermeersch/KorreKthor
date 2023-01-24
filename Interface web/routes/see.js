@@ -119,4 +119,11 @@ router.get("/deleteExam/:examid/WARNING_NO_TURNING_BACK", access.hasAccess, (req
     })
 })
 
+router.post("/userPreferences/:redirection", access.hasAccess, (req,res)=>{
+    req.session.preferences.maskAbs = "maskAbs" in req.body ? true : false 
+    req.session.preferences.maskDouble = "maskDouble" in req.body ? true : false 
+    req.session.preferences.maskNotSubmitted = "maskNotSubmitted" in req.body ? true : false 
+
+    res.redirect("/see/copies/" + req.params.redirection)
+})
 module.exports = router;

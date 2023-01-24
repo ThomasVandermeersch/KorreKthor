@@ -51,6 +51,7 @@ router.get('/callback',
         logger.info(`L'utilisateur ${user.fullName} s'est connecté !`) 
         req.session["userObject"] = user
         req.session["accesses"] = {examIds:[],copyIds:[]}
+        req.session["preferences"] = {maskAbs:false, maskDouble:false, maskNotSubmitted:true}
         res.redirect('/');
       }).catch(err=>{
         logger.error(err)

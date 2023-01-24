@@ -4,14 +4,43 @@ div(class="container page")
     div(class="card mt-2")
         div(class="card-body")
             h4(class="card-title") Examen : #[strong #{exam.name}]
-            h6(class="") Statistiques :
-            div(class="row")
-                ul(class="col-5 ms-4") 
-                    li Moyenne :  pts
-                    li Variance : pts
-                ul(class="col-5")
-                    li Participation :  étudiants
-                    li Zeros :  étudiants                
+            
+            h6 Préférences d'affichage : 
+            form(action="/see/userPreferences/" + exam.id, method="POST" , class="form-inline")
+
+                div(class="row")
+                    ul(class="col-6 ms-3")
+                        
+                        if session.preferences.maskAbs
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_1" type="checkbox" checked name="maskAbs" value="yes" ) 
+                        else
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_1" type="checkbox" name="maskAbs" value="yes" ) 
+                        label(for="checkbox_1") Ignorer les copies qui contiennent une question non cochée
+                        p
+
+                        if session.preferences.maskDouble
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_2" type="checkbox" checked name="maskDouble" value="yes" ) 
+                        else
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_2" type="checkbox" name="maskDouble" value="yes" ) 
+                        label(for="checkbox_2") Ignorer les copies qui contiennent une question doublement cochée
+                        p
+
+                        if session.preferences.maskNotSubmitted
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_3" type="checkbox" checked name="maskNotSubmitted" value="yes" ) 
+                        else   
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_3" type="checkbox" name="maskNotSubmitted" value="yes" ) 
+    
+                        label(for="checkbox_3") Masquer les copies non soumises
+                            
+                    
+
+                    ul(class="col-5 ms-4") 
+                        button(class="btn btn-success" type="submit") Appliquer les modifications
+
+            
+            
+            
+              
                 
                 //- ul(class="col-5 ms-4") 
                 //-     li Moyenne : #[strong #{stats.mean}] pts
@@ -40,20 +69,21 @@ div(class="container page")
             each copy in copies 
                 
                 if copy.status == "not_submitted"
-                    tr(class="text-muted" style="cursor: not-allowed;" )
-                        if copy.user.fullName == ""
-                            td(class="text-danger") -- Spécifier l'étudiant --
-                                button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
-                                    i(class="fa fa-question-circle" style="font-size:24px;color:red")
-                            td(class="text-danger")
-                        else
-                            td= copy.user.fullName
-                            td= copy.user.matricule
-                        
-                        td 
-                            center Copie non soumise
-                        td  -
-                
+                    if !session.preferences.maskNotSubmitted
+                        tr(class="text-muted" style="cursor: not-allowed;" )
+                            if copy.user.fullName == ""
+                                td(class="text-danger") -- Spécifier l'étudiant --
+                                    button(type="button" class='btn' data-toggle="tooltip" data-placement="bottom" title="Le nom de l'étudiant doit être spécifié car il s'agit d'une copie supplémentaire; l'étudiant n'était pas présent dans le fichier Excel de départ.\n Pour cela cliquer sur la ligne de l'étudiant et remplissez les informations sur la prochaine page")
+                                        i(class="fa fa-question-circle" style="font-size:24px;color:red")
+                                td(class="text-danger")
+                            else
+                                td= copy.user.fullName
+                                td= copy.user.matricule
+                            
+                            td 
+                                center Copie non soumise
+                            td  -
+                    
                 else
                     - var answers = JSON.parse(copy.answers)
 
@@ -72,11 +102,11 @@ div(class="container page")
                                     strong(class="text-danger") ERREUR : Incertitude
                                 else if copy.status == "errorVersion"
                                     strong(class="text-danger") ERREUR : Spécifier la version
-                                else if copy.status == "abs"
+                                else if copy.status == "abs" && !session.preferences.maskAbs
                                     strong(class="text-warning") ATTENTION : Case non cochée
-                                else if copy.status == "double"
+                                else if copy.status == "double" && !session.preferences.maskDouble
                                     strong(class="text-warning") ATTENTION : Deux cases cochées
-                                else if copy.status == "double_and_abs"
+                                else if copy.status == "double_and_abs" && (!session.preferences.maskAbs || !session.preferences.maskDouble)
                                     strong(class="text-warning") ATTENTION: Case non cochée et deux cases cochées
                                 else if copy.status == "verified"
                                     strong(class="text-success") VERIFIEE (par un utilisateur)
