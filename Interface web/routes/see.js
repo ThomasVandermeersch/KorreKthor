@@ -123,6 +123,8 @@ router.post("/userPreferences/:redirection", access.hasAccess, (req,res)=>{
     req.session.preferences.maskAbs = "maskAbs" in req.body ? true : false 
     req.session.preferences.maskDouble = "maskDouble" in req.body ? true : false 
     req.session.preferences.maskNotSubmitted = "maskNotSubmitted" in req.body ? true : false 
+    req.session.preferences.maskOkAndVerified = "maskOkAndVerified" in req.body ? true : false
+
 
     res.redirect("/see/copies/" + req.params.redirection)
 })

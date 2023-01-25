@@ -29,8 +29,14 @@ div(class="container page")
                             input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_3" type="checkbox" checked name="maskNotSubmitted" value="yes" ) 
                         else   
                             input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_3" type="checkbox" name="maskNotSubmitted" value="yes" ) 
-    
                         label(for="checkbox_3") Masquer les copies non soumises
+                        p
+
+                        if session.preferences.maskOkAndVerified
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_4" type="checkbox" checked name="maskOkAndVerified" value="yes" ) 
+                        else   
+                            input(class="form-check-input checkboxClass p-2 m-1" id="checkbox_4" type="checkbox" name="maskOkAndVerified" value="yes" ) 
+                        label(for="checkbox_4") Masquer les copies vérifiées et sans erreur
                             
                     
 
@@ -83,7 +89,9 @@ div(class="container page")
                             td 
                                 center Copie non soumise
                             td  -
-                    
+                
+                else if (copy.status == "verified" || copy.status == "ok") && session.preferences.maskOkAndVerified
+
                 else
                     - var answers = JSON.parse(copy.answers)
 
