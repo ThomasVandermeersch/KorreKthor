@@ -11,16 +11,6 @@ const env = process.env.NODE_ENV || 'development';
 const config = require('./node_scripts/database/config/config')[env]
 const access = require('./node_scripts/hasAccess')
 
-var credentials = {
-  key: fs.readFileSync("certificates/fluke_ecam.key"),
-  cert: fs.readFileSync("certificates/fluke_ecam.cer")
-}
-
-// var credentials = {
-//   key: fs.readFileSync("certificates/key.pem"),
-//   cert: fs.readFileSync("certificates/cert.pem")
-// }
-
 //Configuration de msal
 const msalConfig = {
     auth: {
@@ -89,12 +79,7 @@ app.get("*", access.hasAccess, function (req, res) {
   res.render("index/error");   
 });
 
-
-// Application https port 9898
-const httpsServer = https.createServer(credentials, app)
-
-httpsServer.listen(9898)
-//app.listen(8282)
+app.listen(9898)
 
 console.log("-------------------------------------")
 console.log("| RUNNING KorrKthor on: " + env + " |")
